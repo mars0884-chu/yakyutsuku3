@@ -1,5 +1,5 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='2026.10.06-r6';
+const APP_VERSION='2026.10.07-r1';
 const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,batchSort:'screen',batchSortDir:'asc'};
 const HEADER_ZH={"名前":"姓名","年齢":"年齡","成長":"成長型","投/打":"投／打","出身":"出身地","高校":"高中","大学":"大學","社会人":"社會人","タイプ":"投手類型","ランク":"Rank","体力":"體力","球速":"球速","球威":"球威","制球":"控球","精神":"精神","守備":"守備","捕球":"接球","肩力":"臂力","送球":"傳球","スライダー":"滑球","速スラ":"高速滑球","カットB":"卡特球","カーブ":"曲球","Sカーブ":"S曲球","ドロップ":"Drop曲球","シュート":"噴射球","速シュート":"高速噴射球","シンカー":"伸卡球","スクリュー":"螺旋球","速シンカー":"高速伸卡球","サークルC":"圈指變速","2シーム":"二縫線","Cアップ":"變速球","フォーク":"指叉球","SFF":"快速指叉","縦スラ":"縱滑球","パーム":"掌心球","ナックル":"蝴蝶球","スキル1":"技能1","スキル2":"技能2","スキル3":"技能3","モデル":"原型","右巧":"對右巧打","左巧":"對左巧打","長打":"長打","バント":"短打","選球眼":"選球眼","走力":"跑力","走塁":"跑壘","リード":"配球","捕手":"捕手","一塁":"一壘","二塁":"二壘","三塁":"三壘","遊撃":"游擊","外野":"外野","リーグ":"聯盟／地區","アカデミー":"學院"};
 const BASE_COLS=['名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
@@ -46,7 +46,7 @@ const GUIDE_CATEGORIES=[
   {id:'deep',title:'深入／考古',chapters:['new_20261005','lastdig_20261005','history_20261005','sources','research']}
 ];
 function guideSectionHTML(sec){
-  const title=esc(sec.title||''),note=sec.note?`<div class="guide-note">${esc(sec.note)}</div>`:'',source=sec.source?`<div class="meta"><a href="${esc(sec.source)}" target="_blank" rel="noreferrer">來源</a></div>`:'';
+  const title=esc(sec.title||''),note=sec.note?`<div class="guide-note">${esc(sec.note)}</div>`:'',source=sec.source?`<details class="guide-source"><summary>資料來源</summary><a href="${esc(sec.source)}" target="_blank" rel="noreferrer">開啟原文</a></details>`:'';
   let body='';
   if(sec.type==='table'){body=`<div class="guide-table-wrap"><table class="guide-table"><thead><tr>${(sec.headers||[]).map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${(sec.rows||[]).map(row=>`<tr>${(row||[]).map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
   else if(sec.type==='facts'){body=`<div class="guide-facts">${(sec.rows||[]).map(r=>`<div class="guide-fact"><b>${esc(r?.[0]||'')}</b><span>${esc(r?.[1]||'')}</span></div>`).join('')}</div>`}
@@ -66,8 +66,12 @@ function renderGuides(){
   const q=norm($('#guideQuery').value),root=$('#guideResults'),book=visibleGuideBook();
   if(q){const hits=[];for(const ch of book){const sections=(ch.sections||[]).filter(sec=>norm(JSON.stringify(sec)).includes(q));if(norm(`${ch.title} ${ch.summary||''}`).includes(q)||sections.length)hits.push({...ch,sections:sections.length?sections:(ch.sections||[])})}root.innerHTML=hits.map(guideChapterDetail).join('')||'<div class="card">沒有符合的攻略。</div>';return}
   if(state.guideTopic.startsWith('chapter:')){const id=state.guideTopic.slice(8),ch=book.find(x=>x.id===id);if(ch){root.innerHTML=guideChapterDetail(ch);return}state.guideTopic='all'}
-  const cat=GUIDE_CATEGORIES.find(c=>c.id===state.guideTopic)||GUIDE_CATEGORIES[0],list=cat.id==='all'?book:cat.chapters.map(id=>book.find(x=>x.id===id)).filter(Boolean);
-  root.innerHTML=list.map(guideChapterCard).join('')||'<div class="card">這個分類目前沒有內容。</div>';
+  const cat=GUIDE_CATEGORIES.find(c=>c.id===state.guideTopic)||GUIDE_CATEGORIES[0];
+  if(cat.id==='all'){
+    root.innerHTML=GUIDE_CATEGORIES.slice(1).map(c=>{const list=c.chapters.map(id=>book.find(x=>x.id===id)).filter(Boolean);return list.length?`<section class="guide-index-group"><h2>${esc(c.title)}</h2><div class="guide-index-grid">${list.map(guideChapterCard).join('')}</div></section>`:''}).join('')||'<div class="card">目前沒有攻略內容。</div>';
+  }else{
+    const list=cat.chapters.map(id=>book.find(x=>x.id===id)).filter(Boolean);root.innerHTML=list.map(guideChapterCard).join('')||'<div class="card">這個分類目前沒有內容。</div>';
+  }
   root.querySelectorAll('[data-guide-id]').forEach(btn=>btn.onclick=()=>{state.guideTopic='chapter:'+btn.dataset.guideId;renderGuideTopics();renderGuides();window.scrollTo({top:0,behavior:'smooth'})})
 }
 $('#guideQuery').addEventListener('input',debounce(renderGuides));
@@ -79,7 +83,7 @@ $('#cheatQuery').addEventListener('input',debounce(renderCheats));$('#clearCheat
 function renderSources(){$('#sourceList').innerHTML=state.sources.map(s=>`<article class="card"><h3><a href="${esc(s.url)}" target="_blank" rel="noreferrer">${esc(s.name)}</a></h3><div class="source-role">${esc(s.role)}</div><div class="source-note">${esc(s.note)}</div><div class="meta">狀態：${esc(s.status)}｜優先級 ${esc(s.priority)}</div></article>`).join('')}
 $('#refreshData').onclick=async()=>{const b=$('#refreshData');b.disabled=true;$('#dataStatus').textContent='更新完整名冊…';try{await loadData(true)}catch(e){$('#dataStatus').textContent='名冊更新失敗：'+e.message}finally{b.disabled=false}};
 
-// --- 批次截圖找人：固定版面分列 → 本機同源 OCR → 3,767 人封閉候選 → 依選手 ID 去重。---
+// --- 批次截圖找人：固定版面分列 → 本機 OCR 獨立讀字 → 再與完整球員資料庫比對；不使用特定截圖／特定姓名校準表。---
 $('#batchFiles').onchange=e=>{state.batchFiles=[...e.target.files];state.batchRows=[];state.batchRawRows=[];state.expectedTotal=0;renderBatchPreview();renderBatchResults();$('#batchStatus').textContent=`已選 ${state.batchFiles.length} 張。`};
 $('#clearBatch').onclick=()=>{state.batchFiles=[];state.batchRows=[];state.batchRawRows=[];state.expectedTotal=0;$('#batchFiles').value='';renderBatchPreview();renderBatchResults();$('#batchStatus').textContent='可一次選多張 OFFICE MENU 名單截圖。'};
 function renderBatchPreview(){$('#batchPreview').innerHTML='';for(const f of state.batchFiles){const u=URL.createObjectURL(f),d=document.createElement('div');d.className='thumb';d.innerHTML=`<img src="${u}"><small>${esc(f.name)}</small>`;d.querySelector('img').onload=()=>setTimeout(()=>URL.revokeObjectURL(u),1000);$('#batchPreview').appendChild(d)}}
@@ -99,7 +103,7 @@ function splitPlayerName(v){const a=String(v||'').trim().split(/\s+/).filter(Boo
 function detectNameSeparator(canvas){const g=canvas.getContext('2d',{willReadFrequently:true}),id=g.getImageData(0,0,canvas.width,canvas.height).data,x0=Math.floor(canvas.width*.18),x1=Math.floor(canvas.width*.44),y0=Math.floor(canvas.height*.16),y1=Math.floor(canvas.height*.84),occ=[];for(let x=x0;x<x1;x++){let n=0;for(let y=y0;y<y1;y++){const i=(y*canvas.width+x)*4,l=id[i]*.299+id[i+1]*.587+id[i+2]*.114;if(l>178)n++}occ.push(n/Math.max(1,y1-y0))}let best=null,st=-1;for(let i=0;i<=occ.length;i++){const ok=i<occ.length&&occ[i]>.46;if(ok&&st<0)st=i;if((!ok||i===occ.length)&&st>=0){const en=i,w=en-st;if(w>=4&&(!best||w>best.w))best={a:x0+st,b:x0+en,w};st=-1}}return best?{left:best.a/canvas.width,right:best.b/canvas.width}:{left:.285,right:.325}}
 function batchUserWords(){if(state._batchUserWords)return state._batchUserWords;const out=new Set();for(const p of state.players){const n=String(p['名前']||'');const q=splitPlayerName(n);if(q.surname)out.add(q.surname);if(q.given)out.add(q.given);if(q.surname&&q.given)out.add(q.surname+q.given)}state._batchUserWords=[...out].join('\n');return state._batchUserWords}
 function batchKanjiWhitelist(){if(state._batchKanjiWhitelist)return state._batchKanjiWhitelist;const chars=new Set();for(const p of state.players)for(const ch of String(p['名前']||''))if(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}々ヶヵー・]/u.test(ch))chars.add(ch);state._batchKanjiWhitelist=[...chars].join('');return state._batchKanjiWhitelist}
-async function recognizeFixedParts(worker,canvas,threshold=125){const sep=detectNameSeparator(canvas),wl=batchKanjiWhitelist();try{await worker.setParameters({tessedit_pageseg_mode:'8',tessedit_char_whitelist:wl,user_words_file:'yt3-user-words.txt'})}catch(e){}const a=await recognizeText(worker,binaryRegion(canvas,.115,Math.max(.18,sep.left-.008),threshold,6)),b=await recognizeText(worker,binaryRegion(canvas,Math.min(.50,sep.right+.008),.575,threshold,6));try{await worker.setParameters({tessedit_pageseg_mode:'10',tessedit_char_whitelist:'投捕一二三遊外'})}catch(e){}const ps=await recognizeText(worker,binaryRegion(canvas,.012,.105,threshold,5));try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'0123456789歳才'})}catch(e){}const ag=await recognizeText(worker,binaryRegion(canvas,.60,.75,threshold,4));try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'右左両/／'})}catch(e){}const hd=await recognizeText(worker,binaryRegion(canvas,.78,.985,threshold,4));try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:''})}catch(e){}const age=(cleanOCR(ag.text).match(/(18|19|20|21|22|23|24)/)||[])[1]||'',ht=cleanOCR(hd.text).replace(/石/g,'右').replace(/布/g,'右').replace(/[|｜]/g,'/'),hm=ht.match(/([右左])\s*[\/／]\s*([右左両])/),pos=(cleanOCR(ps.text).match(/[投捕一二三遊外]/)||[])[0]||'';return{surname:ocrNamePart(a.text),given:ocrNamePart(b.text),age,hand:hm?`${hm[1]}/${hm[2]}`:'',pos,confidence:Math.round((a.confidence+b.confidence+ps.confidence+ag.confidence+hd.confidence)/5),raw:`${ps.text}｜${a.text}｜□｜${b.text}｜${ag.text}｜${hd.text}`,separator:sep}}
+async function recognizeFixedParts(worker,canvas,threshold=125){const sep=detectNameSeparator(canvas);try{await worker.setParameters({tessedit_pageseg_mode:'8',tessedit_char_whitelist:''})}catch(e){}const a=await recognizeText(worker,binaryRegion(canvas,.115,Math.max(.18,sep.left-.008),threshold,6)),b=await recognizeText(worker,binaryRegion(canvas,Math.min(.50,sep.right+.008),.575,threshold,6));try{await worker.setParameters({tessedit_pageseg_mode:'10',tessedit_char_whitelist:'投捕一二三遊外'})}catch(e){}const ps=await recognizeText(worker,binaryRegion(canvas,.012,.105,threshold,5));try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'0123456789歳才'})}catch(e){}const ag=await recognizeText(worker,binaryRegion(canvas,.60,.75,threshold,4));try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'右左両/／'})}catch(e){}const hd=await recognizeText(worker,binaryRegion(canvas,.78,.985,threshold,4));try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:''})}catch(e){}const age=(cleanOCR(ag.text).match(/(18|19|20|21|22|23|24)/)||[])[1]||'',ht=cleanOCR(hd.text).replace(/石/g,'右').replace(/布/g,'右').replace(/[|｜]/g,'/'),hm=ht.match(/([右左])\s*[\/／]\s*([右左両])/),pos=(cleanOCR(ps.text).match(/[投捕一二三遊外]/)||[])[0]||'';return{surname:ocrNamePart(a.text),given:ocrNamePart(b.text),age,hand:hm?`${hm[1]}/${hm[2]}`:'',pos,confidence:Math.round((a.confidence+b.confidence+ps.confidence+ag.confidence+hd.confidence)/5),raw:`${ps.text}｜${a.text}｜□｜${b.text}｜${ag.text}｜${hd.text}`,separator:sep}}
 function dhash(canvas){const c=document.createElement('canvas');c.width=17;c.height=8;const g=c.getContext('2d',{willReadFrequently:true});g.filter='grayscale(1) contrast(1.7)';g.drawImage(canvas,0,0,17,8);const d=g.getImageData(0,0,17,8).data,bits=[];for(let y=0;y<8;y++)for(let x=0;x<16;x++){const a=d[(y*17+x)*4],b=d[(y*17+x+1)*4];bits.push(a>b?1:0)}return bits}
 function ham(a,b){let n=0;for(let i=0;i<a.length;i++)if(a[i]!==b[i])n++;return n}
 async function ensureLocalOCR(){if(window.Tesseract){state.ocrReady=true;return true}return new Promise(resolve=>{const old=document.querySelector('script[data-yt3-ocr]');if(old)old.remove();const s=document.createElement('script');s.dataset.yt3Ocr='1';s.src='./vendor/tesseract/tesseract.min.js';s.onload=()=>{state.ocrReady=!!window.Tesseract;resolve(state.ocrReady)};s.onerror=()=>resolve(false);document.head.appendChild(s)})}
@@ -191,9 +195,9 @@ function candidateMatch(parsed){const names=parsed.names?.length?parsed.names:[p
 function parseExpectedTotal(text){const t=cleanOCR(text);let m=t.match(/(?:合計|含計|会計|馬軒)[^0-9]{0,8}(\d{2,3})\s*人/);if(m)return +m[1];const nums=[...t.matchAll(/(\d{2,3})\s*人/g)].map(x=>+x[1]).filter(n=>n>=20&&n<=200);return nums.length?Math.max(...nums):0}
 function mergeEvidence(a,b){const pa=a.parsed||{},pb=b.parsed||{},parsed={...pa,names:[...new Set([...(pa.names||[]),...(pb.names||[])].filter(Boolean))],surnames:[...new Set([pa.surname,...(pa.surnames||[]),pb.surname,...(pb.surnames||[])].filter(Boolean))],givens:[...new Set([pa.given,...(pa.givens||[]),pb.given,...(pb.givens||[])].filter(Boolean))]};if(!parsed.age)parsed.age=pb.age;if(!parsed.hand)parsed.hand=pb.hand;if(!parsed.pos)parsed.pos=pb.pos;const cm=candidateMatch(parsed),keep=(b.ocrConfidence||0)>(a.ocrConfidence||0)?b:a;return{...keep,parsed,raw:[a.raw,b.raw].filter(Boolean).join(' || '),ocrConfidence:Math.max(a.ocrConfidence||0,b.ocrConfidence||0),match:cm.match,candidates:cm.candidates,score:cm.match?.score||cm.candidates?.[0]?.score||0,firstIndex:Math.min(a.firstIndex??9999,b.firstIndex??9999),sources:[...(a.sources||[`${a.file}#${a.row}`]),...(b.sources||[`${b.file}#${b.row}`])]}}
 function consolidateRows(raw,expected=0){const clusters=[];for(const r0 of raw){const r={...r0},h=r.hash||dhash(binaryRegion(r.canvas,.105,.585,126,2));r.hash=h;let idx=-1,best=999;for(let i=0;i<clusters.length;i++){const d=ham(h,clusters[i].hash);if(d<best&&d<=7){best=d;idx=i}}if(idx>=0)clusters[idx]=mergeEvidence(clusters[idx],r);else clusters.push({...r,sources:[`${r.file}#${r.row}`]})}clusters.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));let out=clusters;if(expected&&out.length>expected)out=[...out].sort((a,b)=>(b.match?.score||b.candidates?.[0]?.score||0)-(a.match?.score||a.candidates?.[0]?.score||0)).slice(0,expected).sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));return out}
-function resolveUniqueCandidates(rows){for(const r of rows)r.resolved=null;const used=new Set(rows.filter(r=>r.match?.p?._uid).map(r=>r.match.p._uid)),pending=rows.filter(r=>!r.match);for(let guard=0;guard<rows.length;guard++){let pick=null;for(const r of pending){if(r.resolved)continue;const av=(r.candidates||[]).filter(x=>!used.has(x.p._uid));if(!av.length)continue;const a=av[0],b=av[1],gap=a.score-(b?.score||0),quality=a.score+gap*.45+a.meta*.015;if(a.score<.49)continue;if(!pick||quality>pick.quality)pick={r,a,gap,quality}}if(!pick)break;pick.r.resolved=pick.a;pick.r.status=pick.r.status==='確認'?'確認':'推定';used.add(pick.a.p._uid)}return rows}
+function resolveUniqueCandidates(rows){for(const r of rows)r.resolved=null;const used=new Set(rows.filter(r=>r.match?.p?._uid).map(r=>r.match.p._uid)),pending=rows.filter(r=>!r.match);for(let guard=0;guard<rows.length;guard++){let pick=null;for(const r of pending){if(r.resolved)continue;const av=(r.candidates||[]).filter(x=>!used.has(x.p._uid));if(!av.length)continue;const a=av[0],b=av[1],gap=a.score-(b?.score||0),quality=a.score+gap*.45+a.meta*.015;const safe=(a.score>=.72&&gap>=.035)||(a.score>=.67&&a.meta>=1&&gap>=.04)||(a.score>=.64&&a.meta>=2&&gap>=.045);if(!safe)continue;if(!pick||quality>pick.quality)pick={r,a,gap,quality}}if(!pick)break;pick.r.resolved=pick.a;pick.r.status='推定';used.add(pick.a.p._uid)}return rows}
 function dedupeRecognizedRows(rows,expected=0){const seen=new Map(),rest=[];for(const r of rows){const p=r.match?.p||r.resolved?.p;if(p?._uid){const old=seen.get(p._uid),quality=(r.match?.score||r.resolved?.score||r.score||0)+(r.ocrConfidence||0)/5000;if(!old||quality>old.quality)seen.set(p._uid,{row:r,quality})}else rest.push(r)}let out=[...seen.values()].map(x=>x.row).concat(rest);out.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));if(expected&&out.length>expected)out=out.slice(0,expected);return out}
-function batchDisplayPlayer(r){return r.match?.p||r.resolved?.p||r.candidates?.[0]?.p||null}
+function batchDisplayPlayer(r){return r.match?.p||r.resolved?.p||null}
 const GRADE_SCORE={'SS':15,'S+':14,'S':13,'A+':12,'A':11,'B+':10,'B':9,'C+':8,'C':7,'D+':6,'D':5,'E+':4,'E':3,'F':2,'G':1};
 function gradeScore(v){const t=String(v??'').trim().toUpperCase();if(t in GRADE_SCORE)return GRADE_SCORE[t];const n=parseFloat(t);return Number.isFinite(n)?n:-999}
 function abilitySortTuple(p,key){if(!p)return[-999,-999];const raw=String(p[key]??'').trim();if(!raw||raw==='—'||raw==='–')return[-999,-999];const parts=raw.split(/[\/／]/).map(x=>x.trim()).filter(Boolean);if(key==='球速'){const nums=parts.map(x=>parseFloat(x)).filter(Number.isFinite);return[nums.length?nums[nums.length-1]:-999,nums.length?nums[0]:-999]}return[gradeScore(parts.length>1?parts[parts.length-1]:parts[0]),gradeScore(parts[0])]}
@@ -206,7 +210,7 @@ const BATCH_PITCH=[...BATCH_COMMON,'タイプ','体力','球速','球威','制�
 const BATCH_BAT=[...BATCH_COMMON,'体力','右巧','左巧','長打','バント','選球眼','走力','走塁','精神','守備','捕球','肩力','送球','リード','捕手','一塁','二塁','三塁','遊撃','外野','スキル1','スキル2','スキル3','モデル'];
 function batchHeaderLabel(k){return k==='_screen'?'#':k==='_status'?'狀態':k==='_position'?'守位':(HEADER_ZH[k]||k)}
 function batchSortArrow(k){return state.batchSort===k?(state.batchSortDir==='asc'?' ↑':' ↓'):''}
-function batchCell(r,p,k,displayIndex){if(k==='_screen')return String(displayIndex+1);if(k==='_status')return r.match?'確認':r.resolved?'推定':'候選';if(k==='_position')return esc(p?._position||POSMAP[r.parsed?.pos]||'—');if(k==='名前'){const alts=(r.candidates||[]).filter(x=>x.p._uid!==p?._uid).slice(0,2),alt=alts.length?`<small class="candidate-note">候選：${alts.map(x=>esc(x.p['名前'])).join(' / ')}</small>`:'';return p?`<span class="name-link" data-uid="${esc(p._uid)}">${esc(p['名前'])}</span>${alt}`:'—'}return esc(p?.[k]||'—')}
+function batchCell(r,p,k,displayIndex){if(k==='_screen')return String(displayIndex+1);if(k==='_status')return r.match?'確認':r.resolved?'推定':'候選';if(k==='_position')return esc(p?._position||POSMAP[r.parsed?.pos]||'—');if(k==='名前'){if(!p){const c=(r.candidates||[]).slice(0,3);return c.length?`<span class="candidate-only">候選：${c.map(x=>esc(x.p['名前'])).join(' / ')}</span>`:'未辨識'}const alts=(r.candidates||[]).filter(x=>x.p._uid!==p._uid).slice(0,2),alt=alts.length?`<small class="candidate-note">次選：${alts.map(x=>esc(x.p['名前'])).join(' / ')}</small>`:'';return `<span class="name-link" data-uid="${esc(p._uid)}">${esc(p['名前'])}</span>${alt}`}return esc(p?.[k]||'—')}
 function renderBatchGroup(title,rows,cols){const sorted=sortBatchRows(rows),sortable=new Set(['screen','name','rank','年齢','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野']);let h=`<section class="batch-group"><h3>${esc(title)} <small>${rows.length}</small></h3><div class="table-shell"><table class="data-table batch-detail-table"><thead><tr>`;for(const k of cols){const sk=k==='_screen'?'screen':k==='名前'?'name':k==='ランク'?'rank':k;h+=sortable.has(sk)?`<th class="sortable" data-sort="${esc(sk)}">${esc(batchHeaderLabel(k))}${batchSortArrow(sk)}</th>`:`<th>${esc(batchHeaderLabel(k))}</th>`}h+='</tr></thead><tbody>';sorted.forEach((r,i)=>{const p=batchDisplayPlayer(r);h+='<tr>'+cols.map(k=>`<td class="${k==='名前'?'name':''} ${k==='_status'?(r.match?'good':r.resolved?'estimate':'unresolved'):''}">${batchCell(r,p,k,i)}</td>`).join('')+'</tr>'});h+='</tbody></table></div></section>';return h}
 async function recognizeText(worker,canvas){const r=await worker.recognize(canvas);return{text:cleanOCR(r?.data?.text||''),confidence:Number(r?.data?.confidence||0)}}
 async function runBatch(){
@@ -234,7 +238,7 @@ async function runBatch(){
         const ok=await ensureLocalOCR();
         if(ok){
           try{worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),35000,'Tesseract 複核載入逾時');
-            try{await worker.writeText('yt3-user-words.txt',batchUserWords());await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1',user_words_file:'yt3-user-words.txt'})}catch{}
+            try{await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1',tessedit_char_whitelist:''})}catch{}
             for(let i=0;i<uncertain.length;i++){const row=uncertain[i];setBatchProgress(70+22*(i/Math.max(1,uncertain.length)),`Tesseract 複核 ${i+1}/${uncertain.length}`);
               try{const np=await recognizeFixedParts(worker,row.canvas,125),tp={name:`${np.surname} ${np.given}`.trim(),names:[`${np.surname} ${np.given}`.trim()].filter(Boolean),surname:np.surname,given:np.given,surnames:[np.surname].filter(Boolean),givens:[np.given].filter(Boolean),age:np.age,hand:np.hand,pos:np.pos,text:np.raw},parsed=mergeParsedNameEvidence(row.parsed,tp),cm=candidateMatch(parsed),vis=visualCandidateMatch(row.canvas,parsed);let chosen=cm;if(vis?.match&&(!cm.match||vis.match.score>(cm.match?.score||cm.candidates?.[0]?.score||0)+.03))chosen=vis;row.parsed=parsed;row.raw+=`｜T:${np.raw}`;row.ocrConfidence=Math.max(row.ocrConfidence,np.confidence);row.match=chosen?.match||row.match;row.candidates=chosen?.candidates?.length?chosen.candidates:row.candidates;row.score=row.match?.score||row.candidates?.[0]?.score||row.score;row.status=row.match?'確認':'候選'}catch(e){row.raw+=`｜TERR:${e.message||e}`}
             }
@@ -245,7 +249,7 @@ async function runBatch(){
       setBatchProgress(8,`PaddleOCR 無法啟動，切換 Tesseract 備援：${paddleError?.message||''}`);
       const ok=await ensureLocalOCR();if(!ok)throw new Error('兩個本機辨識引擎都無法載入');
       worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),35000,'Tesseract 備援載入逾時');
-      try{await worker.writeText('yt3-user-words.txt',batchUserWords());await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1',user_words_file:'yt3-user-words.txt'})}catch{}
+      try{await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1',tessedit_char_whitelist:''})}catch{}
       for(let i=0;i<state.batchRawRows.length;i++){const row=state.batchRawRows[i];setBatchProgress(10+82*(i/Math.max(1,state.batchRawRows.length)),`Tesseract 備援 ${i+1}/${state.batchRawRows.length}`);
         try{const np=await recognizeFixedParts(worker,row.canvas,125),parsed={name:`${np.surname} ${np.given}`.trim(),names:[`${np.surname} ${np.given}`.trim()].filter(Boolean),surname:np.surname,given:np.given,surnames:[np.surname].filter(Boolean),givens:[np.given].filter(Boolean),age:np.age,hand:np.hand,pos:np.pos,text:np.raw},cm=candidateMatch(parsed);row.raw='T:'+np.raw;row.ocrConfidence=np.confidence;row.parsed=parsed;row.match=cm.match;row.candidates=cm.candidates;row.score=cm.match?.score||cm.candidates?.[0]?.score||0;row.status=row.match?'確認':'候選'}catch(e){row.status='失敗';row.raw=String(e.message||e)}
       }
@@ -281,20 +285,36 @@ async function checkAppUpdate(manual=false){
   if(manual){showUpdateBar(`已是最新版 ${APP_VERSION}`,100,false);setTimeout(hideUpdateBar,1200)}
   return false
 }
+async function waitForSWState(sw,target='installed',ms=12000){if(!sw||sw.state===target)return;await withTimeout(new Promise(resolve=>sw.addEventListener('statechange',()=>{if(sw.state===target||sw.state==='activated'||sw.state==='redundant')resolve()},{once:false})),ms,'Service Worker 更新逾時')}
 async function applyAppUpdate(){
   try{
-    showUpdateBar('更新程式與離線快取…',18,false);
-    if('serviceWorker'in navigator){const regs=await navigator.serviceWorker.getRegistrations();for(const reg of regs)try{await reg.update()}catch{}}
-    $('#updateProgress').value=45;
-    const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('yt3-')).map(k=>caches.delete(k)));
-    $('#updateProgress').value=72;
-    await fetch(`./index.html?t=${Date.now()}`,{cache:'reload'});await fetch(`./app.js?t=${Date.now()}`,{cache:'reload'});
-    $('#updateProgress').value=100;$('#updateText').textContent='更新完成，重新載入…';
-    setTimeout(()=>location.replace(`./?updated=${Date.now()}`),350);
+    showUpdateBar('取得最新版…',15,false);
+    let changed=false;
+    if('serviceWorker'in navigator){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      for(const reg of regs){
+        try{
+          await reg.update();$('#updateProgress').value=45;
+          if(reg.installing)await waitForSWState(reg.installing);
+          const waiting=reg.waiting;if(waiting){changed=true;waiting.postMessage({type:'SKIP_WAITING'})}
+        }catch(e){console.warn('sw update',e)}
+      }
+    }
+    $('#updateProgress').value=70;
+    await Promise.all([
+      fetch(`./VERSION?t=${Date.now()}`,{cache:'no-store'}),
+      fetch(`./index.html?t=${Date.now()}`,{cache:'no-store'}),
+      fetch(`./app.js?t=${Date.now()}`,{cache:'no-store'})
+    ]);
+    $('#updateProgress').value=92;$('#updateText').textContent='套用新版…';
+    if(changed&&'serviceWorker'in navigator){
+      await Promise.race([new Promise(resolve=>navigator.serviceWorker.addEventListener('controllerchange',resolve,{once:true})),new Promise(resolve=>setTimeout(resolve,1800))]);
+    }
+    $('#updateProgress').value=100;location.replace(`./?updated=${Date.now()}`);
   }catch(e){showUpdateBar('更新失敗：'+(e.message||e),0,true)}
 }
 $('#updateBtn').onclick=()=>checkAppUpdate(true);$('#applyUpdate').onclick=applyAppUpdate;
-window.addEventListener('load',()=>{setTimeout(()=>checkAppUpdate(false),900);setInterval(()=>checkAppUpdate(false),15*60*1000)});
+window.addEventListener('load',()=>{setTimeout(()=>checkAppUpdate(false),700);setInterval(()=>checkAppUpdate(false),10*60*1000)});
 
-if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+if('serviceWorker'in navigator)window.addEventListener('load',async()=>{try{const reg=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});await reg.update()}catch(e){console.warn('service worker',e)}});
 loadData().catch(e=>{$('#dataStatus').textContent='資料載入失敗：'+e.message;console.error(e)});
