@@ -110,5 +110,37 @@
     "status": "partial",
     "priority": 4,
     "note": "部分舊內容／索引可追，完整性不穩定。"
+  },
+  {
+    "name": "巴哈姆特「模擬職棒」哈啦板",
+    "url": "https://forum.gamer.com.tw/listG.php?bsn=6035",
+    "role": "台灣舊社群：PS2 三代攻略／OB／金手指／實機回報",
+    "status": "active_individual_pages",
+    "priority": 2,
+    "note": "板內混有多代；目前已只收可明確判定為 PS2《模擬職棒3》的頁面。個別文章可公開檢索，板列表本身不保證能完整自動展開。"
+  },
+  {
+    "name": "skillove Ameba：やきゅつく3 検証攻略",
+    "url": "https://ameblo.jp/skillove/",
+    "role": "長期實測／技能傳承／球員成績",
+    "status": "active",
+    "priority": 2,
+    "note": "多年實測型資料，適合補技能傳承與長期表現；不當作官方公式。"
+  },
+  {
+    "name": "mixi やきゅつく3 歷史討論",
+    "url": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=1578351",
+    "role": "2005 舊社群技能／留學討論",
+    "status": "search_indexed_partial",
+    "priority": 4,
+    "note": "搜尋索引仍可看到部分歷史片段，完整閱讀可能受登入限制。"
+  },
+  {
+    "name": "うんこちゃんのやきゅつく3 @ wiki",
+    "url": "https://w.atwiki.jp/untsuku3/",
+    "role": "長期遊玩／年度記錄",
+    "status": "active",
+    "priority": 4,
+    "note": "以實況球隊歷史為主，對核心公式價值較低，列為旁證。"
   }
 ]
