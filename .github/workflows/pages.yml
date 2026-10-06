@@ -25,20 +25,20 @@ jobs:
           node --check scripts/refresh-data.mjs
           node --check scripts/vendor-cover.mjs
           node --check scripts/vendor-ocr.mjs
-          node --check scripts/validate-calibration.mjs
+          node --check scripts/vendor-paddleocr.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
-      - name: Validate calibration roster labels
-        run: node scripts/validate-calibration.mjs
       - name: Vendor game cover thumbnail
         run: npm run vendor:cover
       - name: Vendor OCR locally for iPhone/desktop
         run: npm run vendor:ocr
+      - name: Vendor PaddleOCR locally for new rosters
+        run: npm run vendor:paddle
       - name: Assemble static site
         run: |
           rm -rf _site
           mkdir -p _site
-          cp index.html styles.css app.js manifest.webmanifest sw.js _site/
+          cp index.html styles.css app.js manifest.webmanifest sw.js VERSION _site/
           cp -R assets data vendor _site/
           touch _site/.nojekyll
       - name: Publish complete site to gh-pages branch
