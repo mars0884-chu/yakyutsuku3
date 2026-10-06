@@ -24,7 +24,7 @@ async function loadData(forceRoster=false){
     getJSON('./data/guides.json'),getJSON('./data/guide-book.json'),getJSON('./data/cheats.json'),getJSON('./data/sources.json'),
     getJSON('./data/calibration.json').catch(()=>({entries:[]}))
   ]);
-  $('#dataStatus').textContent=`名冊 ${state.players.length.toLocaleString()} 人｜${state.rosterSource}｜攻略 ${state.guides.length.toLocaleString()} 筆`;
+  const guideCount=state.book.reduce((n,ch)=>n+(Number(ch.count)||0),0);$('#dataStatus').textContent=`名冊 ${state.players.length.toLocaleString()} 人｜${state.rosterSource}｜攻略 ${state.book.length} 章／${guideCount.toLocaleString()} 項`;
   renderPlayers();renderGuideTopics();renderGuides();renderCheats();renderSources();
 }
 function switchView(id){$$('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${id}`));$$('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.view===id));if(id==='players')renderPlayers();if(id==='guides')renderGuides();if(id==='cheats')renderCheats()}
@@ -60,7 +60,7 @@ function renderGuides(){
 }
 $('#guideQuery').addEventListener('input',debounce(renderGuides));
 $('#clearGuide').onclick=()=>{$('#guideQuery').value='';state.guideTopic='all';renderGuideTopics();renderGuides()};
-function flattenCheats(){const out=[];for(const ch of state.cheats){for(const sec of ch.sections||[]){if(sec.type==='table'){for(const row of sec.rows||[])out.push({chapter:ch.title,title:sec.title,text:(row||[]).join('｜'),row,headers:sec.headers,source:sec.source})}else for(const item of sec.items||[])out.push({chapter:ch.title,title:sec.title,text:item,source:sec.source})}}return out}
+function flattenCheats(){const out=[];for(const ch of state.cheats){for(const sec of ch.sections||[]){if(sec.type==='table'){for(const row of sec.rows||[])out.push({chapter:ch.title,title:sec.title,text:(row||[]).join('｜'),row,headers:sec.headers,source:sec.source})}else if(sec.type==='facts'){for(const row of sec.rows||[])out.push({chapter:ch.title,title:sec.title,text:(row||[]).join('｜'),row,headers:['項目','內容'],source:sec.source})}else for(const item of sec.items||[])out.push({chapter:ch.title,title:sec.title,text:item,source:sec.source})}}return out}
 function renderCheats(){const q=norm($('#cheatQuery').value);const rows=flattenCheats().filter(x=>!q||norm(`${x.chapter} ${x.title} ${x.text}`).includes(q)).slice(0,260);$('#cheatResults').innerHTML=rows.map(x=>`<article class="card"><h3>${esc(x.title)}</h3>${x.row?`<table><tr>${x.headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr><tr>${x.row.map(v=>`<td>${String(v).includes('\n')||/[0-9A-F]{8}/.test(String(v))?`<pre>${esc(v)}</pre>`:esc(v)}</td>`).join('')}</tr></table>`:`<p>${esc(x.text)}</p>`}${x.source?`<div class="meta"><a href="${esc(x.source)}" target="_blank" rel="noreferrer">來源</a></div>`:''}</article>`).join('')||'<div class="card">沒有符合的金手指資料。</div>'}
 $('#cheatQuery').addEventListener('input',debounce(renderCheats));$('#clearCheat').onclick=()=>{$('#cheatQuery').value='';renderCheats()};
 function renderSources(){$('#sourceList').innerHTML=state.sources.map(s=>`<article class="card"><h3><a href="${esc(s.url)}" target="_blank" rel="noreferrer">${esc(s.name)}</a></h3><div class="source-role">${esc(s.role)}</div><div class="source-note">${esc(s.note)}</div><div class="meta">狀態：${esc(s.status)}｜優先級 ${esc(s.priority)}</div></article>`).join('')}
