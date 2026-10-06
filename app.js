@@ -58,7 +58,8 @@ function guideChapterCard(ch){return `<button class="guide-index-card" data-guid
 function guideChapterDetail(ch){return `<article class="guide-chapter"><div class="guide-chapter-head"><h2>${esc(ch.title)}</h2><p>${esc(ch.summary||'')}</p></div>${(ch.sections||[]).map(guideSectionHTML).join('')}</article>`}
 function visibleGuideBook(){return state.book.filter(ch=>ch.id!=='cheats_20261005')}
 function renderGuideTopics(){
-  $('#guideTopics').innerHTML=GUIDE_CATEGORIES.map(c=>`<button class="chip ${state.guideTopic===c.id?'active':''}" data-topic="${c.id}">${c.title}</button>`).join('');
+  const chapterId=state.guideTopic.startsWith('chapter:')?state.guideTopic.slice(8):'',activeCat=chapterId?(GUIDE_CATEGORIES.find(c=>c.chapters.includes(chapterId))?.id||'all'):state.guideTopic;
+  $('#guideTopics').innerHTML=GUIDE_CATEGORIES.map(c=>`<button class="chip ${activeCat===c.id?'active':''}" data-topic="${c.id}">${c.title}</button>`).join('');
   $('#guideTopics').querySelectorAll('button').forEach(btn=>btn.onclick=()=>{state.guideTopic=btn.dataset.topic;renderGuideTopics();renderGuides()})
 }
 function renderGuides(){
