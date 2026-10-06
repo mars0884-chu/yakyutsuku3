@@ -35,31 +35,42 @@ $('#playerQuery').addEventListener('input',debounce(()=>{state.page=1;renderPlay
 function openPlayer(uid){const p=state.players.find(x=>x._uid===uid);if(!p)return;const keys=Object.keys(p).filter(k=>!k.startsWith('_')&&k!=='Source URL'&&p[k]!==''&&p[k]!=null);$('#drawerBody').innerHTML=`<h2 class="detail-title">${esc(p['名前']||'選手資料')}</h2><div class="detail-grid">${keys.map(k=>`<div class="detail-item"><small>${esc(HEADER_ZH[k]||k)}${HEADER_ZH[k]&&HEADER_ZH[k]!==k?`｜${esc(k)}`:''}</small><b>${esc(p[k])}</b></div>`).join('')}</div>${p._source?`<p class="meta">來源：<a href="${esc(p._source)}" target="_blank" rel="noreferrer">${esc(p._source)}</a></p>`:''}`;$('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false')}
 $('#closeDrawer').onclick=$('.shade').onclick=()=>{$('#drawer').classList.remove('open');$('#drawer').setAttribute('aria-hidden','true')};
 
+
+const GUIDE_CATEGORIES=[
+  {id:'all',title:'全部攻略',chapters:[]},
+  {id:'start',title:'開局／經營',chapters:['start','economy','facilities','home','idea','recommended','leagueops']},
+  {id:'people',title:'找人／契約',chapters:['acquire','cheap','aging','random','academy','models_20261005']},
+  {id:'train',title:'養成／能力',chapters:['camp','study','skills','pitch','experiments_20261005','conditioning','created']},
+  {id:'play',title:'實戰／模式',chapters:['team','advanced','tips','one','bugs']},
+  {id:'deep',title:'深入／考古',chapters:['new_20261005','lastdig_20261005','history_20261005','sources','research']}
+];
 function guideSectionHTML(sec){
-  const title=esc(sec.title||'');
-  const note=sec.note?`<div class="guide-note">${esc(sec.note)}</div>`:'';
-  const source=sec.source?`<div class="meta"><a href="${esc(sec.source)}" target="_blank" rel="noreferrer">來源</a></div>`:'';
+  const title=esc(sec.title||''),note=sec.note?`<div class="guide-note">${esc(sec.note)}</div>`:'',source=sec.source?`<div class="meta"><a href="${esc(sec.source)}" target="_blank" rel="noreferrer">來源</a></div>`:'';
   let body='';
   if(sec.type==='table'){body=`<div class="guide-table-wrap"><table class="guide-table"><thead><tr>${(sec.headers||[]).map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${(sec.rows||[]).map(row=>`<tr>${(row||[]).map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`}
   else if(sec.type==='facts'){body=`<div class="guide-facts">${(sec.rows||[]).map(r=>`<div class="guide-fact"><b>${esc(r?.[0]||'')}</b><span>${esc(r?.[1]||'')}</span></div>`).join('')}</div>`}
   else if(sec.type==='steps'){body=`<ol class="guide-list">${(sec.items||[]).map(v=>`<li>${esc(v)}</li>`).join('')}</ol>`}
   else{body=`<ul class="guide-list">${(sec.items||[]).map(v=>`<li>${esc(v)}</li>`).join('')}</ul>`}
-  return `<section class="guide-section"><h3>${title}</h3>${note}${body}${source}</section>`;
+  return `<section class="guide-section"><h3>${title}</h3>${note}${body}${source}</section>`
 }
+function guideChapterCard(ch){return `<button class="guide-index-card" data-guide-id="${esc(ch.id)}"><b>${esc(ch.title)}</b><span>${esc(ch.summary||'')}</span><small>${esc(ch.count||ch.sections?.length||0)} 項</small></button>`}
+function guideChapterDetail(ch){return `<article class="guide-chapter"><div class="guide-chapter-head"><h2>${esc(ch.title)}</h2><p>${esc(ch.summary||'')}</p></div>${(ch.sections||[]).map(guideSectionHTML).join('')}</article>`}
+function visibleGuideBook(){return state.book.filter(ch=>ch.id!=='cheats_20261005')}
 function renderGuideTopics(){
-  const topics=[{id:'all',title:'全部攻略'},...state.book.map(x=>({id:x.id,title:x.title}))];
-  $('#guideTopics').innerHTML=topics.map(t=>`<button class="chip ${t.id===state.guideTopic?'active':''}" data-topic="${esc(t.id)}">${esc(t.title)}</button>`).join('');
-  $('#guideTopics').querySelectorAll('button').forEach(b=>b.onclick=()=>{state.guideTopic=b.dataset.topic;renderGuideTopics();renderGuides()});
+  $('#guideTopics').innerHTML=GUIDE_CATEGORIES.map(c=>`<button class="chip ${state.guideTopic===c.id?'active':''}" data-topic="${c.id}">${c.title}</button>`).join('');
+  $('#guideTopics').querySelectorAll('button').forEach(btn=>btn.onclick=()=>{state.guideTopic=btn.dataset.topic;renderGuideTopics();renderGuides()})
 }
 function renderGuides(){
-  const q=norm($('#guideQuery').value),root=$('#guideResults');
-  if(q){const hits=[];for(const ch of state.book){const sections=(ch.sections||[]).filter(sec=>norm(JSON.stringify(sec)).includes(q));if(norm(`${ch.title} ${ch.summary||''}`).includes(q)||sections.length)hits.push({...ch,sections:sections.length?sections:(ch.sections||[])})}root.innerHTML=hits.map(ch=>`<article class="guide-chapter"><div class="guide-chapter-head"><h2>${esc(ch.title)}</h2><p>${esc(ch.summary||'')}</p></div>${(ch.sections||[]).map(guideSectionHTML).join('')}</article>`).join('')||'<div class="card">沒有符合的攻略。</div>';return}
-  if(state.guideTopic==='all'){root.innerHTML=state.book.map(ch=>`<button class="guide-index-card" data-guide-id="${esc(ch.id)}"><b>${esc(ch.title)}</b><span>${esc(ch.summary||'')}</span><small>${esc(ch.count||ch.sections?.length||0)} 項</small></button>`).join('');root.querySelectorAll('[data-guide-id]').forEach(b=>b.onclick=()=>{state.guideTopic=b.dataset.guideId;renderGuideTopics();renderGuides();window.scrollTo({top:0,behavior:'smooth'})});return}
-  const ch=state.book.find(x=>x.id===state.guideTopic);if(!ch){state.guideTopic='all';renderGuideTopics();renderGuides();return}
-  root.innerHTML=`<article class="guide-chapter"><div class="guide-chapter-head"><h2>${esc(ch.title)}</h2><p>${esc(ch.summary||'')}</p></div>${(ch.sections||[]).map(guideSectionHTML).join('')}</article>`;
+  const q=norm($('#guideQuery').value),root=$('#guideResults'),book=visibleGuideBook();
+  if(q){const hits=[];for(const ch of book){const sections=(ch.sections||[]).filter(sec=>norm(JSON.stringify(sec)).includes(q));if(norm(`${ch.title} ${ch.summary||''}`).includes(q)||sections.length)hits.push({...ch,sections:sections.length?sections:(ch.sections||[])})}root.innerHTML=hits.map(guideChapterDetail).join('')||'<div class="card">沒有符合的攻略。</div>';return}
+  if(state.guideTopic.startsWith('chapter:')){const id=state.guideTopic.slice(8),ch=book.find(x=>x.id===id);if(ch){root.innerHTML=guideChapterDetail(ch);return}state.guideTopic='all'}
+  const cat=GUIDE_CATEGORIES.find(c=>c.id===state.guideTopic)||GUIDE_CATEGORIES[0],list=cat.id==='all'?book:cat.chapters.map(id=>book.find(x=>x.id===id)).filter(Boolean);
+  root.innerHTML=list.map(guideChapterCard).join('')||'<div class="card">這個分類目前沒有內容。</div>';
+  root.querySelectorAll('[data-guide-id]').forEach(btn=>btn.onclick=()=>{state.guideTopic='chapter:'+btn.dataset.guideId;renderGuideTopics();renderGuides();window.scrollTo({top:0,behavior:'smooth'})})
 }
 $('#guideQuery').addEventListener('input',debounce(renderGuides));
 $('#clearGuide').onclick=()=>{$('#guideQuery').value='';state.guideTopic='all';renderGuideTopics();renderGuides()};
+
 function flattenCheats(){const out=[];for(const ch of state.cheats){for(const sec of ch.sections||[]){if(sec.type==='table'){for(const row of sec.rows||[])out.push({chapter:ch.title,title:sec.title,text:(row||[]).join('｜'),row,headers:sec.headers,source:sec.source})}else if(sec.type==='facts'){for(const row of sec.rows||[])out.push({chapter:ch.title,title:sec.title,text:(row||[]).join('｜'),row,headers:['項目','內容'],source:sec.source})}else for(const item of sec.items||[])out.push({chapter:ch.title,title:sec.title,text:item,source:sec.source})}}return out}
 function renderCheats(){const q=norm($('#cheatQuery').value);const rows=flattenCheats().filter(x=>!q||norm(`${x.chapter} ${x.title} ${x.text}`).includes(q)).slice(0,260);$('#cheatResults').innerHTML=rows.map(x=>`<article class="card"><h3>${esc(x.title)}</h3>${x.row?`<table><tr>${x.headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr><tr>${x.row.map(v=>`<td>${String(v).includes('\n')||/[0-9A-F]{8}/.test(String(v))?`<pre>${esc(v)}</pre>`:esc(v)}</td>`).join('')}</tr></table>`:`<p>${esc(x.text)}</p>`}${x.source?`<div class="meta"><a href="${esc(x.source)}" target="_blank" rel="noreferrer">來源</a></div>`:''}</article>`).join('')||'<div class="card">沒有符合的金手指資料。</div>'}
 $('#cheatQuery').addEventListener('input',debounce(renderCheats));$('#clearCheat').onclick=()=>{$('#cheatQuery').value='';renderCheats()};
