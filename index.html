@@ -41,30 +41,12 @@
   <div class="batch-actions">
     <label class="filebtn">選擇截圖<input id="batchFiles" type="file" accept="image/*" multiple></label>
     <button id="runBatch" class="primary">開始找人</button>
-    <select id="batchSort" aria-label="批次結果排序">
-      <option value="rank">Rank 排序</option>
-      <option value="screen">畫面順序</option>
-      <option value="name">姓名排序</option>
-      <option value="confidence">辨識度排序</option>
-      <option value="長打">長打</option>
-      <option value="選球眼">選球眼</option>
-      <option value="走力">走力</option>
-      <option value="球威">球威</option>
-      <option value="制球">控球</option>
-      <option value="体力">體力</option>
-      <option value="精神">精神</option>
-      <option value="守備">守備</option>
-      <option value="捕球">接球</option>
-      <option value="肩力">臂力</option>
-      <option value="送球">傳球</option>
-      <option value="球速">球速</option>
-    </select>
     <button id="clearBatch">清除</button>
   </div>
   <div id="batchStatus" class="statusline">可一次選多張 OFFICE MENU 名單截圖。</div>
   <div id="batchPreview" class="thumbs"></div>
   <div class="batch-summary" id="batchSummary"></div>
-  <div class="table-shell batch-table-shell"><table id="batchTable" class="data-table"></table></div>
+  <div id="batchTable" class="batch-groups"></div>
 </section>
 
 <section id="view-guides" class="view">
