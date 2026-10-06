@@ -29,8 +29,8 @@ await build({
 });
 await fs.rm(entry,{force:true});
 
-const ortPkg=require.resolve('onnxruntime-web/package.json');
-const ortDist=path.join(path.dirname(ortPkg),'dist');
+const ortEntry=require.resolve('onnxruntime-web');
+const ortDist=path.dirname(ortEntry);
 for(const name of await fs.readdir(ortDist)){
   if(/^ort-wasm.*\.(?:wasm|mjs)$/.test(name)){
     await fs.copyFile(path.join(ortDist,name),path.join(ORT,name));
