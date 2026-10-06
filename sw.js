@@ -1,4 +1,4 @@
-const CACHE='yt3-v20261007-1';
+const CACHE='yt3-v20261007-2';
 const CORE=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./VERSION','./assets/icon.svg','./assets/game-cover.jpg','./assets/icon-192-r2.png','./assets/icon-512-r2.png','./data/players-seed.json','./data/guides.json','./data/guide-book.json','./data/cheats.json','./data/sources.json','./data/research-status.json'];
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('message',e=>{if(e.data?.type==='SKIP_WAITING')self.skipWaiting()});
