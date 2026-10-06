@@ -204,7 +204,7 @@ function abilitySortTuple(p,key){if(!p)return[-999,-999];const raw=String(p[key]
 function batchCompare(a,b,key){const pa=batchDisplayPlayer(a),pb=batchDisplayPlayer(b),rank={S:0,A:1,B:2,C:3,D:4};if(key==='screen')return(a.firstIndex??9999)-(b.firstIndex??9999);if(key==='name')return String(pa?.['名前']||'').localeCompare(String(pb?.['名前']||''),'ja');if(key==='rank')return(rank[pa?.['ランク']]??9)-(rank[pb?.['ランク']]??9)||String(pa?.['名前']||'').localeCompare(String(pb?.['名前']||''),'ja');if(key==='confidence')return(b.match?.score||b.resolved?.score||b.candidates?.[0]?.score||0)-(a.match?.score||a.resolved?.score||a.candidates?.[0]?.score||0);const [a1,a2]=abilitySortTuple(pa,key),[b1,b2]=abilitySortTuple(pb,key);if(a1!==b1)return b1-a1;if(a2!==b2)return b2-a2;return(rank[pa?.['ランク']]??9)-(rank[pb?.['ランク']]??9)}
 function sortBatchRows(rows){let out=[...rows].sort((a,b)=>batchCompare(a,b,state.batchSort));if(state.batchSortDir==='desc'&&['screen','name','rank'].includes(state.batchSort))out.reverse();if(state.batchSortDir==='asc'&&!['screen','name','rank'].includes(state.batchSort))out.reverse();return out}
 function setBatchSort(key){if(state.batchSort===key)state.batchSortDir=state.batchSortDir==='asc'?'desc':'asc';else{state.batchSort=key;state.batchSortDir=['screen','name','rank'].includes(key)?'asc':'desc'}renderBatchResults()}
-function batchGroupName(p){const pos=p?._position||'';if(pos==='投手')return'投手';if(pos==='捕手')return'捕手';if(['一壘手','二壘手','三壘手','游擊手'].includes(pos))return'內野手';if(pos==='外野手')return'外野手';return'其他'}
+function batchGroupName(p,r){const pos=p?._position||POSMAP[r?.parsed?.pos]||'';if(pos==='投手')return'投手';if(pos==='捕手')return'捕手';if(['一壘手','二壘手','三壘手','游擊手'].includes(pos))return'內野手';if(pos==='外野手')return'外野手';return'其他'}
 const BATCH_COMMON=['_screen','_status','名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','_position'];
 const BATCH_PITCH=[...BATCH_COMMON,'タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
 const BATCH_BAT=[...BATCH_COMMON,'体力','右巧','左巧','長打','バント','選球眼','走力','走塁','精神','守備','捕球','肩力','送球','リード','捕手','一塁','二塁','三塁','遊撃','外野','スキル1','スキル2','スキル3','モデル'];
@@ -265,7 +265,7 @@ $('#runBatch').onclick=runBatch;
 function renderBatchResults(){
   const matched=state.batchRows.filter(r=>r.match).length,inferred=state.batchRows.filter(r=>!r.match&&r.resolved).length;
   $('#batchSummary').textContent=state.batchRows.length?`結果 ${state.batchRows.length}${state.expectedTotal?` / 最多 ${state.expectedTotal}`:''}｜確認 ${matched}｜推定 ${inferred}｜候選 ${state.batchRows.length-matched-inferred}`:'';
-  const groups={投手:[],捕手:[],內野手:[],外野手:[],其他:[]};for(const r of state.batchRows){const p=batchDisplayPlayer(r);groups[batchGroupName(p)].push(r)}
+  const groups={投手:[],捕手:[],內野手:[],外野手:[],其他:[]};for(const r of state.batchRows){const p=batchDisplayPlayer(r);groups[batchGroupName(p,r)].push(r)}
   let h='';for(const key of ['投手','捕手','內野手','外野手','其他'])if(groups[key].length)h+=renderBatchGroup(key,groups[key],key==='投手'?BATCH_PITCH:BATCH_BAT);
   $('#batchTable').innerHTML=h;
   $('#batchTable').querySelectorAll('[data-uid]').forEach(td=>td.onclick=()=>openPlayer(td.dataset.uid));
