@@ -15,7 +15,7 @@
   <div class="brand">
     <div><h1>やきゅつく3</h1><div class="brand-sub">查人・攻略・金手指</div></div>
   </div>
-  <button id="installBtn" class="ghost hidden">安裝</button>
+  <div class="top-actions"><button id="updateBtn" class="ghost">更新</button><button id="installBtn" class="ghost hidden">安裝</button></div>
 </header>
 <nav class="mainnav" aria-label="主功能">
   <button class="navbtn active" data-view="players">查人</button>
@@ -24,6 +24,7 @@
   <button class="navbtn" data-view="cheats">金手指</button>
   <button class="navbtn small" data-view="sources">資料</button>
 </nav>
+<div id="updateBar" class="updatebar hidden"><span id="updateText">檢查更新…</span><progress id="updateProgress" max="100" value="0"></progress><button id="applyUpdate">立即更新</button></div>
 <main>
 <section id="view-players" class="view active">
   <div class="searchbar"><input id="playerQuery" type="search" placeholder="輸入姓名、原型、Rank、技能、守位…" autocomplete="off"><button id="clearPlayer">清除</button></div>
