@@ -1,17 +1,18 @@
-name: Build and deploy Yakyutsuku3
+name: Build and publish Yakyutsuku3
 on:
   push:
     branches: [main]
   workflow_dispatch:
   schedule:
     - cron: '25 18 * * 0'
+
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
+
 concurrency:
-  group: pages
+  group: yakyutsuku3-publish
   cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,22 +30,23 @@ jobs:
         run: npm run vendor:ocr
       - name: Assemble static site
         run: |
+          rm -rf _site
           mkdir -p _site
           cp index.html styles.css app.js manifest.webmanifest sw.js _site/
           cp -R assets data vendor _site/
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+          touch _site/.nojekyll
+      - name: Publish complete site to gh-pages branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          cd _site
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages
+          git add -A
+          git commit -m "Publish Yakyutsuku3 from ${SOURCE_SHA}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${REPOSITORY}.git"
+          git push --force origin gh-pages
