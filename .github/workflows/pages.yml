@@ -25,8 +25,11 @@ jobs:
           node --check scripts/refresh-data.mjs
           node --check scripts/vendor-cover.mjs
           node --check scripts/vendor-ocr.mjs
+          node --check scripts/validate-calibration.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
+      - name: Validate calibration roster labels
+        run: node scripts/validate-calibration.mjs
       - name: Vendor game cover thumbnail
         run: npm run vendor:cover
       - name: Vendor OCR locally for iPhone/desktop
