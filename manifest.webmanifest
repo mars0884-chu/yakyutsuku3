@@ -1,0 +1,29 @@
+{
+  "name": "やきゅつく3 查人・攻略・金手指",
+  "short_name": "やきゅつく3",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#edf2f5",
+  "theme_color": "#0f315b",
+  "icons": [
+    {
+      "src": "./assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

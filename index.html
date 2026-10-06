@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes,viewport-fit=cover">
+<meta name="theme-color" content="#0f315b">
+<title>やきゅつく3 查人・攻略・金手指</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css">
+<link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <img class="cover-thumb" src="./assets/game-cover.jpg" alt="プロ野球チームをつくろう！3" onerror="this.onerror=null;this.src='https://www.gavas.jp/upload/save_image/12595.jpg'">
+    <div><h1>やきゅつく3</h1><div class="brand-sub">查人・攻略・金手指</div></div>
+  </div>
+  <button id="installBtn" class="ghost hidden">安裝</button>
+</header>
+<nav class="mainnav" aria-label="主功能">
+  <button class="navbtn active" data-view="players">查人</button>
+  <button class="navbtn" data-view="batch">批次找人</button>
+  <button class="navbtn" data-view="guides">攻略</button>
+  <button class="navbtn" data-view="cheats">金手指</button>
+  <button class="navbtn small" data-view="sources">資料</button>
+</nav>
+<main>
+<section id="view-players" class="view active">
+  <div class="searchbar"><input id="playerQuery" type="search" placeholder="輸入姓名、原型、Rank、技能、守位…" autocomplete="off"><button id="clearPlayer">清除</button></div>
+  <div class="filters-row">
+    <select id="filterGroup"><option value="">全部來源</option><option>國內新人</option><option>外國人</option></select>
+    <select id="filterPos"><option value="">全部守位</option><option>投手</option><option>捕手</option><option>一壘手</option><option>二壘手</option><option>三壘手</option><option>游擊手</option><option>外野手</option></select>
+    <select id="filterRank"><option value="">全部 Rank</option><option>S</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+    <span id="playerCount" class="count"></span>
+  </div>
+  <div class="table-shell"><table id="playerTable" class="data-table"></table></div>
+  <div class="pager"><button id="prevPage">上一頁</button><span id="pageInfo"></span><button id="nextPage">下一頁</button></div>
+</section>
+
+<section id="view-batch" class="view">
+  <div class="batch-actions">
+    <label class="filebtn">選擇截圖<input id="batchFiles" type="file" accept="image/*" multiple></label>
+    <button id="runBatch" class="primary">開始找人</button>
+    <button id="clearBatch">清除</button>
+  </div>
+  <div id="batchStatus" class="statusline">可一次選多張 OFFICE MENU 名單截圖。</div>
+  <div id="batchPreview" class="thumbs"></div>
+  <div class="batch-summary" id="batchSummary"></div>
+  <div class="table-shell batch-table-shell"><table id="batchTable" class="data-table"></table></div>
+</section>
+
+<section id="view-guides" class="view">
+  <div class="searchbar"><input id="guideQuery" type="search" placeholder="搜尋攻略內容：留學、經營、技能、爆發、交易…"><button id="clearGuide">清除</button></div>
+  <div id="guideTopics" class="chips"></div>
+  <div id="guideResults" class="cards"></div>
+</section>
+
+<section id="view-cheats" class="view">
+  <div class="searchbar"><input id="cheatQuery" type="search" placeholder="搜尋：資金、PAR、XT、交易、成長、設施…"><button id="clearCheat">清除</button></div>
+  <div id="cheatResults" class="cards"></div>
+</section>
+
+<section id="view-sources" class="view">
+  <div class="source-head"><b id="dataStatus">資料載入中…</b><button id="refreshData">更新完整名冊</button></div>
+  <div id="sourceList" class="cards compact"></div>
+</section>
+</main>
+
+<div id="drawer" class="drawer" aria-hidden="true"><div class="shade"></div><article class="sheet"><button id="closeDrawer" class="close">關閉</button><div id="drawerBody"></div></article></div>
+
+<script src="./app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+[
+  {
+    "name": "がめづくし / Gamezukushi",
+    "url": "https://gamezukushi.com/yakyutsuku3/",
+    "role": "選手名冊主資料＋攻略",
+    "status": "active",
+    "priority": 1,
+    "note": "15 個國內新人／外國人名冊頁；完整名冊目標 3,767 筆。"
+  },
+  {
+    "name": "GAME攻略書庫 やきゅつく3 Wiki",
+    "url": "https://wiki.yakyutsuku.game-syo.com/",
+    "role": "攻略資料庫",
+    "status": "active",
+    "priority": 1,
+    "note": "設施、經營、技能、留學、事件、爆發經驗值等。"
+  },
+  {
+    "name": "Sheep+ やきゅつく3攻略",
+    "url": "https://www.sheepplus.com/yakyutsuku3/",
+    "role": "攻略資料庫",
+    "status": "active",
+    "priority": 1,
+    "note": "Home Town、設施、經營企劃、Idea Memo、Team Color 等。"
+  },
+  {
+    "name": "Ikasumi やきゅつく3 プレイデータ",
+    "url": "https://www.ikasumi.org/yakyu3/",
+    "role": "OB／架空選手＋攻略筆記",
+    "status": "active",
+    "priority": 1,
+    "note": "OB、實用架空選手、隊伍顏色、經營企劃、留學等。"
+  },
+  {
+    "name": "ゲーム好き",
+    "url": "https://gamezukinahito.blog.fc2.com/blog-category-2.html",
+    "role": "近年逆向／ISO 改造／最新版資料",
+    "status": "active",
+    "priority": 1,
+    "note": "2023–2026 仍有更新；含 ISO 資料結構與最新版改造研究。"
+  },
+  {
+    "name": "抜け出せ三等兵",
+    "url": "https://hiscode.blog56.fc2.com/blog-entry-54.html",
+    "role": "PS2 XT/PAR 改造碼",
+    "status": "active",
+    "priority": 1,
+    "note": "歷史改造碼的主要原始來源之一。"
+  },
+  {
+    "name": "Wazap!",
+    "url": "https://wazap.com/game/13936/cheats/",
+    "role": "攻略／裏技／PAR 回報",
+    "status": "active",
+    "priority": 2,
+    "note": "29 筆攻略／裏技，另有 PAR 問答與實機回報。"
+  },
+  {
+    "name": "5ch / 2ch 過去ログ",
+    "url": "https://kako.5ch.io/test/read.cgi/gameurawaza/1156139067/l50",
+    "role": "歷史攻略／改造碼討論",
+    "status": "archive",
+    "priority": 2,
+    "note": "可追溯多代改造碼討論與後續實機回報。"
+  },
+  {
+    "name": "Crazyboys00 WordPress",
+    "url": "https://crazyboys00.wordpress.com/category/%E3%82%84%E3%81%8D%E3%82%85%E3%81%A4%E3%81%8F%EF%BC%93%E6%94%BB%E7%95%A5%EF%BC%88%EF%BC%9F%EF%BC%89/",
+    "role": "長篇攻略／實戰紀錄",
+    "status": "active",
+    "priority": 2,
+    "note": "2006 年大量攻略文章仍可讀。"
+  },
+  {
+    "name": "re-owls やきゅつく3プレイ日記",
+    "url": "https://re-owls.com/",
+    "role": "近年實戰紀錄",
+    "status": "active",
+    "priority": 3,
+    "note": "現代重玩紀錄，可補充實戰觀察。"
+  },
+  {
+    "name": "Codevis 舊站",
+    "url": "https://codevis.nobody.jp/old/game/yk3/",
+    "role": "歷史 Play Diary／名單例",
+    "status": "active",
+    "priority": 3,
+    "note": "舊站仍可索引。"
+  },
+  {
+    "name": "KADOKAWA 官方 Complete Guide",
+    "url": "https://www.kadokawa.co.jp/product/200700002980/",
+    "role": "官方攻略本書目",
+    "status": "catalog_only",
+    "priority": 3,
+    "note": "官方 447 頁攻略本書目可查；未發現公開完整數位正文。"
+  },
+  {
+    "name": "Vector やきゅつく3用選手データビューアー",
+    "url": "https://www.vector.co.jp/",
+    "role": "舊工具線索",
+    "status": "partial",
+    "priority": 3,
+    "note": "歷史工具線索，現行可取得性有限。"
+  },
+  {
+    "name": "notitle / 舊個人站",
+    "url": "https://notitle.moo.jp/",
+    "role": "舊攻略線索",
+    "status": "partial",
+    "priority": 4,
+    "note": "部分舊內容／索引可追，完整性不穩定。"
+  }
+]

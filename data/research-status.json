@@ -1,0 +1,26 @@
+{
+  "checked_at":"2026-10-06",
+  "scope":"公開、可檢索、目前可讀取的 Web 資料",
+  "result":"目前未再找到會改變核心名冊或攻略架構的新主要來源；後續搜尋多為已知來源、轉載、遊玩日記或既有來源的子頁。",
+  "core_sources":[
+    "gamezukushi.com",
+    "wiki.yakyutsuku.game-syo.com",
+    "sheepplus.com",
+    "ikasumi.org",
+    "gamezukinahito.blog.fc2.com",
+    "hiscode.blog56.fc2.com",
+    "wazap.com",
+    "5ch/kako archives",
+    "crazyboys00.wordpress.com"
+  ],
+  "secondary_sources":[
+    "re-owls.com",
+    "codevis.nobody.jp",
+    "yuru-non-act2.blog.jp",
+    "ameblo.jp",
+    "notitle.moo.jp",
+    "KADOKAWA official guide catalog",
+    "Vector historical utility listing"
+  ],
+  "boundary":"無法證明整個歷史 Internet 絕對沒有未索引、已刪除、會員限定或私人保存資料；此結論只代表目前公開可搜尋、可讀的路徑已沒有新的高價值核心來源。"
+}
