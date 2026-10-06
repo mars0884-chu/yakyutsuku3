@@ -1,8 +1,8 @@
 {
-  "checked_at":"2026-10-06",
-  "scope":"公開、可檢索、目前可讀取的 Web 資料",
-  "result":"目前未再找到會改變核心名冊或攻略架構的新主要來源；後續搜尋多為已知來源、轉載、遊玩日記或既有來源的子頁。",
-  "core_sources":[
+  "checked_at": "2026-10-06",
+  "scope": "公開、可檢索、目前可讀取的 Web 資料",
+  "result": "本輪加入巴哈姆特板號 6035 後，找到一批可明確判定為 PS2《模擬職棒3》的有效資料：2006 XT/PAR 金手指與實機回報、2006 初期經營法、2018 PCSX2 1.4 重玩／金手指／改名原型，以及可用來區分 PS2 三代與 DS 版的系統討論。以作品名、PS2版、系統名、舊站名與改造碼再反向搜尋後，新增結果已高度回到既有核心來源或玩家日記，暫未再出現會改變核心名冊／攻略架構的新主要站點。",
+  "core_sources": [
     "gamezukushi.com",
     "wiki.yakyutsuku.game-syo.com",
     "sheepplus.com",
@@ -11,16 +11,20 @@
     "hiscode.blog56.fc2.com",
     "wazap.com",
     "5ch/kako archives",
-    "crazyboys00.wordpress.com"
+    "crazyboys00.wordpress.com",
+    "forum.gamer.com.tw",
+    "ameblo.jp/skillove"
   ],
-  "secondary_sources":[
+  "secondary_sources": [
     "re-owls.com",
     "codevis.nobody.jp",
     "yuru-non-act2.blog.jp",
     "ameblo.jp",
     "notitle.moo.jp",
     "KADOKAWA official guide catalog",
-    "Vector historical utility listing"
+    "Vector historical utility listing",
+    "mixi.jp",
+    "w.atwiki.jp/untsuku3"
   ],
-  "boundary":"無法證明整個歷史 Internet 絕對沒有未索引、已刪除、會員限定或私人保存資料；此結論只代表目前公開可搜尋、可讀的路徑已沒有新的高價值核心來源。"
+  "boundary": "巴哈板號 6035 混有多代作品，已只納入頁面明示 PS2、標題明示《模擬職棒3》或能由系統差異確定是 PS2 三代的內容。仍無法證明整個歷史 Internet 絕對沒有未索引、已刪除、會員限定或私人保存資料；『挖到底』只代表目前公開、可檢索、可讀取路徑在這一輪已沒有新的高價值核心來源。"
 }
