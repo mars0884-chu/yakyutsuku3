@@ -24,7 +24,8 @@ await build({
   target:['safari15','chrome100'],
   minify:true,
   sourcemap:false,
-  define:{global:'globalThis'}
+  define:{global:'globalThis'},
+  external:['fs','path']
 });
 await fs.rm(entry,{force:true});
 
