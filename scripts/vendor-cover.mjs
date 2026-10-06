@@ -17,7 +17,13 @@ try{
   input=await fs.readFile(path.join(ASSETS,'icon.svg'));
   await sharp(input).jpeg({quality:90}).toFile(path.join(ASSETS,'game-cover.jpg'));
 }
-// Square app icons: keep title/central field area visible rather than stretching.
+// PWA icon: remove the shop-photo white mat first, then fill the square.
+let iconSource=input;
+try{
+  iconSource=await sharp(input).flatten({background:'#ffffff'}).trim({background:'#ffffff',threshold:18}).jpeg({quality:96}).toBuffer();
+}catch(e){console.warn('Icon trim fallback:',e.message)}
 for(const size of [192,512]){
-  await sharp(input).resize(size,size,{fit:'cover',position:'centre'}).png().toFile(path.join(ASSETS,`icon-${size}.png`));
+  const out=path.join(ASSETS,`icon-${size}-r2.png`);
+  await sharp(iconSource).resize(size,size,{fit:'cover',position:'centre'}).png().toFile(out);
+  console.log('icon',size,out);
 }
