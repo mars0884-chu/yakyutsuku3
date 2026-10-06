@@ -12,7 +12,6 @@
 <body>
 <header class="topbar">
   <div class="brand">
-    <img class="cover-thumb" src="./assets/game-cover.jpg" alt="プロ野球チームをつくろう！3" onerror="this.onerror=null;this.src='https://www.gavas.jp/upload/save_image/12595.jpg'">
     <div><h1>やきゅつく3</h1><div class="brand-sub">查人・攻略・金手指</div></div>
   </div>
   <button id="installBtn" class="ghost hidden">安裝</button>
@@ -41,6 +40,12 @@
   <div class="batch-actions">
     <label class="filebtn">選擇截圖<input id="batchFiles" type="file" accept="image/*" multiple></label>
     <button id="runBatch" class="primary">開始找人</button>
+    <select id="batchSort" aria-label="批次結果排序">
+      <option value="rank">Rank 排序</option>
+      <option value="screen">畫面順序</option>
+      <option value="name">姓名排序</option>
+      <option value="confidence">辨識度排序</option>
+    </select>
     <button id="clearBatch">清除</button>
   </div>
   <div id="batchStatus" class="statusline">可一次選多張 OFFICE MENU 名單截圖。</div>
