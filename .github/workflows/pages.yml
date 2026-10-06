@@ -9,9 +9,6 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: yakyutsuku3-publish
-  cancel-in-progress: true
 
 jobs:
   build:
