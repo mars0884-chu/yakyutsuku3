@@ -1,5 +1,6 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const state={players:[],guides:[],book:[],cheats:[],sources:[],calibration:{entries:[]},page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,batchSort:'screen',batchSortDir:'asc'};
+const APP_VERSION='2026.10.06-r6';
+const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,batchSort:'screen',batchSortDir:'asc'};
 const HEADER_ZH={"名前":"姓名","年齢":"年齡","成長":"成長型","投/打":"投／打","出身":"出身地","高校":"高中","大学":"大學","社会人":"社會人","タイプ":"投手類型","ランク":"Rank","体力":"體力","球速":"球速","球威":"球威","制球":"控球","精神":"精神","守備":"守備","捕球":"接球","肩力":"臂力","送球":"傳球","スライダー":"滑球","速スラ":"高速滑球","カットB":"卡特球","カーブ":"曲球","Sカーブ":"S曲球","ドロップ":"Drop曲球","シュート":"噴射球","速シュート":"高速噴射球","シンカー":"伸卡球","スクリュー":"螺旋球","速シンカー":"高速伸卡球","サークルC":"圈指變速","2シーム":"二縫線","Cアップ":"變速球","フォーク":"指叉球","SFF":"快速指叉","縦スラ":"縱滑球","パーム":"掌心球","ナックル":"蝴蝶球","スキル1":"技能1","スキル2":"技能2","スキル3":"技能3","モデル":"原型","右巧":"對右巧打","左巧":"對左巧打","長打":"長打","バント":"短打","選球眼":"選球眼","走力":"跑力","走塁":"跑壘","リード":"配球","捕手":"捕手","一塁":"一壘","二塁":"二壘","三塁":"三壘","遊撃":"游擊","外野":"外野","リーグ":"聯盟／地區","アカデミー":"學院"};
 const BASE_COLS=['名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -20,9 +21,8 @@ async function loadRoster(force=false){
 function indexPlayers(players){return players.map((p,i)=>({...p,_uid:p._uid||`${p._slug||'p'}-${i}`,_search:norm(Object.entries(p).filter(([k])=>!k.startsWith('_')).map(([k,v])=>`${k} ${HEADER_ZH[k]||''} ${v}`).join(' ')+' '+(p._group||'')+' '+(p._position||''))}))}
 async function loadData(forceRoster=false){
   const roster=await loadRoster(forceRoster);state.players=indexPlayers(roster.players);state.rosterSource=roster.source;
-  [state.guides,state.book,state.cheats,state.sources,state.calibration]=await Promise.all([
-    getJSON('./data/guides.json'),getJSON('./data/guide-book.json'),getJSON('./data/cheats.json'),getJSON('./data/sources.json'),
-    getJSON('./data/calibration.json').catch(()=>({entries:[]}))
+  [state.guides,state.book,state.cheats,state.sources]=await Promise.all([
+    getJSON('./data/guides.json'),getJSON('./data/guide-book.json'),getJSON('./data/cheats.json'),getJSON('./data/sources.json')
   ]);
   const guideCount=state.book.reduce((n,ch)=>n+(Number(ch.count)||0),0);$('#dataStatus').textContent=`名冊 ${state.players.length.toLocaleString()} 人｜${state.rosterSource}｜攻略 ${state.book.length} 章／${guideCount.toLocaleString()} 項`;
   renderPlayers();renderGuideTopics();renderGuides();renderCheats();renderSources();
@@ -71,11 +71,6 @@ $('#batchFiles').onchange=e=>{state.batchFiles=[...e.target.files];state.batchRo
 $('#clearBatch').onclick=()=>{state.batchFiles=[];state.batchRows=[];state.batchRawRows=[];state.expectedTotal=0;$('#batchFiles').value='';renderBatchPreview();renderBatchResults();$('#batchStatus').textContent='可一次選多張 OFFICE MENU 名單截圖。'};
 function renderBatchPreview(){$('#batchPreview').innerHTML='';for(const f of state.batchFiles){const u=URL.createObjectURL(f),d=document.createElement('div');d.className='thumb';d.innerHTML=`<img src="${u}"><small>${esc(f.name)}</small>`;d.querySelector('img').onload=()=>setTimeout(()=>URL.revokeObjectURL(u),1000);$('#batchPreview').appendChild(d)}}
 function loadImage(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);res(im)};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('圖片解碼失敗'))};im.src=u})}
-function imageDhashHex(img,w=32,h=16){const c=document.createElement('canvas');c.width=w+1;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(img,0,0,c.width,c.height);const d=g.getImageData(0,0,c.width,c.height).data,bits=[];for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*(w+1)+x)*4,j=i+4,a=d[i]*.299+d[i+1]*.587+d[i+2]*.114,b=d[j]*.299+d[j+1]*.587+d[j+2]*.114;bits.push(a>b?1:0)}let out='';for(let i=0;i<bits.length;i+=8){let v=0;for(let k=0;k<8;k++)v=(v<<1)|(bits[i+k]||0);out+=v.toString(16).padStart(2,'0')}return out}
-function hexHamming(a,b){if(!a||!b||a.length!==b.length)return 9999;let n=0;for(let i=0;i<a.length;i++){let v=parseInt(a[i],16)^parseInt(b[i],16);v=(v&5)+((v>>1)&5);n+=(v&3)+((v>>2)&3)}return n}
-function playerByExactName(name){const q=norm(name);return state.players.find(p=>norm(p['名前'])===q)||null}
-async function tryCalibrationBatch(){const pack=state.calibration;if(!pack?.entries?.length||!state.batchFiles.length)return false;const matched=[];for(const file of state.batchFiles){const im=await loadImage(file),hash=imageDhashHex(im),id=file.name.replace(/\.[^.]+$/,'');const named=pack.entries.find(e=>e.id===id&&Math.abs(im.naturalWidth-e.width)<=30&&Math.abs(im.naturalHeight-e.height)<=30);let best=named?{entry:named,distance:0,score:-100,method:'filename+size'}:null;if(!best){for(const e of pack.entries){const d=hexHamming(hash,e.hash),dimPenalty=(Math.abs(im.naturalWidth-e.width)+Math.abs(im.naturalHeight-e.height))>180?6:0,score=d+dimPenalty;if(!best||score<best.score)best={entry:e,distance:d,score,method:'hash'}}}if(!best||(!named&&best.distance>(pack.maxDistance??18)))return false;matched.push({file:file.name,entry:best.entry,distance:best.distance,method:best.method})}
-  const unique=new Map();let seq=0;for(const m of matched){for(let i=0;i<(m.entry.names||[]).length;i++){const name=m.entry.names[i],p=playerByExactName(name),key=p?._uid||norm(name),row={firstIndex:seq++,file:m.file,row:i+1,status:'校準確認',raw:`calibration:${m.entry.id} ${m.method||''} d=${m.distance}`,parsed:{name},match:p?{p,score:1,nameScore:1,meta:0}:null,resolved:null,candidates:p?[{p,score:1,nameScore:1,meta:0}]:[],ocrConfidence:100,score:1,calibrated:true,calibrationName:name};if(!unique.has(key))unique.set(key,row)}}state.batchRawRows=[...unique.values()];state.batchRows=[...unique.values()];state.expectedTotal=pack.expectedTotal||Math.max(...matched.map(x=>x.entry.total||0),state.batchRows.length);renderBatchResults();const found=state.batchRows.filter(r=>r.match).length;$('#batchStatus').textContent=`高解析校準辨識完成：${state.batchRows.length} 人／名單 ${state.expectedTotal}；名冊精確對應 ${found} 人。未載入 OCR。`;return true}
 function withTimeout(promise,ms,label='處理逾時'){let t;return Promise.race([promise,new Promise((_,rej)=>t=setTimeout(()=>rej(new Error(label)),ms))]).finally(()=>clearTimeout(t))}
 
 function rowCrops(img,fileName){const ratio=img.naturalWidth/img.naturalHeight;if(ratio<1.65)return[];const x0=.153,x1=.684,y0=.181,y1=.903,rows=11,rh=(y1-y0)/rows,out=[];for(let i=0;i<rows;i++){const y=y0+i*rh,c=document.createElement('canvas'),w=Math.round(img.naturalWidth*(x1-x0)),h=Math.round(img.naturalHeight*rh);c.width=w;c.height=h;c.getContext('2d',{willReadFrequently:true}).drawImage(img,Math.round(img.naturalWidth*x0),Math.round(img.naturalHeight*y),w,h,0,0,w,h);out.push({canvas:c,file:fileName,row:i+1})}return out}
@@ -95,6 +90,68 @@ async function recognizeFixedParts(worker,canvas,threshold=125){const sep=detect
 function dhash(canvas){const c=document.createElement('canvas');c.width=17;c.height=8;const g=c.getContext('2d',{willReadFrequently:true});g.filter='grayscale(1) contrast(1.7)';g.drawImage(canvas,0,0,17,8);const d=g.getImageData(0,0,17,8).data,bits=[];for(let y=0;y<8;y++)for(let x=0;x<16;x++){const a=d[(y*17+x)*4],b=d[(y*17+x+1)*4];bits.push(a>b?1:0)}return bits}
 function ham(a,b){let n=0;for(let i=0;i<a.length;i++)if(a[i]!==b[i])n++;return n}
 async function ensureLocalOCR(){if(window.Tesseract){state.ocrReady=true;return true}return new Promise(resolve=>{const old=document.querySelector('script[data-yt3-ocr]');if(old)old.remove();const s=document.createElement('script');s.dataset.yt3Ocr='1';s.src='./vendor/tesseract/tesseract.min.js';s.onload=()=>{state.ocrReady=!!window.Tesseract;resolve(state.ocrReady)};s.onerror=()=>resolve(false);document.head.appendChild(s)})}
+async function ensurePaddleOCR(){
+  if(window.YT3PaddleOCR?.PaddleOCR){state.paddleReady=true;return true}
+  return new Promise(resolve=>{
+    const old=document.querySelector('script[data-yt3-paddle]');if(old)old.remove();
+    const sc=document.createElement('script');sc.dataset.yt3Paddle='1';sc.src='./vendor/paddleocr/paddleocr.bundle.js';
+    sc.onload=()=>{state.paddleReady=!!window.YT3PaddleOCR?.PaddleOCR;resolve(state.paddleReady)};
+    sc.onerror=()=>resolve(false);document.head.appendChild(sc);
+  })
+}
+async function createPaddleOCR(){
+  const ok=await ensurePaddleOCR();if(!ok)throw new Error('PaddleOCR 本機引擎檔案無法載入');
+  setBatchProgress(4,'載入本機 PaddleOCR 模型…');
+  return withTimeout(window.YT3PaddleOCR.PaddleOCR.create({
+    textDetectionModelName:'PP-OCRv5_mobile_det',
+    textDetectionModelAsset:{url:'./vendor/paddleocr/models/PP-OCRv5_mobile_det_onnx_infer.tar'},
+    textRecognitionModelName:'PP-OCRv5_mobile_rec',
+    textRecognitionModelAsset:{url:'./vendor/paddleocr/models/PP-OCRv5_mobile_rec_onnx_infer.tar'},
+    textDetectionBatchSize:2,textRecognitionBatchSize:8,
+    ortOptions:{backend:'wasm',wasmPaths:'./vendor/paddleocr/ort/',numThreads:1,simd:true}
+  }),90000,'PaddleOCR 本機模型載入逾時')
+}
+function setBatchProgress(percent,text){
+  const p=Math.max(0,Math.min(100,Math.round(percent||0)));
+  $('#batchStatus').textContent=`${text||''}${p? `｜${p}%`:''}`;
+}
+function nameInkRatio(src){
+  const g=src.getContext('2d',{willReadFrequently:true}),x0=Math.floor(src.width*.10),x1=Math.floor(src.width*.59),id=g.getImageData(x0,0,Math.max(1,x1-x0),src.height).data;
+  let hi=0,lo=0;for(let i=0;i<id.length;i+=4){const l=id[i]*.299+id[i+1]*.587+id[i+2]*.114;if(l>145)hi++;if(l<95)lo++}
+  return Math.min(hi,lo)/Math.max(1,id.length/4)
+}
+function paddleNameCanvas(src,threshold=122){
+  const sep=detectNameSeparator(src),x0=Math.max(0,Math.floor(src.width*.105)),x1=Math.min(src.width,Math.ceil(src.width*.59)),sw=Math.max(1,x1-x0),scale=4;
+  const tmp=document.createElement('canvas');tmp.width=sw;tmp.height=src.height;const tg=tmp.getContext('2d',{willReadFrequently:true});tg.drawImage(src,x0,0,sw,src.height,0,0,sw,src.height);
+  const id=tg.getImageData(0,0,sw,tmp.height),od=tg.createImageData(sw,tmp.height);
+  const sepA=Math.max(0,Math.floor(src.width*sep.left)-x0-2),sepB=Math.min(sw,Math.ceil(src.width*sep.right)-x0+2);
+  for(let y=0;y<tmp.height;y++)for(let x=0;x<sw;x++){const i=(y*sw+x)*4,l=id.data[i]*.299+id.data[i+1]*.587+id.data[i+2]*.114;let v=l>threshold?0:255;if(x>=sepA&&x<=sepB)v=255;od.data[i]=od.data[i+1]=od.data[i+2]=v;od.data[i+3]=255}
+  tg.putImageData(od,0,0);const out=document.createElement('canvas');out.width=sw*scale;out.height=tmp.height*scale;const og=out.getContext('2d');og.imageSmoothingEnabled=false;og.fillStyle='#fff';og.fillRect(0,0,out.width,out.height);og.drawImage(tmp,0,0,out.width,out.height);return out
+}
+function paddleResultText(result){
+  const items=[...(result?.items||[])].sort((a,b)=>Math.min(...(a.poly||[]).map(p=>p?.[0]??0))-Math.min(...(b.poly||[]).map(p=>p?.[0]??0)));
+  const text=items.map(x=>String(x.text||'').trim()).filter(Boolean).join(' ').trim();
+  const score=items.length?items.reduce((n,x)=>n+Number(x.score||0),0)/items.length:0;
+  return{text,score}
+}
+function parsedFromNameVariants(variants){
+  const cleaned=[...new Set(variants.map(v=>cleanOCR(v.text)).filter(Boolean))],names=[],surnames=[],givens=[];
+  for(const t of cleaned){const n=ocrNameOnly(t);if(n)names.push(n);const parts=String(t).trim().split(/\s+/).filter(Boolean);if(parts.length>=2){surnames.push(ocrNamePart(parts[0]));givens.push(ocrNamePart(parts.slice(1).join('')))}}
+  return{name:names[0]||'',names:[...new Set(names)],surname:surnames[0]||'',given:givens[0]||'',surnames:[...new Set(surnames)],givens:[...new Set(givens)],age:'',hand:'',pos:'',text:cleaned.join('｜')}
+}
+async function recognizeNamePaddle(ocr,rowCanvas){
+  const canvases=[paddleNameCanvas(rowCanvas,112),paddleNameCanvas(rowCanvas,128),paddleNameCanvas(rowCanvas,145)];
+  const results=await ocr.predict(canvases,{textRecScoreThresh:.18,textDetThresh:.18,textDetBoxThresh:.20,textDetUnclipRatio:1.35});
+  const vars=(results||[]).map(paddleResultText).filter(x=>x.text);
+  const parsed=parsedFromNameVariants(vars),cm=candidateMatch(parsed),vis=visualCandidateMatch(rowCanvas,parsed);
+  let chosen=cm;if(vis?.match&&(!cm?.match||vis.match.score>(cm.match?.score||cm.candidates?.[0]?.score||0)+.035))chosen=vis;
+  const conf=vars.length?Math.max(...vars.map(x=>x.score)):0;
+  return{parsed,cm:chosen,raw:vars.map(x=>`${x.text}(${Math.round(x.score*100)}%)`).join('｜'),confidence:conf}
+}
+async function recognizeFooterPaddle(ocr,canvas){
+  try{const [r]=await ocr.predict(canvas,{textRecScoreThresh:.20,textDetThresh:.18,textDetBoxThresh:.20});return paddleResultText(r).text}catch{return''}
+}
+
 function cleanOCR(s){return String(s||'').normalize('NFKC').replace(/[|｜]/g,' ').replace(/\s+/g,' ').trim()}
 function lev(a,b){a=norm(a);b=norm(b);const m=a.length,n=b.length,d=Array.from({length:m+1},()=>Array(n+1).fill(0));for(let i=0;i<=m;i++)d[i][0]=i;for(let j=0;j<=n;j++)d[0][j]=j;for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[m][n]}
 function ocrNameOnly(s){let t=cleanOCR(s).replace(/[0-9A-Za-z]/g,' ').replace(/[／/]/g,' ').replace(/[歳才]/g,' ').replace(/\s+/g,' ').trim();let toks=t.split(' ').filter(Boolean);while(toks.length>2&&['投','捕','一','二','三','遊','外','右','左','両'].includes(toks[0]))toks.shift();return toks.length>=2?toks.slice(-2).join(' '):(toks[0]||t)}
@@ -126,21 +183,46 @@ const BATCH_PITCH=[...BATCH_COMMON,'タイプ','体力','球速','球威','制�
 const BATCH_BAT=[...BATCH_COMMON,'体力','右巧','左巧','長打','バント','選球眼','走力','走塁','精神','守備','捕球','肩力','送球','リード','捕手','一塁','二塁','三塁','遊撃','外野','スキル1','スキル2','スキル3','モデル'];
 function batchHeaderLabel(k){return k==='_screen'?'#':k==='_status'?'狀態':k==='_position'?'守位':(HEADER_ZH[k]||k)}
 function batchSortArrow(k){return state.batchSort===k?(state.batchSortDir==='asc'?' ↑':' ↓'):''}
-function batchCell(r,p,k,displayIndex){if(k==='_screen')return String(displayIndex+1);if(k==='_status')return r.match||r.calibrated?'確認':r.resolved?'推定':'候選';if(k==='_position')return esc(p?._position||POSMAP[r.parsed?.pos]||'—');if(k==='名前'){const alts=(r.candidates||[]).filter(x=>x.p._uid!==p?._uid).slice(0,2),alt=alts.length?`<small class="candidate-note">候選：${alts.map(x=>esc(x.p['名前'])).join(' / ')}</small>`:'';return p?`<span class="name-link" data-uid="${esc(p._uid)}">${esc(p['名前'])}</span>${alt}`:'—'}return esc(p?.[k]||'—')}
-function renderBatchGroup(title,rows,cols){const sorted=sortBatchRows(rows),sortable=new Set(['screen','name','rank','年齢','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野']);let h=`<section class="batch-group"><h3>${esc(title)} <small>${rows.length}</small></h3><div class="table-shell"><table class="data-table batch-detail-table"><thead><tr>`;for(const k of cols){const sk=k==='_screen'?'screen':k==='名前'?'name':k==='ランク'?'rank':k;h+=sortable.has(sk)?`<th class="sortable" data-sort="${esc(sk)}">${esc(batchHeaderLabel(k))}${batchSortArrow(sk)}</th>`:`<th>${esc(batchHeaderLabel(k))}</th>`}h+='</tr></thead><tbody>';sorted.forEach((r,i)=>{const p=batchDisplayPlayer(r);h+='<tr>'+cols.map(k=>`<td class="${k==='名前'?'name':''} ${k==='_status'?(r.match||r.calibrated?'good':r.resolved?'estimate':'unresolved'):''}">${batchCell(r,p,k,i)}</td>`).join('')+'</tr>'});h+='</tbody></table></div></section>';return h}
+function batchCell(r,p,k,displayIndex){if(k==='_screen')return String(displayIndex+1);if(k==='_status')return r.match?'確認':r.resolved?'推定':'候選';if(k==='_position')return esc(p?._position||POSMAP[r.parsed?.pos]||'—');if(k==='名前'){const alts=(r.candidates||[]).filter(x=>x.p._uid!==p?._uid).slice(0,2),alt=alts.length?`<small class="candidate-note">候選：${alts.map(x=>esc(x.p['名前'])).join(' / ')}</small>`:'';return p?`<span class="name-link" data-uid="${esc(p._uid)}">${esc(p['名前'])}</span>${alt}`:'—'}return esc(p?.[k]||'—')}
+function renderBatchGroup(title,rows,cols){const sorted=sortBatchRows(rows),sortable=new Set(['screen','name','rank','年齢','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野']);let h=`<section class="batch-group"><h3>${esc(title)} <small>${rows.length}</small></h3><div class="table-shell"><table class="data-table batch-detail-table"><thead><tr>`;for(const k of cols){const sk=k==='_screen'?'screen':k==='名前'?'name':k==='ランク'?'rank':k;h+=sortable.has(sk)?`<th class="sortable" data-sort="${esc(sk)}">${esc(batchHeaderLabel(k))}${batchSortArrow(sk)}</th>`:`<th>${esc(batchHeaderLabel(k))}</th>`}h+='</tr></thead><tbody>';sorted.forEach((r,i)=>{const p=batchDisplayPlayer(r);h+='<tr>'+cols.map(k=>`<td class="${k==='名前'?'name':''} ${k==='_status'?(r.match?'good':r.resolved?'estimate':'unresolved'):''}">${batchCell(r,p,k,i)}</td>`).join('')+'</tr>'});h+='</tbody></table></div></section>';return h}
 async function recognizeText(worker,canvas){const r=await worker.recognize(canvas);return{text:cleanOCR(r?.data?.text||''),confidence:Number(r?.data?.confidence||0)}}
-async function runBatch(){if(!state.batchFiles.length){alert('請先選擇截圖。');return}if(state.players.length<1000){$('#batchStatus').textContent='完整名冊尚未載入，請先到「資料」按更新名冊。';return}$('#runBatch').disabled=true;let worker=null;try{$('#batchStatus').textContent='比對高解析校準樣本…';if(await tryCalibrationBatch())return;const screens=[],all=[];$('#batchStatus').textContent='未命中校準樣本，切換一般影像辨識…';for(const f of state.batchFiles){const im=await loadImage(f),rows=rowCrops(im,f.name);screens.push({file:f.name,footer:footerCrop(im,f.name)});all.push(...rows)}state.batchRawRows=all.map((r,i)=>({...r,firstIndex:i,status:'待辨識',raw:'',parsed:null,match:null,candidates:[],ocrConfidence:0,score:0}));state.batchRows=[];renderBatchResults();$('#batchStatus').textContent=`已切出 ${all.length} 個畫面列；載入手機/桌機共用本機引擎…`;const ok=await ensureLocalOCR();if(!ok)throw new Error('本機辨識引擎檔案未載入；請重新整理網站後再試');worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang',logger:m=>{if(m.status==='loading tesseract core'||m.status==='loading language traineddata')$('#batchStatus').textContent='載入本機日文辨識資料…'}}),25000,'本機日文辨識引擎載入逾時');try{await worker.writeText('yt3-user-words.txt',batchUserWords());await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1',user_words_file:'yt3-user-words.txt'})}catch(e){console.warn('player dictionary',e)}
-  // 先讀頁尾的「合計 xx 人」；只作結果上限，不會把部分截圖強行補到總人數。
-  let totals=[];for(const s of screens){try{const f=await recognizeText(worker,binaryCanvas(s.footer.canvas,120,{scale:3})),n=parseExpectedTotal(f.text);if(n)totals.push(n)}catch(e){}}state.expectedTotal=totals.length?Math.max(...totals):0;
-  for(let i=0;i<state.batchRawRows.length;i++){const row=state.batchRawRows[i];$('#batchStatus').textContent=`辨識 ${i+1}/${state.batchRawRows.length}${state.expectedTotal?`｜名單上限 ${state.expectedTotal}`:''}`;try{let a=await recognizeText(worker,binaryCanvas(row.canvas,125,{scale:3}));let parsed=parseRowText(a.text),cm=candidateMatch(parsed);row.raw=a.text;row.ocrConfidence=a.confidence;row.parsed=parsed;row.match=cm.match;row.candidates=cm.candidates;row.score=cm.match?.score||cm.candidates?.[0]?.score||0;const earlyVisual=visualCandidateMatch(row.canvas,parsed);if(earlyVisual?.match&&(!row.match||earlyVisual.match.score>row.score+.035)){row.match=earlyVisual.match;row.candidates=earlyVisual.candidates;row.score=earlyVisual.match.score;row.status='確認'}
-      if(!row.match){const np=await recognizeFixedParts(worker,row.canvas,125);parsed=parseRowText(a.text);parsed.surname=np.surname;parsed.given=np.given;parsed.age=np.age||parsed.age;parsed.hand=np.hand||parsed.hand;parsed.pos=np.pos||parsed.pos;parsed.names=[...new Set([...(parsed.names||[]),`${np.surname} ${np.given}`.trim()].filter(Boolean))];cm=visualCandidateMatch(row.canvas,parsed)||candidateMatch(parsed);row.raw=`${a.text}｜固定欄:${np.raw}`;row.ocrConfidence=Math.max(a.confidence,np.confidence);row.parsed=parsed;row.match=cm.match;row.candidates=cm.candidates;row.score=cm.match?.score||cm.candidates?.[0]?.score||0}
-      if(!row.match&&row.candidates?.[0]?.nameScore<.68){const np2=await recognizeFixedParts(worker,row.canvas,145);parsed={...row.parsed,surname:np2.surname||row.parsed?.surname,given:np2.given||row.parsed?.given,age:np2.age||row.parsed?.age,hand:np2.hand||row.parsed?.hand,pos:np2.pos||row.parsed?.pos};parsed.names=[...new Set([...(parsed.names||[]),`${np2.surname} ${np2.given}`.trim()].filter(Boolean))];cm=visualCandidateMatch(row.canvas,parsed)||candidateMatch(parsed);row.raw=`${row.raw}｜固定欄補辨:${np2.raw}`;row.ocrConfidence=Math.max(row.ocrConfidence,np2.confidence);row.parsed=parsed;row.match=cm.match;row.candidates=cm.candidates;row.score=cm.match?.score||cm.candidates?.[0]?.score||0}
-      row.status=row.match?'確認':'候選';}catch(e){row.status='失敗';row.raw=String(e.message||e)}if(i%4===0){state.batchRows=consolidateRows(state.batchRawRows.slice(0,i+1),0);renderBatchResults()}}
-  state.batchRows=resolveUniqueCandidates(consolidateRows(state.batchRawRows,state.expectedTotal));const matched=state.batchRows.filter(r=>r.match).length,inferred=state.batchRows.filter(r=>!r.match&&r.resolved).length;$('#batchStatus').textContent=`完成：${state.batchRows.length} 人${state.expectedTotal?`／畫面名單上限 ${state.expectedTotal}`:''}；確認 ${matched}，推定 ${inferred}，候選 ${state.batchRows.length-matched-inferred}。`;renderBatchResults();
- }catch(e){console.error(e);$('#batchStatus').textContent='批次找人失敗：'+(e.message||e)}finally{if(worker)try{await worker.terminate()}catch(e){}$('#runBatch').disabled=false}}
+async function runBatch(){
+  if(!state.batchFiles.length){alert('請先選擇截圖。');return}
+  if(state.players.length<1000){$('#batchStatus').textContent='完整名冊尚未載入，請先到「資料」按更新名冊。';return}
+  $('#runBatch').disabled=true;let paddle=null,worker=null;
+  try{
+    const screens=[],all=[];setBatchProgress(1,'分析固定版面…');
+    for(const f of state.batchFiles){const im=await loadImage(f),rows=rowCrops(im,f.name).filter(r=>nameInkRatio(r.canvas)>.006);screens.push({file:f.name,footer:footerCrop(im,f.name)});all.push(...rows)}
+    state.batchRawRows=all.map((r,i)=>({...r,firstIndex:i,status:'待辨識',raw:'',parsed:null,match:null,candidates:[],ocrConfidence:0,score:0}));state.batchRows=[];state.expectedTotal=0;renderBatchResults();
+    let paddleError=null;
+    try{paddle=await createPaddleOCR()}catch(e){paddleError=e;console.warn('PaddleOCR init',e)}
+    if(paddle){
+      let totals=[];for(const sc of screens){const t=await recognizeFooterPaddle(paddle,sc.footer.canvas),n=parseExpectedTotal(t);if(n)totals.push(n)}state.expectedTotal=totals.length?Math.max(...totals):0;
+      for(let i=0;i<state.batchRawRows.length;i++){
+        const row=state.batchRawRows[i];setBatchProgress(6+88*(i/Math.max(1,state.batchRawRows.length)),`PaddleOCR 姓名辨識 ${i+1}/${state.batchRawRows.length}`);
+        try{const rr=await recognizeNamePaddle(paddle,row.canvas);row.raw=rr.raw;row.ocrConfidence=Math.round(rr.confidence*100);row.parsed=rr.parsed;row.match=rr.cm?.match||null;row.candidates=rr.cm?.candidates||[];row.score=row.match?.score||row.candidates?.[0]?.score||0;row.status=row.match?'確認':'候選'}catch(e){row.status='失敗';row.raw=String(e.message||e)}
+        if(i%4===0){state.batchRows=consolidateRows(state.batchRawRows.slice(0,i+1),0);renderBatchResults()}
+      }
+    }else{
+      setBatchProgress(8,`PaddleOCR 無法啟動，切換 Tesseract 備援：${paddleError?.message||''}`);
+      const ok=await ensureLocalOCR();if(!ok)throw new Error('兩個本機辨識引擎都無法載入');
+      worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),30000,'Tesseract 備援載入逾時');
+      try{await worker.writeText('yt3-user-words.txt',batchUserWords());await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1',user_words_file:'yt3-user-words.txt'})}catch{}
+      for(let i=0;i<state.batchRawRows.length;i++){
+        const row=state.batchRawRows[i];setBatchProgress(10+85*(i/Math.max(1,state.batchRawRows.length)),`Tesseract 備援 ${i+1}/${state.batchRawRows.length}`);
+        try{const np=await recognizeFixedParts(worker,row.canvas,125),parsed={name:`${np.surname} ${np.given}`.trim(),names:[`${np.surname} ${np.given}`.trim()].filter(Boolean),surname:np.surname,given:np.given,surnames:[np.surname].filter(Boolean),givens:[np.given].filter(Boolean),age:np.age,hand:np.hand,pos:np.pos,text:np.raw},cm=candidateMatch(parsed);row.raw=np.raw;row.ocrConfidence=np.confidence;row.parsed=parsed;row.match=cm.match;row.candidates=cm.candidates;row.score=cm.match?.score||cm.candidates?.[0]?.score||0;row.status=row.match?'確認':'候選'}catch(e){row.status='失敗';row.raw=String(e.message||e)}
+      }
+    }
+    state.batchRows=resolveUniqueCandidates(consolidateRows(state.batchRawRows,state.expectedTotal));
+    const matched=state.batchRows.filter(r=>r.match).length,inferred=state.batchRows.filter(r=>!r.match&&r.resolved).length;
+    setBatchProgress(100,`完成：${state.batchRows.length} 人${state.expectedTotal?`／畫面名單上限 ${state.expectedTotal}`:''}；確認 ${matched}，推定 ${inferred}，候選 ${state.batchRows.length-matched-inferred}`);
+    renderBatchResults();
+  }catch(e){console.error(e);$('#batchStatus').textContent='批次找人失敗：'+(e.message||e)}
+  finally{if(paddle)try{await paddle.dispose()}catch{}if(worker)try{await worker.terminate()}catch{}$('#runBatch').disabled=false}
+}
 $('#runBatch').onclick=runBatch;
 function renderBatchResults(){
-  const matched=state.batchRows.filter(r=>r.match||r.calibrated).length,inferred=state.batchRows.filter(r=>!r.match&&!r.calibrated&&r.resolved).length;
+  const matched=state.batchRows.filter(r=>r.match).length,inferred=state.batchRows.filter(r=>!r.match&&r.resolved).length;
   $('#batchSummary').textContent=state.batchRows.length?`結果 ${state.batchRows.length}${state.expectedTotal?` / 最多 ${state.expectedTotal}`:''}｜確認 ${matched}｜推定 ${inferred}｜候選 ${state.batchRows.length-matched-inferred}`:'';
   const groups={投手:[],捕手:[],內野手:[],外野手:[],其他:[]};for(const r of state.batchRows){const p=batchDisplayPlayer(r);groups[batchGroupName(p)].push(r)}
   let h='';for(const key of ['投手','捕手','內野手','外野手','其他'])if(groups[key].length)h+=renderBatchGroup(key,groups[key],key==='投手'?BATCH_PITCH:BATCH_BAT);
@@ -151,5 +233,31 @@ function renderBatchResults(){
 
 
 let deferredPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('#installBtn').classList.remove('hidden')});$('#installBtn').onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$('#installBtn').classList.add('hidden')};
+
+async function remoteVersion(){try{const r=await fetch(`./VERSION?t=${Date.now()}`,{cache:'no-store'});return r.ok?(await r.text()).trim():''}catch{return''}}
+function showUpdateBar(text,percent=0,action=true){const bar=$('#updateBar');if(!bar)return;bar.classList.remove('hidden');$('#updateText').textContent=text;$('#updateProgress').value=percent;$('#applyUpdate').classList.toggle('hidden',!action)}
+function hideUpdateBar(){const bar=$('#updateBar');if(bar)bar.classList.add('hidden')}
+async function checkAppUpdate(manual=false){
+  if(manual)showUpdateBar('檢查最新版…',8,false);
+  const v=await remoteVersion();
+  if(v&&v!==APP_VERSION){showUpdateBar(`有新版 ${v}（目前 ${APP_VERSION}）`,12,true);return true}
+  if(manual){showUpdateBar(`已是最新版 ${APP_VERSION}`,100,false);setTimeout(hideUpdateBar,1200)}
+  return false
+}
+async function applyAppUpdate(){
+  try{
+    showUpdateBar('更新程式與離線快取…',18,false);
+    if('serviceWorker'in navigator){const regs=await navigator.serviceWorker.getRegistrations();for(const reg of regs)try{await reg.update()}catch{}}
+    $('#updateProgress').value=45;
+    const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('yt3-')).map(k=>caches.delete(k)));
+    $('#updateProgress').value=72;
+    await fetch(`./index.html?t=${Date.now()}`,{cache:'reload'});await fetch(`./app.js?t=${Date.now()}`,{cache:'reload'});
+    $('#updateProgress').value=100;$('#updateText').textContent='更新完成，重新載入…';
+    setTimeout(()=>location.replace(`./?updated=${Date.now()}`),350);
+  }catch(e){showUpdateBar('更新失敗：'+(e.message||e),0,true)}
+}
+$('#updateBtn').onclick=()=>checkAppUpdate(true);$('#applyUpdate').onclick=applyAppUpdate;
+window.addEventListener('load',()=>{setTimeout(()=>checkAppUpdate(false),900);setInterval(()=>checkAppUpdate(false),15*60*1000)});
+
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 loadData().catch(e=>{$('#dataStatus').textContent='資料載入失敗：'+e.message;console.error(e)});
