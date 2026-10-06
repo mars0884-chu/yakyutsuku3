@@ -22,6 +22,12 @@ jobs:
         with:
           node-version: 22
       - run: npm install --no-audit --no-fund
+      - name: Validate JavaScript syntax
+        run: |
+          node --check app.js
+          node --check scripts/refresh-data.mjs
+          node --check scripts/vendor-cover.mjs
+          node --check scripts/vendor-ocr.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
