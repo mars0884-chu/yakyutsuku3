@@ -26,13 +26,17 @@ jobs:
       - name: Validate JavaScript syntax
         run: |
           node --check app.js
+          node --check krom-profile.js
           node --check scripts/refresh-data.mjs
           node --check scripts/vendor-cover.mjs
           node --check scripts/vendor-ocr.mjs
           node --check scripts/vendor-paddleocr.mjs
           node --check scripts/smoke-recognition.mjs
+          node --check scripts/smoke-krom.mjs
       - name: Verify desktop/mobile recognition coexistence
         run: node scripts/smoke-recognition.mjs
+      - name: Verify PS2 KROM fingerprint engine
+        run: node scripts/smoke-krom.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
@@ -45,7 +49,7 @@ jobs:
         run: |
           rm -rf _site
           mkdir -p _site
-          cp index.html styles.css app.js manifest.webmanifest sw.js VERSION _site/
+          cp index.html styles.css krom-profile.js app.js manifest.webmanifest sw.js VERSION _site/
           cp -R assets data vendor _site/
           touch _site/.nojekyll
       - name: Publish complete site to gh-pages branch
