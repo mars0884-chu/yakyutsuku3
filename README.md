@@ -5,7 +5,7 @@
 ## 主功能
 
 - 選手搜尋：GitHub Pages 建置時從 Gamezukushi 15 個名冊頁產生完整 3,767 人資料。
-- 批次找人：固定 OFFICE MENU 版面切列，先以同站本機 PaddleOCR／Tesseract 獨立讀取日文姓名，再拿 OCR 結果與 3,767 人完整資料庫比對；不使用特定截圖校準名單，低信心只顯示候選，不把第一候選冒充成已確認選手。
+- 批次找人：桌機與手機共用同一套固定 OFFICE MENU 版面 CV 主流程，先做本機字形／版面比對，再與 3,767 人資料庫交叉約束；iPhone/iPad 不啟動 PaddleOCR，桌機的 PaddleOCR／Tesseract 只做可選複核。低信心只顯示候選。
 - 攻略：既有 742 筆整理資料與 31 章整合攻略全文搜尋。
 - 金手指：XT／PAR／PCSX2 資料與來源分開整理。
 - PWA：HTTPS 下可安裝、Service Worker 快取，避免 iPhone Edge 以 `file://` 開啟造成 worker/WASM/CORS 問題。
@@ -32,3 +32,12 @@
 - 攻略首頁改成「開局／經營、找人／契約、養成／能力、實戰／模式、深入／考古」分組；來源連結收折在各段底部。
 - 巴哈姆特板號 6035 已取得並整理可讀全文：2006 新金手指、金手指 1／2、初期經營法、2018 PS2／PCSX2 心得；NDS 混合串只採明確指向 PS2 三代的回覆，DC 二代內容排除。
 - PWA 啟動時自動檢查版本；右上角保留「檢查更新」鍵，發現新版後顯示進度條並更新 Service Worker／快取，不必先刪除主畫面書籤。
+
+
+## 2026-10-07 r3
+
+- 桌機與手機改成同一個固定版面 CV 主核心：兩邊都先執行 `cvAnalyzeRows()`，不再有「手機只能走失敗備援」的架構。
+- iPhone／iPad 主動跳過 PaddleOCR，避免 WebKit/ONNX WASM `no available backend found`；Tesseract 只在可載入時讀頁尾總人數，不是姓名辨識的必要條件。
+- 桌機仍可使用 PaddleOCR／Tesseract 複核低信心列，但 OCR 掛掉時 CV 結果仍可繼續完成。
+- 修正頁尾裁切：舊版裁到約 90% 寬度，會切掉最右側「合計：xx人」；新版改讀完整頁尾，並增加純 CV 的總人數備援。
+- Pages CI 新增桌機／iPhone/iPad 分支 smoke test，並強制確認平台分流發生在共用 CV 之後。
