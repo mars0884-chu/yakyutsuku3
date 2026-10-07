@@ -1,11 +1,11 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='2026.10.07-r8';
+const APP_VERSION='2026.10.07-r9';
 const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,batchSort:'screen',batchSortDir:'asc'};
 const HEADER_ZH={"名前":"姓名","年齢":"年齡","成長":"成長型","投/打":"投／打","出身":"出身地","高校":"高中","大学":"大學","社会人":"社會人","タイプ":"投手類型","ランク":"Rank","体力":"體力","球速":"球速","球威":"球威","制球":"控球","精神":"精神","守備":"守備","捕球":"接球","肩力":"臂力","送球":"傳球","スライダー":"滑球","速スラ":"高速滑球","カットB":"卡特球","カーブ":"曲球","Sカーブ":"S曲球","ドロップ":"Drop曲球","シュート":"噴射球","速シュート":"高速噴射球","シンカー":"伸卡球","スクリュー":"螺旋球","速シンカー":"高速伸卡球","サークルC":"圈指變速","2シーム":"二縫線","Cアップ":"變速球","フォーク":"指叉球","SFF":"快速指叉","縦スラ":"縱滑球","パーム":"掌心球","ナックル":"蝴蝶球","スキル1":"技能1","スキル2":"技能2","スキル3":"技能3","モデル":"原型","右巧":"對右巧打","左巧":"對左巧打","長打":"長打","バント":"短打","選球眼":"選球眼","走力":"跑力","走塁":"跑壘","リード":"配球","捕手":"捕手","一塁":"一壘","二塁":"二壘","三塁":"三壘","遊撃":"游擊","外野":"外野","リーグ":"聯盟／地區","アカデミー":"學院"};
 const BASE_COLS=['名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function norm(v){return String(v??'').normalize('NFKC').toLowerCase().replace(/[\s　・·･,，。\.\/／()（）\-–—_:：;；'"「」『』【】\[\]]/g,'')}
-function normName(v){const t=norm(v);return [...t].map(ch=>{const c=ch.charCodeAt(0);return c>=0x30A1&&c<=0x30F6?String.fromCharCode(c-0x60):ch}).join('')}
+function normName(v){const variants={'薮':'藪','澤':'沢','髙':'高','﨑':'崎','邉':'辺','邊':'辺','濵':'浜','濱':'浜','齋':'斎','齊':'斉','國':'国','廣':'広','神':'神'};const t=norm(v);return [...t].map(ch=>{const c=ch.charCodeAt(0),x=c>=0x30A1&&c<=0x30F6?String.fromCharCode(c-0x60):ch;return variants[x]||x}).join('')}
 function debounce(fn,ms=150){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}}
 async function getJSON(url,opts={}){const r=await fetch(url,{cache:opts.cache||'no-store'});if(!r.ok)throw new Error(`${url} ${r.status}`);return r.json()}
 const ROSTER_DB='yakyutsuku3-roster-v1',ROSTER_STORE='kv',ROSTER_KEY='players-3767';
@@ -217,33 +217,32 @@ function nameInkRatio(src){
   let hi=0,lo=0;for(let i=0;i<id.length;i+=4){const l=id[i]*.299+id[i+1]*.587+id[i+2]*.114;if(l>145)hi++;if(l<95)lo++}
   return Math.min(hi,lo)/Math.max(1,id.length/4)
 }
-function paddleNameCanvas(src,threshold=122){
-  const sep=detectNameSeparator(src),x0=Math.max(0,Math.floor(src.width*.105)),x1=Math.min(src.width,Math.ceil(src.width*.59)),sw=Math.max(1,x1-x0),scale=4;
-  const tmp=document.createElement('canvas');tmp.width=sw;tmp.height=src.height;const tg=tmp.getContext('2d',{willReadFrequently:true});tg.drawImage(src,x0,0,sw,src.height,0,0,sw,src.height);
-  const id=tg.getImageData(0,0,sw,tmp.height),od=tg.createImageData(sw,tmp.height);
-  const sepA=Math.max(0,Math.floor(src.width*sep.left)-x0-2),sepB=Math.min(sw,Math.ceil(src.width*sep.right)-x0+2);
-  for(let y=0;y<tmp.height;y++)for(let x=0;x<sw;x++){const i=(y*sw+x)*4,l=id.data[i]*.299+id.data[i+1]*.587+id.data[i+2]*.114;let v=l>threshold?0:255;if(x>=sepA&&x<=sepB)v=255;od.data[i]=od.data[i+1]=od.data[i+2]=v;od.data[i+3]=255}
-  tg.putImageData(od,0,0);const out=document.createElement('canvas');out.width=sw*scale;out.height=tmp.height*scale;const og=out.getContext('2d');og.imageSmoothingEnabled=false;og.fillStyle='#fff';og.fillRect(0,0,out.width,out.height);og.drawImage(tmp,0,0,out.width,out.height);return out
+function paddlePartCanvas(src,part,threshold=122){
+  const sep=detectNameSeparator(src);
+  const rx0=part==='surname'?.115:Math.min(.50,sep.right+.008),rx1=part==='surname'?Math.max(.18,sep.left-.008):.575;
+  const x0=Math.max(0,Math.floor(src.width*rx0)),x1=Math.min(src.width,Math.ceil(src.width*rx1)),sw=Math.max(1,x1-x0),scale=5;
+  const tmp=document.createElement('canvas');tmp.width=sw;tmp.height=src.height;const g=tmp.getContext('2d',{willReadFrequently:true});g.drawImage(src,x0,0,sw,src.height,0,0,sw,src.height);
+  const id=g.getImageData(0,0,sw,tmp.height),od=g.createImageData(sw,tmp.height);
+  for(let y=0;y<tmp.height;y++)for(let x=0;x<sw;x++){const i=(y*sw+x)*4,l=id.data[i]*.299+id.data[i+1]*.587+id.data[i+2]*.114,v=l>threshold?0:255;od.data[i]=od.data[i+1]=od.data[i+2]=v;od.data[i+3]=255}
+  g.putImageData(od,0,0);const out=document.createElement('canvas');out.width=sw*scale;out.height=tmp.height*scale;const og=out.getContext('2d');og.imageSmoothingEnabled=false;og.fillStyle='#fff';og.fillRect(0,0,out.width,out.height);og.drawImage(tmp,0,0,out.width,out.height);return out
 }
 function paddleResultText(result){
   const items=[...(result?.items||[])].sort((a,b)=>Math.min(...(a.poly||[]).map(p=>p?.[0]??0))-Math.min(...(b.poly||[]).map(p=>p?.[0]??0)));
-  const text=items.map(x=>String(x.text||'').trim()).filter(Boolean).join(' ').trim();
+  const text=items.map(x=>String(x.text||'').trim()).filter(Boolean).join('').trim();
   const score=items.length?items.reduce((n,x)=>n+Number(x.score||0),0)/items.length:0;
   return{text,score}
 }
-function parsedFromNameVariants(variants){
-  const cleaned=[...new Set(variants.map(v=>cleanOCR(v.text)).filter(Boolean))],names=[],surnames=[],givens=[];
-  for(const t of cleaned){const n=ocrNameOnly(t);if(n)names.push(n);const parts=String(t).trim().split(/\s+/).filter(Boolean);if(parts.length>=2){surnames.push(ocrNamePart(parts[0]));givens.push(ocrNamePart(parts.slice(1).join('')))}}
-  return{name:names[0]||'',names:[...new Set(names)],surname:surnames[0]||'',given:givens[0]||'',surnames:[...new Set(surnames)],givens:[...new Set(givens)],age:'',hand:'',pos:'',text:cleaned.join('｜')}
-}
 async function recognizeNamePaddle(ocr,rowCanvas){
-  const canvases=[paddleNameCanvas(rowCanvas,112),paddleNameCanvas(rowCanvas,128),paddleNameCanvas(rowCanvas,145)];
-  const results=await ocr.predict(canvases,{textRecScoreThresh:.18,textDetThresh:.18,textDetBoxThresh:.20,textDetUnclipRatio:1.35});
-  const vars=(results||[]).map(paddleResultText).filter(x=>x.text);
-  const parsed=parsedFromNameVariants(vars),cm=candidateMatch(parsed),vis=visualCandidateMatch(rowCanvas,parsed);
+  const thresholds=[112,128,145],canvases=[];
+  for(const th of thresholds){canvases.push(paddlePartCanvas(rowCanvas,'surname',th));canvases.push(paddlePartCanvas(rowCanvas,'given',th))}
+  const results=await ocr.predict(canvases,{textRecScoreThresh:.18,textDetThresh:.18,textDetBoxThresh:.20,textDetUnclipRatio:1.30});
+  const surnames=[],givens=[],raw=[],scores=[];
+  for(let i=0;i<(results||[]).length;i++){const x=paddleResultText(results[i]),part=i%2===0?'S':'G';if(x.text){const v=ocrNamePart(x.text);if(v){(part==='S'?surnames:givens).push(v);raw.push(part+':'+v+'('+Math.round(x.score*100)+'%)');scores.push(x.score)}}}
+  const su=[...new Set(surnames)],gi=[...new Set(givens)],names=[];for(const a of su)for(const b of gi)names.push((a+' '+b).trim());
+  const parsed={name:names[0]||'',names:[...new Set(names)],surname:su[0]||'',given:gi[0]||'',surnames:su,givens:gi,age:'',hand:'',pos:'',text:raw.join('｜')};
+  const cm=candidateMatch(parsed),vis=visualCandidateMatch(rowCanvas,parsed);
   let chosen=cm;if(vis?.match&&(!cm?.match||vis.match.score>(cm.match?.score||cm.candidates?.[0]?.score||0)+.035))chosen=vis;
-  const conf=vars.length?Math.max(...vars.map(x=>x.score)):0;
-  return{parsed,cm:chosen,raw:vars.map(x=>`${x.text}(${Math.round(x.score*100)}%)`).join('｜'),confidence:conf}
+  return{parsed,cm:chosen,raw:raw.join('｜'),confidence:scores.length?Math.max(...scores):0}
 }
 async function recognizeFooterPaddle(ocr,canvas){
   try{const [r]=await ocr.predict(canvas,{textRecScoreThresh:.20,textDetThresh:.18,textDetBoxThresh:.20});return paddleResultText(r).text}catch{return''}
@@ -261,7 +260,30 @@ const visualTemplateCache=new Map();
 function renderedWordBitmap(word,w,h,weight=700){const key=`${word}|${w}x${h}|${weight}`;if(visualTemplateCache.has(key))return visualTemplateCache.get(key);const c=document.createElement('canvas');c.width=220;c.height=64;const g=c.getContext('2d',{willReadFrequently:true});g.fillStyle='#000';g.fillRect(0,0,c.width,c.height);g.fillStyle='#fff';g.textBaseline='top';g.font=`${weight} 34px ${VISUAL_FONT_STACK}`;g.fillText(word,2,-3);const id=g.getImageData(0,0,c.width,c.height),pts=[];for(let y=0;y<c.height;y++)for(let x=0;x<c.width;x++){const i=(y*c.width+x)*4;if(id.data[i]>72)pts.push([x,y])}if(!pts.length)return null;let minx=c.width,miny=c.height,maxx=0,maxy=0;for(const [x,y] of pts){if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y}const src=document.createElement('canvas');src.width=maxx-minx+1;src.height=maxy-miny+1;src.getContext('2d').drawImage(c,minx,miny,src.width,src.height,0,0,src.width,src.height);const out=document.createElement('canvas');out.width=w;out.height=h;const og=out.getContext('2d',{willReadFrequently:true});og.imageSmoothingEnabled=true;og.drawImage(src,0,0,w,h);const od=og.getImageData(0,0,w,h).data,bits=new Uint8Array(w*h);for(let i=0,j=0;i<od.length;i+=4,j++)bits[j]=od[i]>72?1:0;const v={bits,w,h};visualTemplateCache.set(key,v);if(visualTemplateCache.size>9000){const first=visualTemplateCache.keys().next().value;visualTemplateCache.delete(first)}return v}
 function bitmapDice(a,b,dx=0,dy=0){let inter=0,na=0,nb=0;for(let y=0;y<a.h;y++)for(let x=0;x<a.w;x++){const av=a.bits[y*a.w+x];if(av)na++;const bx=x-dx,by=y-dy,bv=(bx>=0&&bx<b.w&&by>=0&&by<b.h)?b.bits[by*b.w+bx]:0;if(bv)nb++;if(av&&bv)inter++}return(2*inter)/(na+nb+1e-6)}
 function visualWordSimilarity(target,word){if(!target||!word)return 0;let best=0;for(const weight of [600,700,800]){const tpl=renderedWordBitmap(word,target.w,target.h,weight);if(!tpl)continue;for(let dy=-1;dy<=1;dy++)for(let dx=-2;dx<=2;dx++){const sc=bitmapDice(target,tpl,dx,dy);if(sc>best)best=sc}}return best}
-function visualCandidateMatch(canvas,parsed){const sep=detectNameSeparator(canvas),surnameTarget=targetWordBitmap(canvas,.115,Math.max(.18,sep.left-.008),108),givenTarget=targetWordBitmap(canvas,Math.min(.50,sep.right+.008),.575,108);if(!surnameTarget&&!givenTarget)return null;let pool=state.players;const gates=[];if(parsed.pos)gates.push(p=>p._position===POSMAP[parsed.pos]);if(parsed.hand)gates.push(p=>String(p['投/打']||'').replace('／','/')===parsed.hand);for(const gate of gates){const n=pool.filter(gate);if(n.length)pool=n}if(surnameTarget){const n=pool.filter(p=>Math.abs([...splitPlayerName(p['名前']).surname].length-surnameTarget.charCount)<=1);if(n.length)pool=n}if(givenTarget){const n=pool.filter(p=>Math.abs([...splitPlayerName(p['名前']).given].length-givenTarget.charCount)<=1);if(n.length)pool=n}const scored=pool.map(p=>{const q=splitPlayerName(p['名前']),ss=surnameTarget?visualWordSimilarity(surnameTarget,q.surname):0,gs=givenTarget?visualWordSimilarity(givenTarget,q.given):0,den=(surnameTarget?.45:0)+(givenTarget?.55:0)||1,visual=(ss*.45+gs*.55)/den;let meta=0,bonus=0;if(parsed.pos&&p._position===POSMAP[parsed.pos]){meta++;bonus+=.025}if(parsed.hand&&String(p['投/打']||'').replace('／','/')===parsed.hand){meta++;bonus+=.035}if(parsed.age&&String(p['年齢']||'')===parsed.age)bonus+=.006;return{p,score:Math.min(1,visual+bonus),visualScore:visual,surnameScore:ss,givenScore:gs,nameScore:visual,meta}}).sort((a,b)=>b.score-a.score),best=scored[0],second=scored[1];if(!best)return null;const margin=best.score-(second?.score||0),accept=(best.visualScore>=.78&&margin>=.03)||(best.visualScore>=.71&&best.meta>=1&&margin>=.025)||(best.visualScore>=.67&&best.meta>=2&&margin>=.02);return{match:accept?best:null,candidates:scored.slice(0,12),margin,method:'visual'}}
+function visualCandidateMatch(canvas,parsed){
+  const sep=detectNameSeparator(canvas),surnameTarget=targetWordBitmap(canvas,.115,Math.max(.18,sep.left-.008),108),givenTarget=targetWordBitmap(canvas,Math.min(.50,sep.right+.008),.575,108);
+  if(!surnameTarget&&!givenTarget)return null;
+  let pool=state.players;const gates=[];
+  if(parsed.pos)gates.push(p=>p._position===POSMAP[parsed.pos]);
+  if(parsed.hand)gates.push(p=>String(p['投/打']||'').replace('／','/')===parsed.hand);
+  for(const gate of gates){const n=pool.filter(gate);if(n.length)pool=n}
+  const surnameTexts=[...new Set([parsed.surname,...(parsed.surnames||[])].filter(Boolean))];
+  if(surnameTexts.length){
+    const scored=pool.map(p=>{const q=splitPlayerName(p['名前']),t=Math.max(...surnameTexts.map(x=>nameSimilarity(x,q.surname)),0);return{p,t}}).sort((a,b)=>b.t-a.t);
+    const best=scored[0]?.t||0;if(best>=.48){const n=scored.filter(x=>x.t>=Math.max(.42,best-.08)).map(x=>x.p);if(n.length&&n.length<=220)pool=n}
+  }
+  if(surnameTarget){const n=pool.filter(p=>Math.abs([...splitPlayerName(p['名前']).surname].length-surnameTarget.charCount)<=1);if(n.length)pool=n}
+  if(givenTarget){const n=pool.filter(p=>Math.abs([...splitPlayerName(p['名前']).given].length-givenTarget.charCount)<=1);if(n.length)pool=n}
+  const givenTexts=[...new Set([parsed.given,...(parsed.givens||[])].filter(Boolean))];
+  const scored=pool.map(p=>{
+    const q=splitPlayerName(p['名前']),ss=surnameTarget?visualWordSimilarity(surnameTarget,q.surname):0,gs=givenTarget?visualWordSimilarity(givenTarget,q.given):0,den=(surnameTarget?.45:0)+(givenTarget?.55:0)||1,visual=(ss*.45+gs*.55)/den;
+    const ts=surnameTexts.length?Math.max(...surnameTexts.map(x=>nameSimilarity(x,q.surname)),0):0,tg=givenTexts.length?Math.max(...givenTexts.map(x=>nameSimilarity(x,q.given)),0):0,textBonus=(ts*.035+tg*.025);
+    let meta=0,bonus=textBonus;if(parsed.pos&&p._position===POSMAP[parsed.pos]){meta++;bonus+=.025}if(parsed.hand&&String(p['投/打']||'').replace('／','/')===parsed.hand){meta++;bonus+=.035}if(parsed.age&&String(p['年齢']||'')===parsed.age)bonus+=.006;
+    return{p,score:Math.min(1,visual+bonus),visualScore:visual,surnameScore:ss,givenScore:gs,nameScore:visual,meta,textSurname:ts,textGiven:tg}
+  }).sort((a,b)=>b.score-a.score),best=scored[0],second=scored[1];
+  if(!best)return null;const margin=best.score-(second?.score||0),accept=(best.visualScore>=.78&&margin>=.03)||(best.visualScore>=.71&&best.meta>=1&&margin>=.025)||(best.visualScore>=.67&&best.meta>=2&&margin>=.02);
+  return{match:accept?best:null,candidates:scored.slice(0,12),margin,method:'visual'}
+}
 
 const CV_FONT_CANDIDATES=['"Hiragino Sans"','"Yu Gothic"','"Meiryo"','"Noto Sans JP"', 'sans-serif','serif'];
 const cvGlyphTemplateCache=new Map();
@@ -378,7 +400,80 @@ function chooseExpectedTotal(values,fallback=0){
 }
 function parseExpectedTotal(text){const t=cleanOCR(text);let m=t.match(/(?:合計|含計|会計|馬軒)[^0-9]{0,8}(\d{2,3})\s*人/);if(m)return +m[1];const nums=[...t.matchAll(/(\d{2,3})\s*人/g)].map(x=>+x[1]).filter(n=>n>=20&&n<=200);return nums.length?Math.max(...nums):0}
 function mergeEvidence(a,b){const pa=a.parsed||{},pb=b.parsed||{},parsed={...pa,names:[...new Set([...(pa.names||[]),...(pb.names||[])].filter(Boolean))],surnames:[...new Set([pa.surname,...(pa.surnames||[]),pb.surname,...(pb.surnames||[])].filter(Boolean))],givens:[...new Set([pa.given,...(pa.givens||[]),pb.given,...(pb.givens||[])].filter(Boolean))]};if(!parsed.age)parsed.age=pb.age;if(!parsed.hand)parsed.hand=pb.hand;if(!parsed.pos)parsed.pos=pb.pos;const hasText=parsed.names.length||parsed.surnames.length||parsed.givens.length,cm=hasText?candidateMatch(parsed):null,qa=(a.match?.score||a.candidates?.[0]?.score||0),qb=(b.match?.score||b.candidates?.[0]?.score||0),keep=qb>qa?b:a;const cq=(cm?.match?.score||cm?.candidates?.[0]?.score||0),chosen=cm?.candidates?.length&&cq>Math.max(qa,qb)?cm:{match:keep.match||null,candidates:keep.candidates||[]};return{...keep,parsed,raw:[a.raw,b.raw].filter(Boolean).join(' || '),ocrConfidence:Math.max(a.ocrConfidence||0,b.ocrConfidence||0),match:chosen.match||null,candidates:chosen.candidates||[],score:chosen.match?.score||chosen.candidates?.[0]?.score||0,firstIndex:Math.min(a.firstIndex??9999,b.firstIndex??9999),sources:[...(a.sources||[`${a.file}#${a.row}`]),...(b.sources||[`${b.file}#${b.row}`])]}}
-function consolidateRows(raw,expected=0){const clusters=[];for(const r0 of raw){const r={...r0},h=r.hash||dhash(binaryRegion(r.canvas,.105,.585,126,2));r.hash=h;let idx=-1,best=999;for(let i=0;i<clusters.length;i++){const d=ham(h,clusters[i].hash);if(d<best&&d<=7){best=d;idx=i}}if(idx>=0)clusters[idx]=mergeEvidence(clusters[idx],r);else clusters.push({...r,sources:[`${r.file}#${r.row}`]})}clusters.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));let out=clusters;if(expected&&out.length>expected)out=[...out].sort((a,b)=>(b.match?.score||b.candidates?.[0]?.score||0)-(a.match?.score||a.candidates?.[0]?.score||0)).slice(0,expected).sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));return out}
+function rowNameSignature(canvas){
+  const sep=detectNameSeparator(canvas);
+  const parts=[
+    cvMaskRegion(canvas,.115,Math.max(.18,sep.left-.008),108),
+    cvMaskRegion(canvas,Math.min(.50,sep.right+.008),.575,108)
+  ];
+  return parts.map(p=>p?cvDescriptor(cvNormalizeCell(p.bits,p.w,p.h,28)):null)
+}
+function rowNameSimilarity(a,b){
+  const sa=a._nameSig||(a._nameSig=rowNameSignature(a.canvas)),sb=b._nameSig||(b._nameSig=rowNameSignature(b.canvas));
+  let sum=0,n=0,min=1;
+  for(let i=0;i<2;i++)if(sa[i]&&sb[i]){const v=cvFeatureSimilarity(sa[i],sb[i]);sum+=v;n++;if(v<min)min=v}
+  if(!n)return 0;
+  const mean=sum/n;
+  return n===2?mean*.85+min*.15:mean*.90
+}
+function rowCandidateAgreement(a,b){
+  const ida=a.match?.p?._uid||a.resolved?.p?._uid,idb=b.match?.p?._uid||b.resolved?.p?._uid;
+  if(ida&&idb&&ida===idb)return 1;
+  const A=new Set((a.candidates||[]).slice(0,5).map(x=>x.p?._uid).filter(Boolean)),B=(b.candidates||[]).slice(0,5).map(x=>x.p?._uid).filter(Boolean);
+  if(B.some(x=>A.has(x)))return .72;
+  const pa=a.parsed||{},pb=b.parsed||{};
+  if(pa.pos&&pb.pos&&pa.pos!==pb.pos)return -.35;
+  if(pa.hand&&pb.hand&&pa.hand!==pb.hand)return -.35;
+  return 0
+}
+function rowOverlapScore(a,b){
+  const visual=rowNameSimilarity(a,b),agree=rowCandidateAgreement(a,b);
+  return {visual,agree,score:Math.max(0,Math.min(1.15,visual+Math.max(0,agree)*.12))};
+}
+function pageOverlapCandidates(prev,next){
+  const max=Math.min(10,prev.length,next.length),out=[{k:0,score:0,min:1,strict:true}];
+  for(let k=1;k<=max;k++){
+    const ss=[];let agree=0,bad=false;
+    for(let i=0;i<k;i++){const z=rowOverlapScore(prev[prev.length-k+i],next[i]);ss.push(z.score);agree+=z.agree;if(z.agree<0)bad=true}
+    const mean=ss.reduce((a,x)=>a+x,0)/k,min=Math.min(...ss),avgAgree=agree/k;
+    const strict=!bad&&(k===1?mean>=.985:(mean>=.90&&min>=.79));
+    const supported=!bad&&k>=2&&mean>=.77&&min>=.68&&avgAgree>=.18;
+    if(strict||supported)out.push({k,score:mean+(supported&&!strict?-.035:0),min,strict,supported,avgAgree});
+  }
+  return out.sort((a,b)=>(b.strict?1:0)-(a.strict?1:0)||b.score-a.score||b.k-a.k)
+}
+function choosePageOverlaps(pages,expected=0){
+  const pairs=[];for(let i=0;i+1<pages.length;i++)pairs.push(pageOverlapCandidates(pages[i],pages[i+1]));
+  const need=expected?Math.max(0,pages.reduce((n,p)=>n+p.length,0)-expected):0;
+  if(need){
+    let dp=new Map([[0,{score:0,ks:[]}]]);
+    for(const opts of pairs){
+      const nx=new Map();
+      for(const [sum,st] of dp)for(const o of opts){
+        const ns=sum+o.k;if(ns>need)continue;
+        const bonus=o.k?o.score*o.k:0,v={score:st.score+bonus,ks:[...st.ks,o.k]},old=nx.get(ns);
+        if(!old||v.score>old.score)nx.set(ns,v)
+      }
+      dp=nx;
+    }
+    if(dp.has(need))return dp.get(need).ks;
+  }
+  return pairs.map(opts=>opts.find(o=>o.k>0)?.k||0)
+}
+function consolidateRows(raw,expected=0){
+  if(!raw.length)return[];
+  const pages=[];let cur=null;
+  for(const r of raw){if(!cur||cur.file!==r.file){cur={file:r.file,rows:[]};pages.push(cur)}cur.rows.push(r)}
+  const ks=choosePageOverlaps(pages.map(p=>p.rows),expected),parent=raw.map((_,i)=>i),index=new Map(raw.map((r,i)=>[r,i]));
+  const find=x=>parent[x]===x?x:(parent[x]=find(parent[x])),join=(a,b)=>{a=find(a);b=find(b);if(a!==b)parent[b]=a};
+  for(let p=0;p<ks.length;p++){const k=ks[p]||0,A=pages[p].rows,B=pages[p+1].rows;for(let i=0;i<k;i++)join(index.get(A[A.length-k+i]),index.get(B[i]))}
+  const groups=new Map();
+  for(let i=0;i<raw.length;i++){const root=find(i),g=groups.get(root)||[];g.push(raw[i]);groups.set(root,g)}
+  const out=[];
+  for(const g of groups.values()){let row={...g[0],sources:[g[0].file+'#'+g[0].row]};for(let i=1;i<g.length;i++)row=mergeEvidence(row,g[i]);out.push(row)}
+  out.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));
+  return out
+}
 function resolveUniqueCandidates(rows){for(const r of rows)r.resolved=null;const used=new Set(rows.filter(r=>r.match?.p?._uid).map(r=>r.match.p._uid)),pending=rows.filter(r=>!r.match);for(let guard=0;guard<rows.length;guard++){let pick=null;for(const r of pending){if(r.resolved)continue;const av=(r.candidates||[]).filter(x=>!used.has(x.p._uid));if(!av.length)continue;const a=av[0],b=av[1],gap=a.score-(b?.score||0),quality=a.score+gap*.45+a.meta*.015;const safe=(a.score>=.72&&gap>=.035)||(a.score>=.67&&a.meta>=1&&gap>=.04)||(a.score>=.64&&a.meta>=2&&gap>=.045);if(!safe)continue;if(!pick||quality>pick.quality)pick={r,a,gap,quality}}if(!pick)break;pick.r.resolved=pick.a;pick.r.status='推定';used.add(pick.a.p._uid)}return rows}
 function dedupeRecognizedRows(rows,expected=0){const seen=new Map(),rest=[];for(const r of rows){const p=r.match?.p||r.resolved?.p;if(p?._uid){const old=seen.get(p._uid),quality=(r.match?.score||r.resolved?.score||r.score||0)+(r.ocrConfidence||0)/5000;if(!old||quality>old.quality)seen.set(p._uid,{row:r,quality})}else rest.push(r)}let out=[...seen.values()].map(x=>x.row).concat(rest);out.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));if(expected&&out.length>expected)out=out.slice(0,expected);return out}
 function batchDisplayPlayer(r){return r.match?.p||r.resolved?.p||null}
