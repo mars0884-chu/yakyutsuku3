@@ -91,7 +91,8 @@ function loadImage(file){return new Promise((res,rej)=>{const u=URL.createObject
 function withTimeout(promise,ms,label='處理逾時'){let t;return Promise.race([promise,new Promise((_,rej)=>t=setTimeout(()=>rej(new Error(label)),ms))]).finally(()=>clearTimeout(t))}
 
 function rowCrops(img,fileName){const ratio=img.naturalWidth/img.naturalHeight;if(ratio<1.65)return[];const x0=.153,x1=.684,y0=.181,y1=.903,rows=11,rh=(y1-y0)/rows,out=[];for(let i=0;i<rows;i++){const y=y0+i*rh,c=document.createElement('canvas'),w=Math.round(img.naturalWidth*(x1-x0)),h=Math.round(img.naturalHeight*rh);c.width=w;c.height=h;c.getContext('2d',{willReadFrequently:true}).drawImage(img,Math.round(img.naturalWidth*x0),Math.round(img.naturalHeight*y),w,h,0,0,w,h);out.push({canvas:c,file:fileName,row:i+1})}return out}
-function footerCrop(img,fileName){const c=document.createElement('canvas'),sx=Math.round(img.naturalWidth*.14),sy=Math.round(img.naturalHeight*.895),sw=Math.round(img.naturalWidth*.76),sh=Math.max(1,img.naturalHeight-sy);c.width=sw;c.height=sh;c.getContext('2d',{willReadFrequently:true}).drawImage(img,sx,sy,sw,sh,0,0,sw,sh);return{canvas:c,file:fileName}}
+function footerCrop(img,fileName){const c=document.createElement('canvas'),sx=Math.round(img.naturalWidth*.025),sy=Math.round(img.naturalHeight*.885),sw=Math.round(img.naturalWidth*.965),sh=Math.max(1,img.naturalHeight-sy);c.width=sw;c.height=sh;c.getContext('2d',{willReadFrequently:true}).drawImage(img,sx,sy,sw,sh,0,0,sw,sh);return{canvas:c,file:fileName}}
+function footerTotalCrop(img,fileName){const c=document.createElement('canvas'),sx=Math.round(img.naturalWidth*.79),sy=Math.round(img.naturalHeight*.885),sw=Math.max(1,Math.round(img.naturalWidth*.205)),sh=Math.max(1,Math.round(img.naturalHeight*.11));c.width=sw;c.height=sh;c.getContext('2d',{willReadFrequently:true}).drawImage(img,sx,sy,sw,sh,0,0,sw,sh);return{canvas:c,file:fileName}}
 function grayPixels(src){const g=src.getContext('2d',{willReadFrequently:true}),d=g.getImageData(0,0,src.width,src.height),a=new Uint8Array(src.width*src.height);for(let i=0,j=0;i<d.data.length;i+=4,j++)a[j]=Math.round(d.data[i]*.299+d.data[i+1]*.587+d.data[i+2]*.114);return a}
 function binaryCanvas(src,threshold=125,{cropName=false,scale=3}={}){let sx=0,sw=src.width;if(cropName){sx=Math.round(src.width*.115);sw=Math.round(src.width*.49)}const tmp=document.createElement('canvas');tmp.width=sw;tmp.height=src.height;tmp.getContext('2d',{willReadFrequently:true}).drawImage(src,sx,0,sw,src.height,0,0,sw,src.height);const g=tmp.getContext('2d',{willReadFrequently:true}),id=g.getImageData(0,0,sw,tmp.height),gray=new Uint8Array(sw*tmp.height);for(let i=0,j=0;i<id.data.length;i+=4,j++)gray[j]=Math.round(id.data[i]*.299+id.data[i+1]*.587+id.data[i+2]*.114);
   // 遊戲姓名欄中間有固定白色方塊。它不是文字；若不移除會被 OCR 當成一個假漢字。
@@ -256,6 +257,14 @@ function cvCandidateMatch(canvas){
 async function cvAnalyzeRows(rows){
   for(let i=0;i<rows.length;i++){const row=rows[i];setBatchProgress(4+56*(i/Math.max(1,rows.length)),'本機固定版面 CV '+(i+1)+'/'+rows.length);try{const r=cvCandidateMatch(row.canvas);row.parsed=r.parsed;row.match=r.match||null;row.candidates=r.candidates;row.score=row.match?.score||r.candidates?.[0]?.score||0;row.status=row.match?'確認':'候選';row.raw='CV';row.cvMargin=r.margin}catch(e){row.raw='CVERR:'+String(e.message||e);row.candidates=[]}if(i%6===0){state.batchRows=consolidateRows(rows.slice(0,i+1),0);renderBatchResults();await new Promise(requestAnimationFrame)}}
 }
+function cvFooterTotal(totalCanvas){
+  const labels=[];for(let n=20;n<=200;n++)labels.push(String(n)+'人');
+  const votes=[];
+  for(const th of [92,108,124]){const target=cvMaskRegion(totalCanvas,0,1,th);if(!target)continue;const scored=labels.map(v=>({v,score:cvWordScore(target,v)})).sort((a,b)=>b.score-a.score),a=scored[0],b=scored[1];if(a)votes.push({n:parseInt(a.v,10),score:a.score,margin:a.score-(b?.score||0)})}
+  if(!votes.length)return 0;const groups=new Map();for(const v of votes){const g=groups.get(v.n)||[];g.push(v);groups.set(v.n,g)}
+  const ranked=[...groups.entries()].map(([n,vs])=>({n,agree:vs.length,score:vs.reduce((a,x)=>a+x.score,0)/vs.length,margin:vs.reduce((a,x)=>a+x.margin,0)/vs.length})).sort((a,b)=>b.agree-a.agree||b.score-a.score||b.margin-a.margin),best=ranked[0];
+  return best&&((best.agree>=2&&best.score>=.54)||(best.agree>=3&&best.score>=.50))?best.n:0
+}
 function mergeRowOCR(row,parsed,cm,raw,confidence=0){
   const merged=mergeParsedNameEvidence(row.parsed,parsed),textCM=candidateMatch(merged),vis=visualCandidateMatch(row.canvas,merged);
   const options=[row.match?{match:row.match,candidates:row.candidates||[]}:null,cm,textCM,vis].filter(Boolean),quality=o=>o.match?.score||o.candidates?.[0]?.score||0;
@@ -305,8 +314,8 @@ async function runBatch(){
   $('#runBatch').disabled=true;let paddle=null,worker=null;
   try{
     const screens=[],all=[];setBatchProgress(1,'分析固定版面…');
-    for(const f of state.batchFiles){const im=await loadImage(f),rows=rowCrops(im,f.name).filter(r=>nameInkRatio(r.canvas)>.006);screens.push({file:f.name,footer:footerCrop(im,f.name)});all.push(...rows)}
-    state.batchRawRows=all.map((r,i)=>({...r,firstIndex:i,status:'待辨識',raw:'',parsed:null,match:null,candidates:[],ocrConfidence:0,score:0}));state.batchRows=[];state.expectedTotal=0;renderBatchResults();
+    for(const f of state.batchFiles){const im=await loadImage(f),rows=rowCrops(im,f.name).filter(r=>nameInkRatio(r.canvas)>.006);screens.push({file:f.name,footer:footerCrop(im,f.name),total:footerTotalCrop(im,f.name)});all.push(...rows)}
+    state.batchRawRows=all.map((r,i)=>({...r,firstIndex:i,status:'待辨識',raw:'',parsed:null,match:null,candidates:[],ocrConfidence:0,score:0}));state.batchRows=[];state.expectedTotal=0;const cvTotals=screens.map(sc=>cvFooterTotal(sc.total.canvas)).filter(n=>n>=20&&n<=200);if(cvTotals.length){const freq=new Map();for(const n of cvTotals)freq.set(n,(freq.get(n)||0)+1);state.expectedTotal=[...freq.entries()].sort((a,b)=>b[1]-a[1]||b[0]-a[0])[0][0]}renderBatchResults();
 
     // 所有平台先跑同一套固定版面 CV；不需要 PaddleOCR / Tesseract 才能產生候選。
     await cvAnalyzeRows(state.batchRawRows);
@@ -320,7 +329,7 @@ async function runBatch(){
       if(ok){
         try{
           worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),35000,'頁尾辨識載入逾時');
-          state.expectedTotal=await tesseractFooterTotal(worker,screens);
+          {const n=await tesseractFooterTotal(worker,screens);if(n>=20&&n<=200)state.expectedTotal=n;}
         }catch(e){console.warn('mobile footer OCR',e)}
       }
     }else{
@@ -338,7 +347,7 @@ async function runBatch(){
       if(needTess&&await ensureLocalOCR()){
         try{
           worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),35000,'Tesseract 複核載入逾時');
-          if(!state.expectedTotal)state.expectedTotal=await tesseractFooterTotal(worker,screens);
+          if(!state.expectedTotal){const n=await tesseractFooterTotal(worker,screens);if(n>=20&&n<=200)state.expectedTotal=n;}
           const uncertain=state.batchRawRows.filter(r=>!r.match&&r.score<.80);
           try{await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1',tessedit_char_whitelist:''})}catch{}
           for(let i=0;i<uncertain.length;i++){const row=uncertain[i];setBatchProgress(85+10*(i/Math.max(1,uncertain.length)),'Tesseract 複核 '+(i+1)+'/'+uncertain.length);try{const np=await recognizeFixedParts(worker,row.canvas,125),parsed={name:(np.surname+' '+np.given).trim(),names:[(np.surname+' '+np.given).trim()].filter(Boolean),surname:np.surname,given:np.given,surnames:[np.surname].filter(Boolean),givens:[np.given].filter(Boolean),age:np.age,hand:np.hand,pos:np.pos,text:np.raw},cm=candidateMatch(parsed);mergeRowOCR(row,parsed,cm,'T:'+np.raw,np.confidence)}catch(e){row.raw+='｜TERR:'+String(e.message||e)}}
