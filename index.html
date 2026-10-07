@@ -44,6 +44,12 @@
     <button id="runBatch" class="primary">開始找人</button>
     <button id="clearBatch">清除</button>
   </div>
+  <div class="batch-font-tools">
+    <label class="filebtn">建立 PS2 字形庫<input id="biosFile" type="file" accept=".bin,.rom,.bios,application/octet-stream"></label>
+    <label class="filebtn">匯入字形庫<input id="fontProfileFile" type="file" accept=".yt3fp,application/json"></label>
+    <button id="exportFontProfile" disabled>匯出字形庫</button>
+    <span id="fontProfileStatus">尚未建立字形庫</span>
+  </div>
   <div id="batchStatus" class="statusline">可一次選多張 OFFICE MENU 名單截圖。</div>
   <div id="batchPreview" class="thumbs"></div>
   <div class="batch-summary" id="batchSummary"></div>
@@ -69,6 +75,7 @@
 
 <div id="drawer" class="drawer" aria-hidden="true"><div class="shade"></div><article class="sheet"><button id="closeDrawer" class="close">關閉</button><div id="drawerBody"></div></article></div>
 
+<script src="./krom-profile.js" defer></script>
 <script src="./app.js" defer></script>
 </body>
 </html>
