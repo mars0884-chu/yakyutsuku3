@@ -1,5 +1,5 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='2026.10.07-r6';
+const APP_VERSION='2026.10.07-r7';
 const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,batchSort:'screen',batchSortDir:'asc'};
 const HEADER_ZH={"名前":"姓名","年齢":"年齡","成長":"成長型","投/打":"投／打","出身":"出身地","高校":"高中","大学":"大學","社会人":"社會人","タイプ":"投手類型","ランク":"Rank","体力":"體力","球速":"球速","球威":"球威","制球":"控球","精神":"精神","守備":"守備","捕球":"接球","肩力":"臂力","送球":"傳球","スライダー":"滑球","速スラ":"高速滑球","カットB":"卡特球","カーブ":"曲球","Sカーブ":"S曲球","ドロップ":"Drop曲球","シュート":"噴射球","速シュート":"高速噴射球","シンカー":"伸卡球","スクリュー":"螺旋球","速シンカー":"高速伸卡球","サークルC":"圈指變速","2シーム":"二縫線","Cアップ":"變速球","フォーク":"指叉球","SFF":"快速指叉","縦スラ":"縱滑球","パーム":"掌心球","ナックル":"蝴蝶球","スキル1":"技能1","スキル2":"技能2","スキル3":"技能3","モデル":"原型","右巧":"對右巧打","左巧":"對左巧打","長打":"長打","バント":"短打","選球眼":"選球眼","走力":"跑力","走塁":"跑壘","リード":"配球","捕手":"捕手","一塁":"一壘","二塁":"二壘","三塁":"三壘","遊撃":"游擊","外野":"外野","リーグ":"聯盟／地區","アカデミー":"學院"};
 const BASE_COLS=['名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
@@ -62,13 +62,45 @@ function renderGuideTopics(){
   $('#guideTopics').innerHTML=GUIDE_CATEGORIES.map(c=>`<button class="chip ${activeCat===c.id?'active':''}" data-topic="${c.id}">${c.title}</button>`).join('');
   $('#guideTopics').querySelectorAll('button').forEach(btn=>btn.onclick=()=>{state.guideTopic=btn.dataset.topic;renderGuideTopics();renderGuides()})
 }
+function guideQueryForms(v){
+  const raw=norm(v),forms=new Set([raw]);
+  const pairs=[['引越し屋','引っ越し屋'],['球團','球団'],['企劃','企画'],['プラ原型球員','プラモデル'],['木彫り的熊','木彫りの熊'],['自由的女神','自由の女神'],['鳥的巣','鳥の巣'],['絵的具','絵の具']];
+  for(const [a,b] of pairs){const na=norm(a),nb=norm(b);if(raw.includes(na))forms.add(raw.replace(na,nb));if(raw.includes(nb))forms.add(raw.replace(nb,na))}
+  return [...forms].filter(Boolean)
+}
+function guideRowSearch(book,query){
+  const qs=guideQueryForms(query),hits=[];
+  const has=v=>{const t=norm(String(v??''));return qs.some(q=>t.includes(q))};
+  for(const ch of book)for(const sec of ch.sections||[]){
+    if(sec.rows?.length){
+      for(const row of sec.rows){const joined=(row||[]).join('｜');if(has(joined)||has(sec.title)||has(ch.title))hits.push({kind:'row',chapter:ch.title,section:sec.title,headers:sec.headers||[],row,source:sec.source})}
+    }else{
+      for(const item of sec.items||[])if(has(item)||has(sec.title)||has(ch.title))hits.push({kind:'item',chapter:ch.title,section:sec.title,item,source:sec.source})
+    }
+  }
+  return hits
+}
+function renderGuideSearchHits(hits){
+  return hits.slice(0,180).map(x=>{
+    if(x.kind==='row'){
+      const heads=x.headers?.length?x.headers:x.row.map((_,i)=>i===0?'項目':'內容');
+      const cells=x.row.map((v,i)=>'<div class="guide-search-cell"><small>'+esc(heads[i]||'內容')+'</small><b>'+esc(v||'—')+'</b></div>').join('');
+      return '<article class="card guide-search-hit"><div class="meta">'+esc(x.chapter)+' › '+esc(x.section)+'</div><div class="guide-search-grid">'+cells+'</div>'+(x.source?'<div class="meta"><a href="'+esc(x.source)+'" target="_blank" rel="noreferrer">來源</a></div>':'')+'</article>';
+    }
+    return '<article class="card guide-search-hit"><div class="meta">'+esc(x.chapter)+' › '+esc(x.section)+'</div><p>'+esc(x.item)+'</p>'+(x.source?'<div class="meta"><a href="'+esc(x.source)+'" target="_blank" rel="noreferrer">來源</a></div>':'')+'</article>';
+  }).join('')
+}
 function renderGuides(){
-  const q=norm($('#guideQuery').value),root=$('#guideResults'),book=visibleGuideBook();
-  if(q){const hits=[];for(const ch of book){const sections=(ch.sections||[]).filter(sec=>norm(JSON.stringify(sec)).includes(q));if(norm(`${ch.title} ${ch.summary||''}`).includes(q)||sections.length)hits.push({...ch,sections:sections.length?sections:(ch.sections||[])})}root.innerHTML=hits.map(guideChapterDetail).join('')||'<div class="card">沒有符合的攻略。</div>';return}
+  const q=$('#guideQuery').value.trim(),root=$('#guideResults'),book=visibleGuideBook();
+  if(q){
+    const hits=guideRowSearch(book,q);
+    root.innerHTML=hits.length?'<div class="guide-search-summary">找到 '+hits.length+' 筆；以下直接顯示命中的條件／組合／取得地／效果。</div>'+renderGuideSearchHits(hits):'<div class="card">沒有符合的攻略。</div>';
+    return
+  }
   if(state.guideTopic.startsWith('chapter:')){const id=state.guideTopic.slice(8),ch=book.find(x=>x.id===id);if(ch){root.innerHTML=guideChapterDetail(ch);return}state.guideTopic='all'}
   const cat=GUIDE_CATEGORIES.find(c=>c.id===state.guideTopic)||GUIDE_CATEGORIES[0];
   if(cat.id==='all'){
-    root.innerHTML=GUIDE_CATEGORIES.slice(1).map(c=>{const list=c.chapters.map(id=>book.find(x=>x.id===id)).filter(Boolean);return list.length?`<section class="guide-index-group"><h2>${esc(c.title)}</h2><div class="guide-index-grid">${list.map(guideChapterCard).join('')}</div></section>`:''}).join('')||'<div class="card">目前沒有攻略內容。</div>';
+    root.innerHTML=GUIDE_CATEGORIES.slice(1).map(c=>{const list=c.chapters.map(id=>book.find(x=>x.id===id)).filter(Boolean);return list.length?'<section class="guide-index-group"><h2>'+esc(c.title)+'</h2><div class="guide-index-grid">'+list.map(guideChapterCard).join('')+'</div></section>':''}).join('')||'<div class="card">目前沒有攻略內容。</div>';
   }else{
     const list=cat.chapters.map(id=>book.find(x=>x.id===id)).filter(Boolean);root.innerHTML=list.map(guideChapterCard).join('')||'<div class="card">這個分類目前沒有內容。</div>';
   }
