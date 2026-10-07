@@ -78,7 +78,11 @@ function guideRowSearch(book,query){
       for(const item of sec.items||[])if(has(item)||has(sec.title)||has(ch.title))hits.push({kind:'item',chapter:ch.title,section:sec.title,item,source:sec.source})
     }
   }
-  return hits
+  const priority=x=>x.section==='經營企劃完整逆引：條件／需求道具／取得地／組合／效果'?0:x.section==='Idea Memo 68 種'?1:x.section==='出張依頼完整規則／出差委託'?2:3;
+  hits.sort((a,b)=>priority(a)-priority(b));
+  const seen=new Set(),out=[];
+  for(const x of hits){const key=x.kind==='row'?(x.chapter+'|'+String(x.row?.[0]||'')):(x.chapter+'|'+x.section+'|'+x.item);if(seen.has(key))continue;seen.add(key);out.push(x)}
+  return out
 }
 function renderGuideSearchHits(hits){
   return hits.slice(0,180).map(x=>{
