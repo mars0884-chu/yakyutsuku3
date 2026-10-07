@@ -1,5 +1,5 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='2026.10.07-r9';
+const APP_VERSION='2026.10.07-r10-test';
 const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,batchSort:'screen',batchSortDir:'asc'};
 const HEADER_ZH={"名前":"姓名","年齢":"年齡","成長":"成長型","投/打":"投／打","出身":"出身地","高校":"高中","大学":"大學","社会人":"社會人","タイプ":"投手類型","ランク":"Rank","体力":"體力","球速":"球速","球威":"球威","制球":"控球","精神":"精神","守備":"守備","捕球":"接球","肩力":"臂力","送球":"傳球","スライダー":"滑球","速スラ":"高速滑球","カットB":"卡特球","カーブ":"曲球","Sカーブ":"S曲球","ドロップ":"Drop曲球","シュート":"噴射球","速シュート":"高速噴射球","シンカー":"伸卡球","スクリュー":"螺旋球","速シンカー":"高速伸卡球","サークルC":"圈指變速","2シーム":"二縫線","Cアップ":"變速球","フォーク":"指叉球","SFF":"快速指叉","縦スラ":"縱滑球","パーム":"掌心球","ナックル":"蝴蝶球","スキル1":"技能1","スキル2":"技能2","スキル3":"技能3","モデル":"原型","右巧":"對右巧打","左巧":"對左巧打","長打":"長打","バント":"短打","選球眼":"選球眼","走力":"跑力","走塁":"跑壘","リード":"配球","捕手":"捕手","一塁":"一壘","二塁":"二壘","三塁":"三壘","遊撃":"游擊","外野":"外野","リーグ":"聯盟／地區","アカデミー":"學院"};
 const BASE_COLS=['名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
@@ -372,6 +372,13 @@ function mergeRowOCR(row,parsed,cm,raw,confidence=0){
   options.sort((a,b)=>quality(b)-quality(a));const best=options[0]||{match:null,candidates:row.candidates||[]};
   row.parsed=merged;row.match=best.match||null;row.candidates=best.candidates?.length?best.candidates:(row.candidates||[]);row.score=row.match?.score||row.candidates?.[0]?.score||0;row.ocrConfidence=Math.max(row.ocrConfidence||0,confidence||0);row.raw=[row.raw,raw].filter(Boolean).join('｜');row.status=row.match?'確認':'候選';
 }
+async function recognizeNameTesseractFast(worker,canvas,threshold=125){
+  const sep=detectNameSeparator(canvas);
+  const a=await recognizeText(worker,binaryRegion(canvas,.115,Math.max(.18,sep.left-.008),threshold,5));
+  const b=await recognizeText(worker,binaryRegion(canvas,Math.min(.50,sep.right+.008),.575,threshold,5));
+  const surname=ocrNamePart(a.text),given=ocrNamePart(b.text),name=(surname+' '+given).trim();
+  return{parsed:{name,names:[name].filter(Boolean),surname,given,surnames:[surname].filter(Boolean),givens:[given].filter(Boolean),age:'',hand:'',pos:'',text:[a.text,b.text].filter(Boolean).join('｜')},raw:'S:'+a.text+'｜G:'+b.text,confidence:Math.round(((a.confidence||0)+(b.confidence||0))/2)}
+}
 async function tesseractFooterTotal(worker,screens){
   const totals=[];try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'0123456789人合計投手野手'})}catch{}
   for(const sc of screens){try{const r=await recognizeText(worker,binaryCanvas(sc.footer.canvas,125,{scale:3})),n=parseExpectedTotal(r.text);if(n>=20&&n<=200)totals.push(n)}catch{}}
@@ -495,7 +502,7 @@ async function recognizeText(worker,canvas){const r=await worker.recognize(canva
 async function runBatch(){
   if(!state.batchFiles.length){alert('請先選擇截圖。');return}
   if(state.players.length<1000){$('#batchStatus').textContent='完整名冊尚未載入，請先到「資料」按更新名冊。';return}
-  $('#runBatch').disabled=true;let paddle=null,worker=null;
+  $('#runBatch').disabled=true;let paddle=null,worker=null,mobileNameOCR=false;
   try{
     const screens=[],all=[];setBatchProgress(1,'分析固定版面…');
     for(const f of state.batchFiles){const im=await loadImage(f),rows=rowCrops(im,f.name).filter(r=>nameInkRatio(r.canvas)>.006);screens.push({file:f.name,footer:footerCrop(im,f.name),total:footerTotalCrop(im,f.name)});all.push(...rows)}
@@ -507,14 +514,30 @@ async function runBatch(){
 
     const ios=isIOSLike();
     if(ios){
-      setBatchProgress(62,'手機：CV 主流程完成，讀取名單總人數…');
-      // iPhone/iPad 不啟動 PaddleOCR；WebKit/ONNX WASM 在實機上不穩定。
+      setBatchProgress(62,'手機：CV 主流程完成，載入本機日文 OCR…');
+      // iPhone/iPad 不啟動 PaddleOCR；改用本機 Tesseract 複核低信心姓名。
       const ok=await ensureLocalOCR();
       if(ok){
         try{
-          worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),35000,'頁尾辨識載入逾時');
+          worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),45000,'手機 OCR 載入逾時');
           {const n=await tesseractFooterTotal(worker,screens);if(n>=20&&n<=200)state.expectedTotal=n;}
-        }catch(e){console.warn('mobile footer OCR',e)}
+          try{await worker.setParameters({tessedit_pageseg_mode:'8',tessedit_char_whitelist:batchKanjiWhitelist(),user_defined_dpi:'300'})}catch{}
+          const uncertain=state.batchRawRows.filter(r=>!r.match||r.score<.84||((r.candidates?.[0]?.score||0)-(r.candidates?.[1]?.score||0))<.045);
+          for(let i=0;i<uncertain.length;i++){
+            const row=uncertain[i];setBatchProgress(66+28*(i/Math.max(1,uncertain.length)),'手機姓名 OCR '+(i+1)+'/'+uncertain.length);
+            try{
+              const rr=await recognizeNameTesseractFast(worker,row.canvas,125);
+              mergeRowOCR(row,rr.parsed,null,'M:'+rr.raw,rr.confidence);
+              const gap=(row.candidates?.[0]?.score||0)-(row.candidates?.[1]?.score||0);
+              if(!row.match&&(row.score<.76||gap<.025)){
+                const rr2=await recognizeNameTesseractFast(worker,row.canvas,145);
+                mergeRowOCR(row,rr2.parsed,null,'M2:'+rr2.raw,rr2.confidence);
+              }
+              mobileNameOCR=true;
+            }catch(e){row.raw+='｜MERR:'+String(e.message||e)}
+            if(i%3===0){state.batchRows=consolidateRows(state.batchRawRows.slice(0),0);renderBatchResults();await new Promise(requestAnimationFrame)}
+          }
+        }catch(e){console.warn('mobile name OCR',e)}
       }
     }else{
       // 桌機仍與手機共用 CV；PaddleOCR 只做加分複核，不是必要條件。
@@ -541,7 +564,7 @@ async function runBatch(){
 
     let rows=resolveUniqueCandidates(consolidateRows(state.batchRawRows,state.expectedTotal));rows=dedupeRecognizedRows(rows,state.expectedTotal);state.batchRows=rows;
     const matched=rows.filter(r=>r.match).length,inferred=rows.filter(r=>!r.match&&r.resolved).length;
-    const mode=ios?'手機 CV':'桌機 CV＋可用時 OCR 複核';
+    const mode=ios?(mobileNameOCR?'手機 CV＋本機 OCR':'手機 CV（姓名 OCR 未完成）'):'桌機 CV＋可用時 OCR 複核';
     setBatchProgress(100,'完成：'+rows.length+' 人'+(state.expectedTotal?'／畫面名單上限 '+state.expectedTotal:'')+'；確認 '+matched+'，推定 '+inferred+'，候選 '+(rows.length-matched-inferred)+'｜'+mode);
     renderBatchResults();
   }catch(e){console.error(e);$('#batchStatus').textContent='批次找人失敗：'+(e.message||e)}
