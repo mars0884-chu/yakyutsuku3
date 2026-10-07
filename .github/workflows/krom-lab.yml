@@ -1,0 +1,27 @@
+name: KROM recognition lab
+on:
+  push:
+    branches: [krom-profile-lab]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax
+        run: |
+          node --check app.js
+          node --check krom-profile.js
+          node --check scripts/smoke-recognition.mjs
+          node --check scripts/smoke-krom.mjs
+      - name: KROM engine
+        run: node scripts/smoke-krom.mjs
+      - name: Shared recognition path
+        run: node scripts/smoke-recognition.mjs
