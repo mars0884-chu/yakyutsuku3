@@ -5,7 +5,7 @@ const HEADER_ZH={"名前":"姓名","年齢":"年齡","成長":"成長型","投/�
 const BASE_COLS=['名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function norm(v){return String(v??'').normalize('NFKC').toLowerCase().replace(/[\s　・·･,，。\.\/／()（）\-–—_:：;；'"「」『』【】\[\]]/g,'')}
-function normName(v){const t=norm(v);return [...t].map(ch=>{const c=ch.charCodeAt(0);return c>=0x30A1&&c<=0x30F6?String.fromCharCode(c-0x60):ch}).join('')}
+function normName(v){const variants={'薮':'藪','澤':'沢','髙':'高','﨑':'崎','邉':'辺','邊':'辺','濵':'浜','濱':'浜','齋':'斎','齊':'斉','國':'国','廣':'広','神':'神'};const t=norm(v);return [...t].map(ch=>{const c=ch.charCodeAt(0),x=c>=0x30A1&&c<=0x30F6?String.fromCharCode(c-0x60):ch;return variants[x]||x}).join('')}
 function debounce(fn,ms=150){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}}
 async function getJSON(url,opts={}){const r=await fetch(url,{cache:opts.cache||'no-store'});if(!r.ok)throw new Error(`${url} ${r.status}`);return r.json()}
 const ROSTER_DB='yakyutsuku3-roster-v1',ROSTER_STORE='kv',ROSTER_KEY='players-3767';
