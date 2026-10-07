@@ -354,15 +354,31 @@ function rowNameSimilarity(a,b){
   const mean=sum/n;
   return n===2?mean*.85+min*.15:mean*.90
 }
+function rowCandidateAgreement(a,b){
+  const ida=a.match?.p?._uid||a.resolved?.p?._uid,idb=b.match?.p?._uid||b.resolved?.p?._uid;
+  if(ida&&idb&&ida===idb)return 1;
+  const A=new Set((a.candidates||[]).slice(0,5).map(x=>x.p?._uid).filter(Boolean)),B=(b.candidates||[]).slice(0,5).map(x=>x.p?._uid).filter(Boolean);
+  if(B.some(x=>A.has(x)))return .72;
+  const pa=a.parsed||{},pb=b.parsed||{};
+  if(pa.pos&&pb.pos&&pa.pos!==pb.pos)return -.35;
+  if(pa.hand&&pb.hand&&pa.hand!==pb.hand)return -.35;
+  return 0
+}
+function rowOverlapScore(a,b){
+  const visual=rowNameSimilarity(a,b),agree=rowCandidateAgreement(a,b);
+  return {visual,agree,score:Math.max(0,Math.min(1.15,visual+Math.max(0,agree)*.12))};
+}
 function pageOverlapCandidates(prev,next){
-  const max=Math.min(10,prev.length,next.length),out=[{k:0,score:0,min:1,valid:true}];
+  const max=Math.min(10,prev.length,next.length),out=[{k:0,score:0,min:1,strict:true}];
   for(let k=1;k<=max;k++){
-    const sims=[];for(let i=0;i<k;i++)sims.push(rowNameSimilarity(prev[prev.length-k+i],next[i]));
-    const mean=sims.reduce((a,x)=>a+x,0)/k,min=Math.min(...sims);
-    const valid=k===1?(mean>=.985):(mean>=.915&&min>=.80);
-    if(valid)out.push({k,score:mean,min,valid});
+    const ss=[];let agree=0,bad=false;
+    for(let i=0;i<k;i++){const z=rowOverlapScore(prev[prev.length-k+i],next[i]);ss.push(z.score);agree+=z.agree;if(z.agree<0)bad=true}
+    const mean=ss.reduce((a,x)=>a+x,0)/k,min=Math.min(...ss),avgAgree=agree/k;
+    const strict=!bad&&(k===1?mean>=.985:(mean>=.90&&min>=.79));
+    const supported=!bad&&k>=2&&mean>=.77&&min>=.68&&avgAgree>=.18;
+    if(strict||supported)out.push({k,score:mean+(supported&&!strict?-.035:0),min,strict,supported,avgAgree});
   }
-  return out.sort((a,b)=>b.score-a.score||b.k-a.k)
+  return out.sort((a,b)=>(b.strict?1:0)-(a.strict?1:0)||b.score-a.score||b.k-a.k)
 }
 function choosePageOverlaps(pages,expected=0){
   const pairs=[];for(let i=0;i+1<pages.length;i++)pairs.push(pageOverlapCandidates(pages[i],pages[i+1]));
