@@ -263,7 +263,7 @@ function cvFooterTotal(totalCanvas){
   for(const th of [92,108,124]){const target=cvMaskRegion(totalCanvas,0,1,th);if(!target)continue;const scored=labels.map(v=>({v,score:cvWordScore(target,v)})).sort((a,b)=>b.score-a.score),a=scored[0],b=scored[1];if(a)votes.push({n:parseInt(a.v,10),score:a.score,margin:a.score-(b?.score||0)})}
   if(!votes.length)return 0;const groups=new Map();for(const v of votes){const g=groups.get(v.n)||[];g.push(v);groups.set(v.n,g)}
   const ranked=[...groups.entries()].map(([n,vs])=>({n,agree:vs.length,score:vs.reduce((a,x)=>a+x.score,0)/vs.length,margin:vs.reduce((a,x)=>a+x.margin,0)/vs.length})).sort((a,b)=>b.agree-a.agree||b.score-a.score||b.margin-a.margin),best=ranked[0];
-  return best&&((best.agree>=2&&best.score>=.54)||(best.agree>=3&&best.score>=.50))?best.n:0
+  return best&&best.agree===3&&best.score>=.58&&best.margin>=.02?best.n:0
 }
 function mergeRowOCR(row,parsed,cm,raw,confidence=0){
   const merged=mergeParsedNameEvidence(row.parsed,parsed),textCM=candidateMatch(merged),vis=visualCandidateMatch(row.canvas,merged);
