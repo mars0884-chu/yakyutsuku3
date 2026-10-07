@@ -178,33 +178,32 @@ function nameInkRatio(src){
   let hi=0,lo=0;for(let i=0;i<id.length;i+=4){const l=id[i]*.299+id[i+1]*.587+id[i+2]*.114;if(l>145)hi++;if(l<95)lo++}
   return Math.min(hi,lo)/Math.max(1,id.length/4)
 }
-function paddleNameCanvas(src,threshold=122){
-  const sep=detectNameSeparator(src),x0=Math.max(0,Math.floor(src.width*.105)),x1=Math.min(src.width,Math.ceil(src.width*.59)),sw=Math.max(1,x1-x0),scale=4;
-  const tmp=document.createElement('canvas');tmp.width=sw;tmp.height=src.height;const tg=tmp.getContext('2d',{willReadFrequently:true});tg.drawImage(src,x0,0,sw,src.height,0,0,sw,src.height);
-  const id=tg.getImageData(0,0,sw,tmp.height),od=tg.createImageData(sw,tmp.height);
-  const sepA=Math.max(0,Math.floor(src.width*sep.left)-x0-2),sepB=Math.min(sw,Math.ceil(src.width*sep.right)-x0+2);
-  for(let y=0;y<tmp.height;y++)for(let x=0;x<sw;x++){const i=(y*sw+x)*4,l=id.data[i]*.299+id.data[i+1]*.587+id.data[i+2]*.114;let v=l>threshold?0:255;if(x>=sepA&&x<=sepB)v=255;od.data[i]=od.data[i+1]=od.data[i+2]=v;od.data[i+3]=255}
-  tg.putImageData(od,0,0);const out=document.createElement('canvas');out.width=sw*scale;out.height=tmp.height*scale;const og=out.getContext('2d');og.imageSmoothingEnabled=false;og.fillStyle='#fff';og.fillRect(0,0,out.width,out.height);og.drawImage(tmp,0,0,out.width,out.height);return out
+function paddlePartCanvas(src,part,threshold=122){
+  const sep=detectNameSeparator(src);
+  const rx0=part==='surname'?.115:Math.min(.50,sep.right+.008),rx1=part==='surname'?Math.max(.18,sep.left-.008):.575;
+  const x0=Math.max(0,Math.floor(src.width*rx0)),x1=Math.min(src.width,Math.ceil(src.width*rx1)),sw=Math.max(1,x1-x0),scale=5;
+  const tmp=document.createElement('canvas');tmp.width=sw;tmp.height=src.height;const g=tmp.getContext('2d',{willReadFrequently:true});g.drawImage(src,x0,0,sw,src.height,0,0,sw,src.height);
+  const id=g.getImageData(0,0,sw,tmp.height),od=g.createImageData(sw,tmp.height);
+  for(let y=0;y<tmp.height;y++)for(let x=0;x<sw;x++){const i=(y*sw+x)*4,l=id.data[i]*.299+id.data[i+1]*.587+id.data[i+2]*.114,v=l>threshold?0:255;od.data[i]=od.data[i+1]=od.data[i+2]=v;od.data[i+3]=255}
+  g.putImageData(od,0,0);const out=document.createElement('canvas');out.width=sw*scale;out.height=tmp.height*scale;const og=out.getContext('2d');og.imageSmoothingEnabled=false;og.fillStyle='#fff';og.fillRect(0,0,out.width,out.height);og.drawImage(tmp,0,0,out.width,out.height);return out
 }
 function paddleResultText(result){
   const items=[...(result?.items||[])].sort((a,b)=>Math.min(...(a.poly||[]).map(p=>p?.[0]??0))-Math.min(...(b.poly||[]).map(p=>p?.[0]??0)));
-  const text=items.map(x=>String(x.text||'').trim()).filter(Boolean).join(' ').trim();
+  const text=items.map(x=>String(x.text||'').trim()).filter(Boolean).join('').trim();
   const score=items.length?items.reduce((n,x)=>n+Number(x.score||0),0)/items.length:0;
   return{text,score}
 }
-function parsedFromNameVariants(variants){
-  const cleaned=[...new Set(variants.map(v=>cleanOCR(v.text)).filter(Boolean))],names=[],surnames=[],givens=[];
-  for(const t of cleaned){const n=ocrNameOnly(t);if(n)names.push(n);const parts=String(t).trim().split(/\s+/).filter(Boolean);if(parts.length>=2){surnames.push(ocrNamePart(parts[0]));givens.push(ocrNamePart(parts.slice(1).join('')))}}
-  return{name:names[0]||'',names:[...new Set(names)],surname:surnames[0]||'',given:givens[0]||'',surnames:[...new Set(surnames)],givens:[...new Set(givens)],age:'',hand:'',pos:'',text:cleaned.join('｜')}
-}
 async function recognizeNamePaddle(ocr,rowCanvas){
-  const canvases=[paddleNameCanvas(rowCanvas,112),paddleNameCanvas(rowCanvas,128),paddleNameCanvas(rowCanvas,145)];
-  const results=await ocr.predict(canvases,{textRecScoreThresh:.18,textDetThresh:.18,textDetBoxThresh:.20,textDetUnclipRatio:1.35});
-  const vars=(results||[]).map(paddleResultText).filter(x=>x.text);
-  const parsed=parsedFromNameVariants(vars),cm=candidateMatch(parsed),vis=visualCandidateMatch(rowCanvas,parsed);
+  const thresholds=[112,128,145],canvases=[];
+  for(const th of thresholds){canvases.push(paddlePartCanvas(rowCanvas,'surname',th));canvases.push(paddlePartCanvas(rowCanvas,'given',th))}
+  const results=await ocr.predict(canvases,{textRecScoreThresh:.18,textDetThresh:.18,textDetBoxThresh:.20,textDetUnclipRatio:1.30});
+  const surnames=[],givens=[],raw=[],scores=[];
+  for(let i=0;i<(results||[]).length;i++){const x=paddleResultText(results[i]),part=i%2===0?'S':'G';if(x.text){const v=ocrNamePart(x.text);if(v){(part==='S'?surnames:givens).push(v);raw.push(part+':'+v+'('+Math.round(x.score*100)+'%)');scores.push(x.score)}}}
+  const su=[...new Set(surnames)],gi=[...new Set(givens)],names=[];for(const a of su)for(const b of gi)names.push((a+' '+b).trim());
+  const parsed={name:names[0]||'',names:[...new Set(names)],surname:su[0]||'',given:gi[0]||'',surnames:su,givens:gi,age:'',hand:'',pos:'',text:raw.join('｜')};
+  const cm=candidateMatch(parsed),vis=visualCandidateMatch(rowCanvas,parsed);
   let chosen=cm;if(vis?.match&&(!cm?.match||vis.match.score>(cm.match?.score||cm.candidates?.[0]?.score||0)+.035))chosen=vis;
-  const conf=vars.length?Math.max(...vars.map(x=>x.score)):0;
-  return{parsed,cm:chosen,raw:vars.map(x=>`${x.text}(${Math.round(x.score*100)}%)`).join('｜'),confidence:conf}
+  return{parsed,cm:chosen,raw:raw.join('｜'),confidence:scores.length?Math.max(...scores):0}
 }
 async function recognizeFooterPaddle(ocr,canvas){
   try{const [r]=await ocr.predict(canvas,{textRecScoreThresh:.20,textDetThresh:.18,textDetBoxThresh:.20});return paddleResultText(r).text}catch{return''}
