@@ -1,5 +1,5 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='2026.10.07-r4';
+const APP_VERSION='2026.10.07-r5';
 const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,batchSort:'screen',batchSortDir:'asc'};
 const HEADER_ZH={"名前":"姓名","年齢":"年齡","成長":"成長型","投/打":"投／打","出身":"出身地","高校":"高中","大学":"大學","社会人":"社會人","タイプ":"投手類型","ランク":"Rank","体力":"體力","球速":"球速","球威":"球威","制球":"控球","精神":"精神","守備":"守備","捕球":"接球","肩力":"臂力","送球":"傳球","スライダー":"滑球","速スラ":"高速滑球","カットB":"卡特球","カーブ":"曲球","Sカーブ":"S曲球","ドロップ":"Drop曲球","シュート":"噴射球","速シュート":"高速噴射球","シンカー":"伸卡球","スクリュー":"螺旋球","速シンカー":"高速伸卡球","サークルC":"圈指變速","2シーム":"二縫線","Cアップ":"變速球","フォーク":"指叉球","SFF":"快速指叉","縦スラ":"縱滑球","パーム":"掌心球","ナックル":"蝴蝶球","スキル1":"技能1","スキル2":"技能2","スキル3":"技能3","モデル":"原型","右巧":"對右巧打","左巧":"對左巧打","長打":"長打","バント":"短打","選球眼":"選球眼","走力":"跑力","走塁":"跑壘","リード":"配球","捕手":"捕手","一塁":"一壘","二塁":"二壘","三塁":"三壘","遊撃":"游擊","外野":"外野","リーグ":"聯盟／地區","アカデミー":"學院"};
 const BASE_COLS=['名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
@@ -90,7 +90,7 @@ function renderBatchPreview(){$('#batchPreview').innerHTML='';for(const f of sta
 function loadImage(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);res(im)};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('圖片解碼失敗'))};im.src=u})}
 function withTimeout(promise,ms,label='處理逾時'){let t;return Promise.race([promise,new Promise((_,rej)=>t=setTimeout(()=>rej(new Error(label)),ms))]).finally(()=>clearTimeout(t))}
 
-function rowCrops(img,fileName){const ratio=img.naturalWidth/img.naturalHeight;if(ratio<1.65)return[];const x0=.153,x1=.684,y0=.181,y1=.903,rows=11,rh=(y1-y0)/rows,out=[];for(let i=0;i<rows;i++){const y=y0+i*rh,c=document.createElement('canvas'),w=Math.round(img.naturalWidth*(x1-x0)),h=Math.round(img.naturalHeight*rh);c.width=w;c.height=h;c.getContext('2d',{willReadFrequently:true}).drawImage(img,Math.round(img.naturalWidth*x0),Math.round(img.naturalHeight*y),w,h,0,0,w,h);out.push({canvas:c,file:fileName,row:i+1})}return out}
+function rowCrops(img,fileName,group=''){const x0=.153,x1=.684,y0=.181,y1=.903,rows=11,rh=(y1-y0)/rows,out=[];for(let i=0;i<rows;i++){const y=y0+i*rh,c=document.createElement('canvas'),w=Math.round(img.naturalWidth*(x1-x0)),h=Math.round(img.naturalHeight*rh);c.width=w;c.height=h;c.getContext('2d',{willReadFrequently:true}).drawImage(img,Math.round(img.naturalWidth*x0),Math.round(img.naturalHeight*y),w,h,0,0,w,h);out.push({canvas:c,file:fileName,row:i+1,group})}return out}
 function footerCrop(img,fileName){const c=document.createElement('canvas'),sx=Math.round(img.naturalWidth*.025),sy=Math.round(img.naturalHeight*.885),sw=Math.round(img.naturalWidth*.965),sh=Math.max(1,img.naturalHeight-sy);c.width=sw;c.height=sh;c.getContext('2d',{willReadFrequently:true}).drawImage(img,sx,sy,sw,sh,0,0,sw,sh);return{canvas:c,file:fileName}}
 function footerTotalCrop(img,fileName){const c=document.createElement('canvas'),sx=Math.round(img.naturalWidth*.79),sy=Math.round(img.naturalHeight*.885),sw=Math.max(1,Math.round(img.naturalWidth*.205)),sh=Math.max(1,Math.round(img.naturalHeight*.11));c.width=sw;c.height=sh;c.getContext('2d',{willReadFrequently:true}).drawImage(img,sx,sy,sw,sh,0,0,sw,sh);return{canvas:c,file:fileName}}
 function grayPixels(src){const g=src.getContext('2d',{willReadFrequently:true}),d=g.getImageData(0,0,src.width,src.height),a=new Uint8Array(src.width*src.height);for(let i=0,j=0;i<d.data.length;i+=4,j++)a[j]=Math.round(d.data[i]*.299+d.data[i+1]*.587+d.data[i+2]*.114);return a}
@@ -103,8 +103,8 @@ function ocrNamePart(s){return cleanOCR(s).replace(/[^\p{Script=Han}\p{Script=Hi
 function splitPlayerName(v){const a=String(v||'').trim().split(/\s+/).filter(Boolean);return{surname:a[0]||'',given:a.slice(1).join('')}}
 function detectNameSeparator(canvas){const g=canvas.getContext('2d',{willReadFrequently:true}),id=g.getImageData(0,0,canvas.width,canvas.height).data,x0=Math.floor(canvas.width*.18),x1=Math.floor(canvas.width*.44),y0=Math.floor(canvas.height*.16),y1=Math.floor(canvas.height*.84),occ=[];for(let x=x0;x<x1;x++){let n=0;for(let y=y0;y<y1;y++){const i=(y*canvas.width+x)*4,l=id[i]*.299+id[i+1]*.587+id[i+2]*.114;if(l>178)n++}occ.push(n/Math.max(1,y1-y0))}let best=null,st=-1;for(let i=0;i<=occ.length;i++){const ok=i<occ.length&&occ[i]>.46;if(ok&&st<0)st=i;if((!ok||i===occ.length)&&st>=0){const en=i,w=en-st;if(w>=4&&(!best||w>best.w))best={a:x0+st,b:x0+en,w};st=-1}}return best?{left:best.a/canvas.width,right:best.b/canvas.width}:{left:.285,right:.325}}
 function batchUserWords(){if(state._batchUserWords)return state._batchUserWords;const out=new Set();for(const p of state.players){const n=String(p['名前']||'');const q=splitPlayerName(n);if(q.surname)out.add(q.surname);if(q.given)out.add(q.given);if(q.surname&&q.given)out.add(q.surname+q.given)}state._batchUserWords=[...out].join('\n');return state._batchUserWords}
-function batchKanjiWhitelist(){if(state._batchKanjiWhitelist)return state._batchKanjiWhitelist;const chars=new Set();for(const p of state.players)for(const ch of String(p['名前']||''))if(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}々ヶヵー・]/u.test(ch))chars.add(ch);state._batchKanjiWhitelist=[...chars].join('');return state._batchKanjiWhitelist}
-async function recognizeFixedParts(worker,canvas,threshold=125){const sep=detectNameSeparator(canvas);try{await worker.setParameters({tessedit_pageseg_mode:'8',tessedit_char_whitelist:''})}catch(e){}const a=await recognizeText(worker,binaryRegion(canvas,.115,Math.max(.18,sep.left-.008),threshold,6)),b=await recognizeText(worker,binaryRegion(canvas,Math.min(.50,sep.right+.008),.575,threshold,6));try{await worker.setParameters({tessedit_pageseg_mode:'10',tessedit_char_whitelist:'投捕一二三遊外'})}catch(e){}const ps=await recognizeText(worker,binaryRegion(canvas,.012,.105,threshold,5));try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'0123456789歳才'})}catch(e){}const ag=await recognizeText(worker,binaryRegion(canvas,.60,.75,threshold,4));try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'右左両/／'})}catch(e){}const hd=await recognizeText(worker,binaryRegion(canvas,.78,.985,threshold,4));try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:''})}catch(e){}const age=(cleanOCR(ag.text).match(/(18|19|20|21|22|23|24)/)||[])[1]||'',ht=cleanOCR(hd.text).replace(/石/g,'右').replace(/布/g,'右').replace(/[|｜]/g,'/'),hm=ht.match(/([右左])\s*[\/／]\s*([右左両])/),pos=(cleanOCR(ps.text).match(/[投捕一二三遊外]/)||[])[0]||'';return{surname:ocrNamePart(a.text),given:ocrNamePart(b.text),age,hand:hm?`${hm[1]}/${hm[2]}`:'',pos,confidence:Math.round((a.confidence+b.confidence+ps.confidence+ag.confidence+hd.confidence)/5),raw:`${ps.text}｜${a.text}｜□｜${b.text}｜${ag.text}｜${hd.text}`,separator:sep}}
+function batchKanjiWhitelist(){if(state._batchKanjiWhitelist)return state._batchKanjiWhitelist;const chars=new Set();for(const p of state.players)for(const ch of String(p['名前']||''))if(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}々ヶヵー・A-Za-z]/u.test(ch))chars.add(ch);state._batchKanjiWhitelist=[...chars].join('');return state._batchKanjiWhitelist}
+async function recognizeFixedParts(worker,canvas,threshold=125){const sep=detectNameSeparator(canvas);try{await worker.setParameters({tessedit_pageseg_mode:'8',tessedit_char_whitelist:''})}catch(e){}const a=await recognizeText(worker,binaryRegion(canvas,.07,Math.max(.14,sep.left-.008),threshold,6)),b=await recognizeText(worker,binaryRegion(canvas,Math.min(.30,sep.right+.008),.42,threshold,6));try{await worker.setParameters({tessedit_pageseg_mode:'10',tessedit_char_whitelist:'投捕一二三遊外'})}catch(e){}const ps=await recognizeText(worker,binaryRegion(canvas,.01,.075,threshold,5));try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'0123456789歳才'})}catch(e){}const ag=await recognizeText(worker,binaryRegion(canvas,.54,.70,threshold,4));try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'右左両/／'})}catch(e){}const hd=await recognizeText(worker,binaryRegion(canvas,.77,.96,threshold,4));try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:''})}catch(e){}const age=(cleanOCR(ag.text).match(/(18|19|20|21|22|23|24)/)||[])[1]||'',ht=cleanOCR(hd.text).replace(/石/g,'右').replace(/布/g,'右').replace(/[|｜]/g,'/'),hm=ht.match(/([右左])\s*[\/／]\s*([右左両])/),pos=(cleanOCR(ps.text).match(/[投捕一二三遊外]/)||[])[0]||'';return{surname:ocrNamePart(a.text),given:ocrNamePart(b.text),age,hand:hm?`${hm[1]}/${hm[2]}`:'',pos,confidence:Math.round((a.confidence+b.confidence+ps.confidence+ag.confidence+hd.confidence)/5),raw:`${ps.text}｜${a.text}｜□｜${b.text}｜${ag.text}｜${hd.text}`,separator:sep}}
 function dhash(canvas){const c=document.createElement('canvas');c.width=17;c.height=8;const g=c.getContext('2d',{willReadFrequently:true});g.filter='grayscale(1) contrast(1.7)';g.drawImage(canvas,0,0,17,8);const d=g.getImageData(0,0,17,8).data,bits=[];for(let y=0;y<8;y++)for(let x=0;x<16;x++){const a=d[(y*17+x)*4],b=d[(y*17+x+1)*4];bits.push(a>b?1:0)}return bits}
 function ham(a,b){let n=0;for(let i=0;i<a.length;i++)if(a[i]!==b[i])n++;return n}
 async function ensureLocalOCR(){if(window.Tesseract){state.ocrReady=true;return true}return new Promise(resolve=>{const old=document.querySelector('script[data-yt3-ocr]');if(old)old.remove();const s=document.createElement('script');s.dataset.yt3Ocr='1';s.src='./vendor/tesseract/tesseract.min.js';s.onload=()=>{state.ocrReady=!!window.Tesseract;resolve(state.ocrReady)};s.onerror=()=>resolve(false);document.head.appendChild(s)})}
@@ -134,7 +134,7 @@ function setBatchProgress(percent,text){
   $('#batchStatus').textContent=`${text||''}${p? `｜${p}%`:''}`;
 }
 function nameInkRatio(src){
-  const g=src.getContext('2d',{willReadFrequently:true}),x0=Math.floor(src.width*.10),x1=Math.floor(src.width*.59),id=g.getImageData(x0,0,Math.max(1,x1-x0),src.height).data;
+  const g=src.getContext('2d',{willReadFrequently:true}),x0=Math.floor(src.width*.065),x1=Math.floor(src.width*.43),id=g.getImageData(x0,0,Math.max(1,x1-x0),src.height).data;
   let hi=0,lo=0;for(let i=0;i<id.length;i+=4){const l=id[i]*.299+id[i+1]*.587+id[i+2]*.114;if(l>145)hi++;if(l<95)lo++}
   return Math.min(hi,lo)/Math.max(1,id.length/4)
 }
@@ -277,6 +277,74 @@ async function tesseractFooterTotal(worker,screens){
   try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:''})}catch{}return best
 }
 
+
+function detectRosterGroup(img){
+  const c=document.createElement('canvas'),w=Math.max(1,Math.round(img.naturalWidth*.72)),h=Math.max(1,Math.round(img.naturalHeight*.09));c.width=w;c.height=h;
+  c.getContext('2d',{willReadFrequently:true}).drawImage(img,0,0,w,h,0,0,w,h);
+  const d=c.getContext('2d',{willReadFrequently:true}).getImageData(0,0,w,h).data;let sx=0,n=0;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4,r=d[i],g=d[i+1],b=d[i+2];if(r>95&&r>g*1.15&&r>b*1.18&&g<155){sx+=x;n++}}
+  if(!n)return'';const q=(sx/n)/w;
+  if(q<.30)return'投手';if(q<.43)return'捕手';if(q<.68)return'內野手';return'外野手'
+}
+function rawWordMask(src,rx0,rx1,threshold=112){
+  const sx=Math.max(0,Math.floor(src.width*rx0)),ex=Math.min(src.width,Math.ceil(src.width*rx1)),sw=Math.max(1,ex-sx),g=src.getContext('2d',{willReadFrequently:true}),id=g.getImageData(sx,0,sw,src.height).data,bits=new Uint8Array(sw*src.height);
+  const occ=new Float32Array(sw);for(let x=0;x<sw;x++){let k=0;for(let y=0;y<src.height;y++){const i=(y*sw+x)*4,l=id[i]*.299+id[i+1]*.587+id[i+2]*.114;if(l>threshold)k++}occ[x]=k/src.height}
+  for(let y=0;y<src.height;y++)for(let x=0;x<sw;x++){const i=(y*sw+x)*4,l=id[i]*.299+id[i+1]*.587+id[i+2]*.114;bits[y*sw+x]=(l>threshold&&occ[x]<.82)?1:0}
+  let minx=sw,miny=src.height,maxx=-1,maxy=-1;for(let y=0;y<src.height;y++)for(let x=0;x<sw;x++)if(bits[y*sw+x]){if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y}
+  if(maxx<minx||maxy<miny)return null;return{bits,w:sw,h:src.height,minx,maxx,miny,maxy}
+}
+function glyphBitmap(mask,x0,x1,size=28){
+  x0=Math.max(0,Math.floor(x0));x1=Math.min(mask.w,Math.ceil(x1));const w=Math.max(1,x1-x0),h=mask.h,tmp=new Uint8Array(w*h);for(let y=0;y<h;y++)for(let x=0;x<w;x++)tmp[y*w+x]=mask.bits[y*mask.w+x0+x];
+  return cvNormalizeCell(tmp,w,h,size)
+}
+function splitWordGlyphs(src,rx0,rx1){
+  const m=rawWordMask(src,rx0,rx1,112);if(!m)return[];const bw=m.maxx-m.minx+1,bh=m.maxy-m.miny+1,pitch=Math.max(1,bh*.86),count=Math.max(1,Math.min(8,Math.round(bw/pitch))),step=bw/count,out=[];
+  for(let i=0;i<count;i++){const a=m.minx+i*step,b=m.minx+(i+1)*step;out.push(glyphBitmap(m,a,b,28))}
+  return out
+}
+function glyphDice(a,b){let inter=0,na=0,nb=0;for(let i=0;i<a.bits.length;i++){const av=a.bits[i],bv=b.bits[i];if(av)na++;if(bv)nb++;if(av&&bv)inter++}return 2*inter/(na+nb+1e-6)}
+function glyphSimilarity(a,b){return glyphDice(a,b)*.76+cvFeatureSimilarity(cvDescriptor(a),cvDescriptor(b))*.24}
+function glyphToCanvas(bm,scale=4){
+  const c=document.createElement('canvas');c.width=bm.w*scale;c.height=bm.h*scale;const g=c.getContext('2d'),id=g.createImageData(c.width,c.height);
+  for(let y=0;y<c.height;y++)for(let x=0;x<c.width;x++){const v=bm.bits[Math.floor(y/scale)*bm.w+Math.floor(x/scale)]?0:255,i=(y*c.width+x)*4;id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255}g.putImageData(id,0,0);return c
+}
+function buildGlyphClusters(rows){
+  const clusters=[];
+  const assign=bm=>{let best=-1,score=0;for(let i=0;i<clusters.length;i++){const s=glyphSimilarity(bm,clusters[i].bitmap);if(s>score){score=s;best=i}}if(best>=0&&score>=.88){clusters[best].count++;return best}clusters.push({bitmap:bm,count:1,char:'',confidence:0,votes:new Map()});return clusters.length-1};
+  for(const r of rows){
+    const sep=detectNameSeparator(r.canvas),sg=splitWordGlyphs(r.canvas,.07,Math.max(.14,sep.left-.008)),gg=splitWordGlyphs(r.canvas,Math.min(.30,sep.right+.008),.42);
+    r.sGlyphs=sg.map(assign);r.gGlyphs=gg.map(assign);r.glyphCount=r.sGlyphs.length+r.gGlyphs.length
+  }
+  return clusters
+}
+function groupPlayerOK(p,group){if(!group)return true;if(group==='投手')return p._position==='投手';if(group==='捕手')return p._position==='捕手';if(group==='外野手')return p._position==='外野手';if(group==='內野手')return['一壘手','二壘手','三壘手','游擊手'].includes(p._position);return true}
+function glyphCandidateMatch(row,clusters){
+  const sl=row.sGlyphs?.length||0,gl=row.gGlyphs?.length||0;if(!sl&&!gl)return{match:null,candidates:[]};
+  let pool=state.players.filter(p=>groupPlayerOK(p,row.group));let exact=pool.filter(p=>{const q=splitPlayerName(p['名前']);return[...q.surname].length===sl&&[...q.given].length===gl});if(exact.length)pool=exact;
+  const scored=pool.map(p=>{const q=splitPlayerName(p['名前']),s=[...q.surname],g=[...q.given];let num=0,den=0,known=0;
+    const calc=(ids,chars)=>ids.forEach((id,i)=>{const cl=clusters[id],w=cl?.char?Math.max(.35,Math.min(1,(cl.confidence||55)/100)):0;if(!w)return;known++;den+=w;num+=chars[i]===cl.char?w:-w*.72});
+    calc(row.sGlyphs||[],s);calc(row.gGlyphs||[],g);const base=den?(.5+.5*(num/den)):.2,score=Math.max(0,Math.min(1,base));return{p,score,nameScore:score,meta:row.group?1:0,known}
+  }).sort((a,b)=>b.score-a.score),a=scored[0],b=scored[1];if(!a)return{match:null,candidates:[]};const margin=a.score-(b?.score||0),accept=(a.known>=3&&a.score>=.78&&margin>=.055)||(a.known>=2&&a.score>=.88&&margin>=.08);return{match:accept?a:null,candidates:scored.slice(0,12),margin}
+}
+function voteGlyphsFromRows(rows,clusters){
+  for(const cl of clusters)cl.votes=new Map();
+  for(const r of rows){const cm=glyphCandidateMatch(r,clusters),a=cm.candidates?.[0],b=cm.candidates?.[1];if(!a||a.known<2||a.score<.82||(a.score-(b?.score||0))<.07)continue;const q=splitPlayerName(a.p['名前']),s=[...q.surname],g=[...q.given],w=.5+(a.score-(b?.score||0))*3;
+    (r.sGlyphs||[]).forEach((id,i)=>{if(!clusters[id].char&&s[i])clusters[id].votes.set(s[i],(clusters[id].votes.get(s[i])||0)+w)});
+    (r.gGlyphs||[]).forEach((id,i)=>{if(!clusters[id].char&&g[i])clusters[id].votes.set(g[i],(clusters[id].votes.get(g[i])||0)+w)})
+  }
+  let changed=0;for(const cl of clusters){if(cl.char||!cl.votes.size)continue;const v=[...cl.votes.entries()].sort((a,b)=>b[1]-a[1]),a=v[0],b=v[1];if(a&&a[1]>=1.1&&a[1]>=(b?.[1]||0)*1.55){cl.char=a[0];cl.confidence=Math.min(78,48+a[1]*10);changed++}}return changed
+}
+async function classifyGlyphClusters(worker,clusters){
+  const whitelist=batchKanjiWhitelist();try{await worker.setParameters({tessedit_pageseg_mode:'10',tessedit_char_whitelist:whitelist,preserve_interword_spaces:'0'})}catch{}
+  const order=[...clusters.keys()].sort((a,b)=>clusters[b].count-clusters[a].count);
+  for(let k=0;k<order.length;k++){const i=order[k],cl=clusters[i];setBatchProgress(20+58*(k/Math.max(1,order.length)),'字形分類 '+(k+1)+'/'+order.length);try{const r=await recognizeText(worker,glyphToCanvas(cl.bitmap,5)),t=ocrNamePart(r.text),ch=[...t][0]||'';if(ch&&r.confidence>=48){cl.char=ch;cl.confidence=r.confidence}}catch{}if(k%8===0)await new Promise(requestAnimationFrame)}
+}
+async function glyphAnalyzeRows(rows,worker){
+  const clusters=buildGlyphClusters(rows);await classifyGlyphClusters(worker,clusters);for(let n=0;n<3;n++)if(!voteGlyphsFromRows(rows,clusters))break;
+  for(const r of rows){const cm=glyphCandidateMatch(r,clusters);r.match=cm.match||null;r.candidates=cm.candidates||[];r.score=r.match?.score||r.candidates?.[0]?.score||0;r.status=r.match?'確認':'候選';r.raw='GLYPH';r.parsed={pos:'',age:'',hand:''}}
+  return clusters
+}
+
 function mergeParsedNameEvidence(a,b){a=a||{};b=b||{};return{...a,
   name:a.name||b.name||'',
   names:[...new Set([...(a.names||[]),...(b.names||[]),a.name,b.name].filter(Boolean))],
@@ -289,7 +357,7 @@ function mergeParsedNameEvidence(a,b){a=a||{};b=b||{};return{...a,
 function candidateMatch(parsed){const names=parsed.names?.length?parsed.names:[parsed.name],surnames=[...new Set([parsed.surname,...(parsed.surnames||[])].filter(Boolean))],givens=[...new Set([parsed.given,...(parsed.givens||[])].filter(Boolean))];let pool=state.players;const gates=[];if(parsed.pos)gates.push(p=>p._position===POSMAP[parsed.pos]);if(parsed.hand)gates.push(p=>String(p['投/打']||'').replace('／','/')===parsed.hand);for(const gate of gates){const narrowed=pool.filter(gate);if(narrowed.length>=1)pool=narrowed}const scored=pool.map(p=>{const pn=p['名前']||'',parts=splitPlayerName(pn),full=Math.max(...names.map(n=>nameSimilarity(n,pn)),0),sur=surnames.length?Math.max(...surnames.map(n=>nameSimilarity(n,parts.surname)),0):0,giv=givens.length?Math.max(...givens.map(n=>nameSimilarity(n,parts.given)),0):0,den=(surnames.length?0.54:0)+(givens.length?0.46:0)||1,part=(sur*.54+giv*.46)/den,ns=Math.max(full,part);let score=ns*.88,meta=0;if(parsed.hand&&String(p['投/打']||'').replace('／','/')===parsed.hand){score+=.055;meta++}if(parsed.pos&&p._position===POSMAP[parsed.pos]){score+=.04;meta++}if(parsed.age&&String(p['年齢']||'')===parsed.age)score+=.008;const sl=surnames[0]?.length||0,gl=givens[0]?.length||0;if(sl&&Math.abs([...parts.surname].length-[...surnames[0]].length)>1)score-=.06;if(gl&&Math.abs([...parts.given].length-[...givens[0]].length)>1)score-=.06;return{p,score,nameScore:ns,fullScore:full,surnameScore:sur,givenScore:giv,meta}}).sort((a,b)=>b.score-a.score),best=scored[0],second=scored[1];if(!best)return{match:null,candidates:[]};const margin=best.score-(second?.score||0),splitStrong=(surnames.length&&givens.length&&best.surnameScore>=.72&&best.givenScore>=.64);const accept=(best.nameScore>=.90&&margin>=.018)||(splitStrong&&margin>=.02)||(best.nameScore>=.74&&best.meta>=1&&margin>=.025)||(best.nameScore>=.68&&best.meta>=2&&margin>=.02);return{match:accept?best:null,candidates:scored.slice(0,12),margin}}
 function parseExpectedTotal(text){const t=cleanOCR(text);let m=t.match(/(?:合計|含計|会計|馬軒)[^0-9]{0,8}(\d{2,3})\s*人/);if(m)return +m[1];const nums=[...t.matchAll(/(\d{2,3})\s*人/g)].map(x=>+x[1]).filter(n=>n>=20&&n<=200);return nums.length?Math.max(...nums):0}
 function mergeEvidence(a,b){const pa=a.parsed||{},pb=b.parsed||{},parsed={...pa,names:[...new Set([...(pa.names||[]),...(pb.names||[])].filter(Boolean))],surnames:[...new Set([pa.surname,...(pa.surnames||[]),pb.surname,...(pb.surnames||[])].filter(Boolean))],givens:[...new Set([pa.given,...(pa.givens||[]),pb.given,...(pb.givens||[])].filter(Boolean))]};if(!parsed.age)parsed.age=pb.age;if(!parsed.hand)parsed.hand=pb.hand;if(!parsed.pos)parsed.pos=pb.pos;const hasText=parsed.names.length||parsed.surnames.length||parsed.givens.length,cm=hasText?candidateMatch(parsed):null,qa=(a.match?.score||a.candidates?.[0]?.score||0),qb=(b.match?.score||b.candidates?.[0]?.score||0),keep=qb>qa?b:a;const cq=(cm?.match?.score||cm?.candidates?.[0]?.score||0),chosen=cm?.candidates?.length&&cq>Math.max(qa,qb)?cm:{match:keep.match||null,candidates:keep.candidates||[]};return{...keep,parsed,raw:[a.raw,b.raw].filter(Boolean).join(' || '),ocrConfidence:Math.max(a.ocrConfidence||0,b.ocrConfidence||0),match:chosen.match||null,candidates:chosen.candidates||[],score:chosen.match?.score||chosen.candidates?.[0]?.score||0,firstIndex:Math.min(a.firstIndex??9999,b.firstIndex??9999),sources:[...(a.sources||[`${a.file}#${a.row}`]),...(b.sources||[`${b.file}#${b.row}`])]}}
-function consolidateRows(raw,expected=0){const clusters=[];for(const r0 of raw){const r={...r0},h=r.hash||dhash(binaryRegion(r.canvas,.105,.585,126,2));r.hash=h;let idx=-1,best=999;for(let i=0;i<clusters.length;i++){const d=ham(h,clusters[i].hash);if(d<best&&d<=7){best=d;idx=i}}if(idx>=0)clusters[idx]=mergeEvidence(clusters[idx],r);else clusters.push({...r,sources:[`${r.file}#${r.row}`]})}clusters.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));let out=clusters;if(expected&&out.length>expected)out=[...out].sort((a,b)=>(b.match?.score||b.candidates?.[0]?.score||0)-(a.match?.score||a.candidates?.[0]?.score||0)).slice(0,expected).sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));return out}
+function consolidateRows(raw,expected=0){const clusters=[];for(const r0 of raw){const r={...r0},h=r.hash||dhash(binaryRegion(r.canvas,.065,.43,126,2));r.hash=h;let idx=-1,best=999;for(let i=0;i<clusters.length;i++){const d=ham(h,clusters[i].hash);if(d<best&&d<=7){best=d;idx=i}}if(idx>=0)clusters[idx]=mergeEvidence(clusters[idx],r);else clusters.push({...r,sources:[`${r.file}#${r.row}`]})}clusters.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));let out=clusters;if(expected&&out.length>expected)out=[...out].sort((a,b)=>(b.match?.score||b.candidates?.[0]?.score||0)-(a.match?.score||a.candidates?.[0]?.score||0)).slice(0,expected).sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));return out}
 function resolveUniqueCandidates(rows){for(const r of rows)r.resolved=null;const used=new Set(rows.filter(r=>r.match?.p?._uid).map(r=>r.match.p._uid)),pending=rows.filter(r=>!r.match);for(let guard=0;guard<rows.length;guard++){let pick=null;for(const r of pending){if(r.resolved)continue;const av=(r.candidates||[]).filter(x=>!used.has(x.p._uid));if(!av.length)continue;const a=av[0],b=av[1],gap=a.score-(b?.score||0),quality=a.score+gap*.45+a.meta*.015;const safe=(a.score>=.72&&gap>=.035)||(a.score>=.67&&a.meta>=1&&gap>=.04)||(a.score>=.64&&a.meta>=2&&gap>=.045);if(!safe)continue;if(!pick||quality>pick.quality)pick={r,a,gap,quality}}if(!pick)break;pick.r.resolved=pick.a;pick.r.status='推定';used.add(pick.a.p._uid)}return rows}
 function dedupeRecognizedRows(rows,expected=0){const seen=new Map(),rest=[];for(const r of rows){const p=r.match?.p||r.resolved?.p;if(p?._uid){const old=seen.get(p._uid),quality=(r.match?.score||r.resolved?.score||r.score||0)+(r.ocrConfidence||0)/5000;if(!old||quality>old.quality)seen.set(p._uid,{row:r,quality})}else rest.push(r)}let out=[...seen.values()].map(x=>x.row).concat(rest);out.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));if(expected&&out.length>expected)out=out.slice(0,expected);return out}
 function batchDisplayPlayer(r){return r.match?.p||r.resolved?.p||null}
@@ -311,57 +379,25 @@ async function recognizeText(worker,canvas){const r=await worker.recognize(canva
 async function runBatch(){
   if(!state.batchFiles.length){alert('請先選擇截圖。');return}
   if(state.players.length<1000){$('#batchStatus').textContent='完整名冊尚未載入，請先到「資料」按更新名冊。';return}
-  $('#runBatch').disabled=true;let paddle=null,worker=null;
+  $('#runBatch').disabled=true;let worker=null;
   try{
-    const screens=[],all=[];setBatchProgress(1,'分析固定版面…');
-    for(const f of state.batchFiles){const im=await loadImage(f),rows=rowCrops(im,f.name).filter(r=>nameInkRatio(r.canvas)>.006);screens.push({file:f.name,footer:footerCrop(im,f.name),total:footerTotalCrop(im,f.name)});all.push(...rows)}
-    state.batchRawRows=all.map((r,i)=>({...r,firstIndex:i,status:'待辨識',raw:'',parsed:null,match:null,candidates:[],ocrConfidence:0,score:0}));state.batchRows=[];state.expectedTotal=0;const cvTotals=screens.map(sc=>cvFooterTotal(sc.total.canvas)).filter(n=>n>=20&&n<=200);if(cvTotals.length){const freq=new Map();for(const n of cvTotals)freq.set(n,(freq.get(n)||0)+1);state.expectedTotal=[...freq.entries()].sort((a,b)=>b[1]-a[1]||b[0]-a[0])[0][0]}renderBatchResults();
+    const screens=[],all=[];setBatchProgress(1,'切出固定欄位與字形…');
+    for(const f of state.batchFiles){const im=await loadImage(f),group=detectRosterGroup(im),rows=rowCrops(im,f.name,group);screens.push({file:f.name,footer:footerCrop(im,f.name),total:footerTotalCrop(im,f.name),group});all.push(...rows)}
+    state.batchRawRows=all.map((r,i)=>({...r,firstIndex:i,status:'待分辨',raw:'',parsed:null,match:null,candidates:[],ocrConfidence:0,score:0}));state.batchRows=[];state.expectedTotal=0;renderBatchResults();
 
-    // 所有平台先跑同一套固定版面 CV；不需要 PaddleOCR / Tesseract 才能產生候選。
-    await cvAnalyzeRows(state.batchRawRows);
-    state.batchRows=consolidateRows(state.batchRawRows,0);renderBatchResults();
+    const ok=await ensureLocalOCR();if(!ok)throw new Error('本機字形分類器無法載入');
+    worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),35000,'本機字形分類器載入逾時');
 
-    const ios=isIOSLike();
-    if(ios){
-      setBatchProgress(62,'手機：CV 主流程完成，讀取名單總人數…');
-      // iPhone/iPad 不啟動 PaddleOCR；WebKit/ONNX WASM 在實機上不穩定。
-      const ok=await ensureLocalOCR();
-      if(ok){
-        try{
-          worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),35000,'頁尾辨識載入逾時');
-          {const n=await tesseractFooterTotal(worker,screens);if(n>=20&&n<=200)state.expectedTotal=n;}
-        }catch(e){console.warn('mobile footer OCR',e)}
-      }
-    }else{
-      // 桌機仍與手機共用 CV；PaddleOCR 只做加分複核，不是必要條件。
-      setBatchProgress(62,'桌機：CV 主流程完成，嘗試 OCR 複核…');
-      try{paddle=await createPaddleOCR()}catch(e){console.warn('PaddleOCR optional',e)}
-      if(paddle){
-        const totals=[];for(const sc of screens){try{const t=await recognizeFooterPaddle(paddle,sc.footer.canvas),n=parseExpectedTotal(t);if(n)totals.push(n)}catch{}}
-        if(totals.length)state.expectedTotal=Math.max(...totals);
-        const uncertain=state.batchRawRows.filter(r=>!r.match||r.score<.84||((r.candidates?.[0]?.score||0)-(r.candidates?.[1]?.score||0))<.045);
-        for(let i=0;i<uncertain.length;i++){const row=uncertain[i];setBatchProgress(64+20*(i/Math.max(1,uncertain.length)),'PaddleOCR 複核 '+(i+1)+'/'+uncertain.length);try{const rr=await recognizeNamePaddle(paddle,row.canvas);mergeRowOCR(row,rr.parsed,rr.cm,'P:'+rr.raw,Math.round(rr.confidence*100))}catch(e){row.raw+='｜PERR:'+String(e.message||e)}}
-      }
-      // Paddle 沒讀到總數，或仍有大量不確定列時，再用 Tesseract；不會改變 CV 主流程。
-      const needTess=!state.expectedTotal||state.batchRawRows.some(r=>!r.match&&r.score<.72);
-      if(needTess&&await ensureLocalOCR()){
-        try{
-          worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),35000,'Tesseract 複核載入逾時');
-          if(!state.expectedTotal){const n=await tesseractFooterTotal(worker,screens);if(n>=20&&n<=200)state.expectedTotal=n;}
-          const uncertain=state.batchRawRows.filter(r=>!r.match&&r.score<.80);
-          try{await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1',tessedit_char_whitelist:''})}catch{}
-          for(let i=0;i<uncertain.length;i++){const row=uncertain[i];setBatchProgress(85+10*(i/Math.max(1,uncertain.length)),'Tesseract 複核 '+(i+1)+'/'+uncertain.length);try{const np=await recognizeFixedParts(worker,row.canvas,125),parsed={name:(np.surname+' '+np.given).trim(),names:[(np.surname+' '+np.given).trim()].filter(Boolean),surname:np.surname,given:np.given,surnames:[np.surname].filter(Boolean),givens:[np.given].filter(Boolean),age:np.age,hand:np.hand,pos:np.pos,text:np.raw},cm=candidateMatch(parsed);mergeRowOCR(row,parsed,cm,'T:'+np.raw,np.confidence)}catch(e){row.raw+='｜TERR:'+String(e.message||e)}}
-        }catch(e){console.warn('Tesseract optional',e)}
-      }
-    }
+    await glyphAnalyzeRows(state.batchRawRows,worker);
+    state.batchRawRows=state.batchRawRows.filter(r=>r.glyphCount>0);
+    const n=await tesseractFooterTotal(worker,screens);if(n>=20&&n<=200)state.expectedTotal=n;
 
     let rows=resolveUniqueCandidates(consolidateRows(state.batchRawRows,state.expectedTotal));rows=dedupeRecognizedRows(rows,state.expectedTotal);state.batchRows=rows;
     const matched=rows.filter(r=>r.match).length,inferred=rows.filter(r=>!r.match&&r.resolved).length;
-    const mode=ios?'手機 CV':'桌機 CV＋可用時 OCR 複核';
-    setBatchProgress(100,'完成：'+rows.length+' 人'+(state.expectedTotal?'／畫面名單上限 '+state.expectedTotal:'')+'；確認 '+matched+'，推定 '+inferred+'，候選 '+(rows.length-matched-inferred)+'｜'+mode);
+    setBatchProgress(100,'完成：'+rows.length+' 人'+(state.expectedTotal?'／畫面名單上限 '+state.expectedTotal:'')+'；確認 '+matched+'，推定 '+inferred+'，候選 '+(rows.length-matched-inferred)+'｜固定字形分辨');
     renderBatchResults();
   }catch(e){console.error(e);$('#batchStatus').textContent='批次找人失敗：'+(e.message||e)}
-  finally{if(paddle)try{await paddle.dispose()}catch{}if(worker)try{await worker.terminate()}catch{}$('#runBatch').disabled=false}
+  finally{if(worker)try{await worker.terminate()}catch{}$('#runBatch').disabled=false}
 }
 $('#runBatch').onclick=runBatch;
 function renderBatchResults(){
