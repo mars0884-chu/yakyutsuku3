@@ -34,7 +34,7 @@
 - PWA 啟動時自動檢查版本；右上角保留「檢查更新」鍵，發現新版後顯示進度條並更新 Service Worker／快取，不必先刪除主畫面書籤。
 
 
-## 2026-10-07 r3
+## 2026-10-07 r4
 
 - 桌機與手機改成同一個固定版面 CV 主核心：兩邊都先執行 `cvAnalyzeRows()`，不再有「手機只能走失敗備援」的架構。
 - iPhone／iPad 主動跳過 PaddleOCR，避免 WebKit/ONNX WASM `no available backend found`；Tesseract 只在可載入時讀頁尾總人數，不是姓名辨識的必要條件。
