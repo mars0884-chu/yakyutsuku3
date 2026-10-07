@@ -1,6 +1,6 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='2026.10.07-r4';
-const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,batchSort:'screen',batchSortDir:'asc'};
+const APP_VERSION='2026.10.07-krom-lab';
+const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,fontProfile:null,batchSort:'screen',batchSortDir:'asc'};
 const HEADER_ZH={"名前":"姓名","年齢":"年齡","成長":"成長型","投/打":"投／打","出身":"出身地","高校":"高中","大学":"大學","社会人":"社會人","タイプ":"投手類型","ランク":"Rank","体力":"體力","球速":"球速","球威":"球威","制球":"控球","精神":"精神","守備":"守備","捕球":"接球","肩力":"臂力","送球":"傳球","スライダー":"滑球","速スラ":"高速滑球","カットB":"卡特球","カーブ":"曲球","Sカーブ":"S曲球","ドロップ":"Drop曲球","シュート":"噴射球","速シュート":"高速噴射球","シンカー":"伸卡球","スクリュー":"螺旋球","速シンカー":"高速伸卡球","サークルC":"圈指變速","2シーム":"二縫線","Cアップ":"變速球","フォーク":"指叉球","SFF":"快速指叉","縦スラ":"縱滑球","パーム":"掌心球","ナックル":"蝴蝶球","スキル1":"技能1","スキル2":"技能2","スキル3":"技能3","モデル":"原型","右巧":"對右巧打","左巧":"對左巧打","長打":"長打","バント":"短打","選球眼":"選球眼","走力":"跑力","走塁":"跑壘","リード":"配球","捕手":"捕手","一塁":"一壘","二塁":"二壘","三塁":"三壘","遊撃":"游擊","外野":"外野","リーグ":"聯盟／地區","アカデミー":"學院"};
 const BASE_COLS=['名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -83,6 +83,37 @@ $('#cheatQuery').addEventListener('input',debounce(renderCheats));$('#clearCheat
 function renderSources(){$('#sourceList').innerHTML=state.sources.map(s=>`<article class="card"><h3><a href="${esc(s.url)}" target="_blank" rel="noreferrer">${esc(s.name)}</a></h3><div class="source-role">${esc(s.role)}</div><div class="source-note">${esc(s.note)}</div><div class="meta">狀態：${esc(s.status)}｜優先級 ${esc(s.priority)}</div></article>`).join('')}
 $('#refreshData').onclick=async()=>{const b=$('#refreshData');b.disabled=true;$('#dataStatus').textContent='更新完整名冊…';try{await loadData(true)}catch(e){$('#dataStatus').textContent='名冊更新失敗：'+e.message}finally{b.disabled=false}};
 
+
+const FONT_DB='yakyutsuku3-font-profile-v1',FONT_STORE='kv',FONT_KEY='krom-profile';
+function fontDB(){return new Promise((resolve,reject)=>{if(!('indexedDB'in window))return reject(new Error('IndexedDB unavailable'));const q=indexedDB.open(FONT_DB,1);q.onupgradeneeded=()=>q.result.createObjectStore(FONT_STORE);q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error||new Error('IndexedDB open failed'))})}
+async function fontProfileGet(){try{const db=await fontDB();return await new Promise((resolve,reject)=>{const tx=db.transaction(FONT_STORE,'readonly'),q=tx.objectStore(FONT_STORE).get(FONT_KEY);q.onsuccess=()=>resolve(q.result||null);q.onerror=()=>reject(q.error)}).finally(()=>db.close())}catch{return null}}
+async function fontProfilePut(profile){const db=await fontDB();await new Promise((resolve,reject)=>{const tx=db.transaction(FONT_STORE,'readwrite');tx.objectStore(FONT_STORE).put(profile,FONT_KEY);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});db.close()}
+function renderFontProfileStatus(){
+  const el=$('#fontProfileStatus'),btn=$('#exportFontProfile');if(!el||!btn)return;
+  if(state.fontProfile&&window.YT3Krom?.validateProfile(state.fontProfile)){el.textContent='字形庫 '+state.fontProfile.id+'｜'+(state.fontProfile.romver||'PS2 BIOS')+'｜'+state.fontProfile.wordCount.toLocaleString()+' 詞';btn.disabled=false}
+  else{el.textContent='尚未建立字形庫';btn.disabled=true}
+}
+async function loadFontProfile(){const p=await fontProfileGet();if(window.YT3Krom?.validateProfile(p))state.fontProfile=p;renderFontProfileStatus()}
+$('#biosFile').onchange=async e=>{
+  const file=e.target.files?.[0];if(!file)return;
+  if(!window.YT3Krom){$('#fontProfileStatus').textContent='字形引擎尚未載入';return}
+  if(state.players.length<3500){$('#fontProfileStatus').textContent='完整名冊尚未載入，請稍後再試';return}
+  const label=$('#fontProfileStatus');try{
+    state.fontProfile=await YT3Krom.buildProfile(file,state.players,(pct,msg)=>{label.textContent=msg+'｜'+pct+'%'});
+    await fontProfilePut(state.fontProfile);renderFontProfileStatus()
+  }catch(err){console.error(err);state.fontProfile=null;label.textContent='建立失敗：'+(err.message||err);renderFontProfileStatus()}
+  finally{e.target.value=''}
+};
+$('#fontProfileFile').onchange=async e=>{
+  const file=e.target.files?.[0];if(!file)return;const label=$('#fontProfileStatus');
+  try{const p=JSON.parse(await file.text());if(!window.YT3Krom?.validateProfile(p))throw new Error('不是有效的やきゅつく3字形庫');state.fontProfile=p;await fontProfilePut(p);renderFontProfileStatus()}catch(err){label.textContent='匯入失敗：'+(err.message||err)}
+  finally{e.target.value=''}
+};
+$('#exportFontProfile').onclick=()=>{
+  if(!window.YT3Krom?.validateProfile(state.fontProfile))return;
+  const blob=new Blob([JSON.stringify(state.fontProfile)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='yakyutsuku3-'+state.fontProfile.id+'.yt3fp';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)
+};
+
 // --- 批次截圖找人：固定版面分列 → 本機 OCR 獨立讀字 → 再與完整球員資料庫比對；不使用特定截圖／特定姓名校準表。---
 $('#batchFiles').onchange=e=>{state.batchFiles=[...e.target.files];state.batchRows=[];state.batchRawRows=[];state.expectedTotal=0;renderBatchPreview();renderBatchResults();$('#batchStatus').textContent=`已選 ${state.batchFiles.length} 張。`};
 $('#clearBatch').onclick=()=>{state.batchFiles=[];state.batchRows=[];state.batchRawRows=[];state.expectedTotal=0;$('#batchFiles').value='';renderBatchPreview();renderBatchResults();$('#batchStatus').textContent='可一次選多張 OFFICE MENU 名單截圖。'};
@@ -90,7 +121,7 @@ function renderBatchPreview(){$('#batchPreview').innerHTML='';for(const f of sta
 function loadImage(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);res(im)};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('圖片解碼失敗'))};im.src=u})}
 function withTimeout(promise,ms,label='處理逾時'){let t;return Promise.race([promise,new Promise((_,rej)=>t=setTimeout(()=>rej(new Error(label)),ms))]).finally(()=>clearTimeout(t))}
 
-function rowCrops(img,fileName){const ratio=img.naturalWidth/img.naturalHeight;if(ratio<1.65)return[];const x0=.153,x1=.684,y0=.181,y1=.903,rows=11,rh=(y1-y0)/rows,out=[];for(let i=0;i<rows;i++){const y=y0+i*rh,c=document.createElement('canvas'),w=Math.round(img.naturalWidth*(x1-x0)),h=Math.round(img.naturalHeight*rh);c.width=w;c.height=h;c.getContext('2d',{willReadFrequently:true}).drawImage(img,Math.round(img.naturalWidth*x0),Math.round(img.naturalHeight*y),w,h,0,0,w,h);out.push({canvas:c,file:fileName,row:i+1})}return out}
+function rowCrops(img,fileName){const x0=.153,x1=.684,y0=.181,y1=.903,rows=11,rh=(y1-y0)/rows,out=[];for(let i=0;i<rows;i++){const y=y0+i*rh,c=document.createElement('canvas'),w=Math.round(img.naturalWidth*(x1-x0)),h=Math.round(img.naturalHeight*rh);c.width=w;c.height=h;c.getContext('2d',{willReadFrequently:true}).drawImage(img,Math.round(img.naturalWidth*x0),Math.round(img.naturalHeight*y),w,h,0,0,w,h);out.push({canvas:c,file:fileName,row:i+1})}return out}
 function footerCrop(img,fileName){const c=document.createElement('canvas'),sx=Math.round(img.naturalWidth*.025),sy=Math.round(img.naturalHeight*.885),sw=Math.round(img.naturalWidth*.965),sh=Math.max(1,img.naturalHeight-sy);c.width=sw;c.height=sh;c.getContext('2d',{willReadFrequently:true}).drawImage(img,sx,sy,sw,sh,0,0,sw,sh);return{canvas:c,file:fileName}}
 function footerTotalCrop(img,fileName){const c=document.createElement('canvas'),sx=Math.round(img.naturalWidth*.79),sy=Math.round(img.naturalHeight*.885),sw=Math.max(1,Math.round(img.naturalWidth*.205)),sh=Math.max(1,Math.round(img.naturalHeight*.11));c.width=sw;c.height=sh;c.getContext('2d',{willReadFrequently:true}).drawImage(img,sx,sy,sw,sh,0,0,sw,sh);return{canvas:c,file:fileName}}
 function grayPixels(src){const g=src.getContext('2d',{willReadFrequently:true}),d=g.getImageData(0,0,src.width,src.height),a=new Uint8Array(src.width*src.height);for(let i=0,j=0;i<d.data.length;i+=4,j++)a[j]=Math.round(d.data[i]*.299+d.data[i+1]*.587+d.data[i+2]*.114);return a}
@@ -308,60 +339,39 @@ function batchSortArrow(k){return state.batchSort===k?(state.batchSortDir==='asc
 function batchCell(r,p,k,displayIndex){if(k==='_screen')return String(displayIndex+1);if(k==='_status')return r.match?'確認':r.resolved?'推定':'候選';if(k==='_position')return esc(p?._position||POSMAP[r.parsed?.pos]||'—');if(k==='名前'){if(!p){const c=(r.candidates||[]).slice(0,3);return c.length?`<span class="candidate-only">候選：${c.map(x=>esc(x.p['名前'])).join(' / ')}</span>`:'未辨識'}const alts=(r.candidates||[]).filter(x=>x.p._uid!==p._uid).slice(0,2),alt=alts.length?`<small class="candidate-note">次選：${alts.map(x=>esc(x.p['名前'])).join(' / ')}</small>`:'';return `<span class="name-link" data-uid="${esc(p._uid)}">${esc(p['名前'])}</span>${alt}`}return esc(p?.[k]||'—')}
 function renderBatchGroup(title,rows,cols){const sorted=sortBatchRows(rows),sortable=new Set(['screen','name','rank','年齢','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野']);let h=`<section class="batch-group"><h3>${esc(title)} <small>${rows.length}</small></h3><div class="table-shell"><table class="data-table batch-detail-table"><thead><tr>`;for(const k of cols){const sk=k==='_screen'?'screen':k==='名前'?'name':k==='ランク'?'rank':k;h+=sortable.has(sk)?`<th class="sortable" data-sort="${esc(sk)}">${esc(batchHeaderLabel(k))}${batchSortArrow(sk)}</th>`:`<th>${esc(batchHeaderLabel(k))}</th>`}h+='</tr></thead><tbody>';sorted.forEach((r,i)=>{const p=batchDisplayPlayer(r);h+='<tr>'+cols.map(k=>`<td class="${k==='名前'?'name':''} ${k==='_status'?(r.match?'good':r.resolved?'estimate':'unresolved'):''}">${batchCell(r,p,k,i)}</td>`).join('')+'</tr>'});h+='</tbody></table></div></section>';return h}
 async function recognizeText(worker,canvas){const r=await worker.recognize(canvas);return{text:cleanOCR(r?.data?.text||''),confidence:Number(r?.data?.confidence||0)}}
+
+function templateConsolidateRows(raw,expected=0){
+  const clusters=[];
+  for(const r0 of raw){const r={...r0},h=r.hash||dhash(binaryRegion(r.canvas,.055,.46,126,2));r.hash=h;let idx=-1,best=999;for(let i=0;i<clusters.length;i++){const d=ham(h,clusters[i].hash);if(d<best&&d<=6){best=d;idx=i}}
+    if(idx>=0){const q=x=>(x.match?.score||x.candidates?.[0]?.score||0)+(x.fontScore||0)*.04;if(q(r)>q(clusters[idx]))clusters[idx]={...r,sources:[...(clusters[idx].sources||[]),r.file+'#'+r.row]}}
+    else clusters.push({...r,sources:[r.file+'#'+r.row]})
+  }
+  clusters.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));let out=clusters;
+  if(expected&&out.length>expected)out=[...out].sort((a,b)=>(b.match?.score||b.candidates?.[0]?.score||0)-(a.match?.score||a.candidates?.[0]?.score||0)).slice(0,expected).sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));
+  return out
+}
+
 async function runBatch(){
   if(!state.batchFiles.length){alert('請先選擇截圖。');return}
   if(state.players.length<1000){$('#batchStatus').textContent='完整名冊尚未載入，請先到「資料」按更新名冊。';return}
-  $('#runBatch').disabled=true;let paddle=null,worker=null;
+  if(!window.YT3Krom?.validateProfile(state.fontProfile)){$('#batchStatus').textContent='請先建立 PS2 字形庫；手機可匯入桌機匯出的字形庫。';return}
+  $('#runBatch').disabled=true;
   try{
-    const screens=[],all=[];setBatchProgress(1,'分析固定版面…');
-    for(const f of state.batchFiles){const im=await loadImage(f),rows=rowCrops(im,f.name).filter(r=>nameInkRatio(r.canvas)>.006);screens.push({file:f.name,footer:footerCrop(im,f.name),total:footerTotalCrop(im,f.name)});all.push(...rows)}
-    state.batchRawRows=all.map((r,i)=>({...r,firstIndex:i,status:'待辨識',raw:'',parsed:null,match:null,candidates:[],ocrConfidence:0,score:0}));state.batchRows=[];state.expectedTotal=0;const cvTotals=screens.map(sc=>cvFooterTotal(sc.total.canvas)).filter(n=>n>=20&&n<=200);if(cvTotals.length){const freq=new Map();for(const n of cvTotals)freq.set(n,(freq.get(n)||0)+1);state.expectedTotal=[...freq.entries()].sort((a,b)=>b[1]-a[1]||b[0]-a[0])[0][0]}renderBatchResults();
-
-    // 所有平台先跑同一套固定版面 CV；不需要 PaddleOCR / Tesseract 才能產生候選。
-    await cvAnalyzeRows(state.batchRawRows);
-    state.batchRows=consolidateRows(state.batchRawRows,0);renderBatchResults();
-
-    const ios=isIOSLike();
-    if(ios){
-      setBatchProgress(62,'手機：CV 主流程完成，讀取名單總人數…');
-      // iPhone/iPad 不啟動 PaddleOCR；WebKit/ONNX WASM 在實機上不穩定。
-      const ok=await ensureLocalOCR();
-      if(ok){
-        try{
-          worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),35000,'頁尾辨識載入逾時');
-          {const n=await tesseractFooterTotal(worker,screens);if(n>=20&&n<=200)state.expectedTotal=n;}
-        }catch(e){console.warn('mobile footer OCR',e)}
-      }
-    }else{
-      // 桌機仍與手機共用 CV；PaddleOCR 只做加分複核，不是必要條件。
-      setBatchProgress(62,'桌機：CV 主流程完成，嘗試 OCR 複核…');
-      try{paddle=await createPaddleOCR()}catch(e){console.warn('PaddleOCR optional',e)}
-      if(paddle){
-        const totals=[];for(const sc of screens){try{const t=await recognizeFooterPaddle(paddle,sc.footer.canvas),n=parseExpectedTotal(t);if(n)totals.push(n)}catch{}}
-        if(totals.length)state.expectedTotal=Math.max(...totals);
-        const uncertain=state.batchRawRows.filter(r=>!r.match||r.score<.84||((r.candidates?.[0]?.score||0)-(r.candidates?.[1]?.score||0))<.045);
-        for(let i=0;i<uncertain.length;i++){const row=uncertain[i];setBatchProgress(64+20*(i/Math.max(1,uncertain.length)),'PaddleOCR 複核 '+(i+1)+'/'+uncertain.length);try{const rr=await recognizeNamePaddle(paddle,row.canvas);mergeRowOCR(row,rr.parsed,rr.cm,'P:'+rr.raw,Math.round(rr.confidence*100))}catch(e){row.raw+='｜PERR:'+String(e.message||e)}}
-      }
-      // Paddle 沒讀到總數，或仍有大量不確定列時，再用 Tesseract；不會改變 CV 主流程。
-      const needTess=!state.expectedTotal||state.batchRawRows.some(r=>!r.match&&r.score<.72);
-      if(needTess&&await ensureLocalOCR()){
-        try{
-          worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),35000,'Tesseract 複核載入逾時');
-          if(!state.expectedTotal){const n=await tesseractFooterTotal(worker,screens);if(n>=20&&n<=200)state.expectedTotal=n;}
-          const uncertain=state.batchRawRows.filter(r=>!r.match&&r.score<.80);
-          try{await worker.setParameters({tessedit_pageseg_mode:'7',preserve_interword_spaces:'1',tessedit_char_whitelist:''})}catch{}
-          for(let i=0;i<uncertain.length;i++){const row=uncertain[i];setBatchProgress(85+10*(i/Math.max(1,uncertain.length)),'Tesseract 複核 '+(i+1)+'/'+uncertain.length);try{const np=await recognizeFixedParts(worker,row.canvas,125),parsed={name:(np.surname+' '+np.given).trim(),names:[(np.surname+' '+np.given).trim()].filter(Boolean),surname:np.surname,given:np.given,surnames:[np.surname].filter(Boolean),givens:[np.given].filter(Boolean),age:np.age,hand:np.hand,pos:np.pos,text:np.raw},cm=candidateMatch(parsed);mergeRowOCR(row,parsed,cm,'T:'+np.raw,np.confidence)}catch(e){row.raw+='｜TERR:'+String(e.message||e)}}
-        }catch(e){console.warn('Tesseract optional',e)}
-      }
+    const raw=[],totals=[];let index=0;setBatchProgress(1,'固定字形比對…');
+    for(let fi=0;fi<state.batchFiles.length;fi++){
+      const file=state.batchFiles[fi],im=await loadImage(file),n=YT3Krom.recognizeTotal(im,state.fontProfile);if(n)totals.push(n);
+      const rows=rowCrops(im,file.name);
+      for(let ri=0;ri<rows.length;ri++){const row=rows[ri],rr=YT3Krom.recognizeRow(row.canvas,state.players,state.fontProfile);if(rr.blank)continue;const pos=rr.meta?.pos?.score>=.63?rr.meta.pos.label:'',age=rr.meta?.age?.score>=.63?rr.meta.age.label:'',hand=rr.meta?.hand?.score>=.63?rr.meta.hand.label:'';raw.push({...row,firstIndex:index++,status:rr.match?'確認':'候選',raw:'KROM',parsed:{pos,age,hand},match:rr.match||null,candidates:rr.candidates||[],ocrConfidence:0,score:rr.match?.score||rr.candidates?.[0]?.score||0,fontScore:rr.fontScore||0})}
+      setBatchProgress(5+80*((fi+1)/state.batchFiles.length),'固定字形比對 '+(fi+1)+'/'+state.batchFiles.length);state.batchRawRows=raw;state.batchRows=templateConsolidateRows(raw,0);renderBatchResults();await new Promise(requestAnimationFrame)
     }
-
-    let rows=resolveUniqueCandidates(consolidateRows(state.batchRawRows,state.expectedTotal));rows=dedupeRecognizedRows(rows,state.expectedTotal);state.batchRows=rows;
+    const cal=YT3Krom.calibrationScore(raw);if(cal<.62){state.batchRawRows=[];state.batchRows=[];state.expectedTotal=0;renderBatchResults();throw new Error('PS2 字形庫與這批遊戲畫面不匹配（校驗 '+Math.round(cal*100)+'%），已停止輸出姓名')}
+    state.expectedTotal=totals.length?[...totals].sort((a,b)=>a-b)[Math.floor(totals.length/2)]:0;
+    let rows=resolveUniqueCandidates(templateConsolidateRows(raw,state.expectedTotal));rows=dedupeRecognizedRows(rows,state.expectedTotal);state.batchRawRows=raw;state.batchRows=rows;
     const matched=rows.filter(r=>r.match).length,inferred=rows.filter(r=>!r.match&&r.resolved).length;
-    const mode=ios?'手機 CV':'桌機 CV＋可用時 OCR 複核';
-    setBatchProgress(100,'完成：'+rows.length+' 人'+(state.expectedTotal?'／畫面名單上限 '+state.expectedTotal:'')+'；確認 '+matched+'，推定 '+inferred+'，候選 '+(rows.length-matched-inferred)+'｜'+mode);
+    setBatchProgress(100,'完成：'+rows.length+' 人'+(state.expectedTotal?'／畫面名單上限 '+state.expectedTotal:'')+'；確認 '+matched+'，推定 '+inferred+'，候選 '+(rows.length-matched-inferred)+'｜PS2 固定字形');
     renderBatchResults();
-  }catch(e){console.error(e);$('#batchStatus').textContent='批次找人失敗：'+(e.message||e)}
-  finally{if(paddle)try{await paddle.dispose()}catch{}if(worker)try{await worker.terminate()}catch{}$('#runBatch').disabled=false}
+  }catch(e){console.error(e);$('#batchStatus').textContent='批次找人停止：'+(e.message||e)}
+  finally{$('#runBatch').disabled=false}
 }
 $('#runBatch').onclick=runBatch;
 function renderBatchResults(){
@@ -419,4 +429,4 @@ $('#updateBtn').onclick=()=>checkAppUpdate(true);$('#applyUpdate').onclick=apply
 window.addEventListener('load',()=>{setTimeout(()=>checkAppUpdate(false),700);setInterval(()=>checkAppUpdate(false),10*60*1000)});
 
 if('serviceWorker'in navigator)window.addEventListener('load',async()=>{try{const reg=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});await reg.update()}catch(e){console.warn('service worker',e)}});
-loadData().catch(e=>{$('#dataStatus').textContent='資料載入失敗：'+e.message;console.error(e)});
+loadFontProfile().catch(()=>{});loadData().catch(e=>{$('#dataStatus').textContent='資料載入失敗：'+e.message;console.error(e)});
