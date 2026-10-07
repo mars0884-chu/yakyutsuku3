@@ -388,7 +388,13 @@ async function recognizeNameTesseractFast(worker,canvas,threshold=125,mode='bina
 
 async function tesseractFooterTotal(worker,screens){
   const totals=[];try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'0123456789人合計投手野手'})}catch{}
-  for(const sc of screens){try{const r=await recognizeText(worker,binaryCanvas(sc.footer.canvas,125,{scale:3})),n=parseExpectedTotal(r.text);if(n>=20&&n<=200)totals.push(n)}catch{}}
+  for(const sc of screens){
+    try{
+      let r=await recognizeText(worker,grayRegion(sc.footer.canvas,0,1,3,1.35)),n=parseExpectedTotal(r.text);
+      if(!(n>=20&&n<=200)){r=await recognizeText(worker,binaryCanvas(sc.footer.canvas,125,{scale:3}));n=parseExpectedTotal(r.text)}
+      if(n>=20&&n<=200)totals.push(n)
+    }catch{}
+  }
   try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:''})}catch{}return chooseExpectedTotal(totals,state.expectedTotal)
 }
 
