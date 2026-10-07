@@ -372,13 +372,20 @@ function mergeRowOCR(row,parsed,cm,raw,confidence=0){
   options.sort((a,b)=>quality(b)-quality(a));const best=options[0]||{match:null,candidates:row.candidates||[]};
   row.parsed=merged;row.match=best.match||null;row.candidates=best.candidates?.length?best.candidates:(row.candidates||[]);row.score=row.match?.score||row.candidates?.[0]?.score||0;row.ocrConfidence=Math.max(row.ocrConfidence||0,confidence||0);row.raw=[row.raw,raw].filter(Boolean).join('｜');row.status=row.match?'確認':'候選';
 }
-async function recognizeNameTesseractFast(worker,canvas,threshold=125){
-  const sep=detectNameSeparator(canvas);
-  const a=await recognizeText(worker,binaryRegion(canvas,.115,Math.max(.18,sep.left-.008),threshold,5));
-  const b=await recognizeText(worker,binaryRegion(canvas,Math.min(.50,sep.right+.008),.575,threshold,5));
-  const surname=ocrNamePart(a.text),given=ocrNamePart(b.text),name=(surname+' '+given).trim();
-  return{parsed:{name,names:[name].filter(Boolean),surname,given,surnames:[surname].filter(Boolean),givens:[given].filter(Boolean),age:'',hand:'',pos:'',text:[a.text,b.text].filter(Boolean).join('｜')},raw:'S:'+a.text+'｜G:'+b.text,confidence:Math.round(((a.confidence||0)+(b.confidence||0))/2)}
+function grayRegion(src,rx0,rx1,scale=5,contrast=1.8){
+  const sx=Math.max(0,Math.round(src.width*rx0)),ex=Math.min(src.width,Math.round(src.width*rx1)),sw=Math.max(1,ex-sx),tmp=document.createElement('canvas');
+  tmp.width=sw;tmp.height=src.height;const g=tmp.getContext('2d',{willReadFrequently:true});g.drawImage(src,sx,0,sw,src.height,0,0,sw,src.height);
+  const id=g.getImageData(0,0,sw,tmp.height);for(let i=0;i<id.data.length;i+=4){const l=id.data[i]*.299+id.data[i+1]*.587+id.data[i+2]*.114,v=Math.max(0,Math.min(255,Math.round((l-128)*contrast+128)));id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255}g.putImageData(id,0,0);
+  const out=document.createElement('canvas');out.width=sw*scale;out.height=tmp.height*scale;const og=out.getContext('2d');og.imageSmoothingEnabled=true;og.drawImage(tmp,0,0,out.width,out.height);return out
 }
+async function recognizeNameTesseractFast(worker,canvas,threshold=125,mode='binary'){
+  const sep=detectNameSeparator(canvas),mk=(a,b)=>mode==='gray'?grayRegion(canvas,a,b,5,1.8):binaryRegion(canvas,a,b,threshold,5);
+  const a=await recognizeText(worker,mk(.115,Math.max(.18,sep.left-.008)));
+  const b=await recognizeText(worker,mk(Math.min(.50,sep.right+.008),.575));
+  const surname=ocrNamePart(a.text),given=ocrNamePart(b.text),name=(surname+' '+given).trim();
+  return{parsed:{name,names:[name].filter(Boolean),surname,given,surnames:[surname].filter(Boolean),givens:[given].filter(Boolean),age:'',hand:'',pos:'',text:[a.text,b.text].filter(Boolean).join('｜')},raw:(mode==='gray'?'G:':'B:')+'S:'+a.text+'｜G:'+b.text,confidence:Math.round(((a.confidence||0)+(b.confidence||0))/2)}
+}
+
 async function tesseractFooterTotal(worker,screens){
   const totals=[];try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'0123456789人合計投手野手'})}catch{}
   for(const sc of screens){try{const r=await recognizeText(worker,binaryCanvas(sc.footer.canvas,125,{scale:3})),n=parseExpectedTotal(r.text);if(n>=20&&n<=200)totals.push(n)}catch{}}
@@ -524,18 +531,27 @@ async function runBatch(){
           try{await worker.setParameters({tessedit_pageseg_mode:'8',tessedit_char_whitelist:batchKanjiWhitelist(),user_defined_dpi:'300'})}catch{}
           const uncertain=state.batchRawRows.filter(r=>!r.match||r.score<.84||((r.candidates?.[0]?.score||0)-(r.candidates?.[1]?.score||0))<.045);
           for(let i=0;i<uncertain.length;i++){
-            const row=uncertain[i];setBatchProgress(66+28*(i/Math.max(1,uncertain.length)),'手機姓名 OCR '+(i+1)+'/'+uncertain.length);
+            const row=uncertain[i];setBatchProgress(66+18*(i/Math.max(1,uncertain.length)),'手機姓名 OCR '+(i+1)+'/'+uncertain.length);
             try{
-              const rr=await recognizeNameTesseractFast(worker,row.canvas,125);
+              const rr=await recognizeNameTesseractFast(worker,row.canvas,125,'binary');
               mergeRowOCR(row,rr.parsed,null,'M:'+rr.raw,rr.confidence);
               const gap=(row.candidates?.[0]?.score||0)-(row.candidates?.[1]?.score||0);
               if(!row.match&&(row.score<.76||gap<.025)){
-                const rr2=await recognizeNameTesseractFast(worker,row.canvas,145);
+                const rr2=await recognizeNameTesseractFast(worker,row.canvas,145,'binary');
                 mergeRowOCR(row,rr2.parsed,null,'M2:'+rr2.raw,rr2.confidence);
               }
               mobileNameOCR=true;
             }catch(e){row.raw+='｜MERR:'+String(e.message||e)}
             if(i%3===0){state.batchRows=consolidateRows(state.batchRawRows.slice(0),0);renderBatchResults();await new Promise(requestAnimationFrame)}
+          }
+          const hard=state.batchRawRows.filter(r=>{const gap=(r.candidates?.[0]?.score||0)-(r.candidates?.[1]?.score||0);return !r.match&&(r.score<.80||gap<.035)});
+          if(hard.length){
+            try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:batchKanjiWhitelist(),user_defined_dpi:'300'})}catch{}
+            for(let i=0;i<hard.length;i++){
+              const row=hard[i];setBatchProgress(85+10*(i/Math.max(1,hard.length)),'手機灰階 OCR '+(i+1)+'/'+hard.length);
+              try{const rr=await recognizeNameTesseractFast(worker,row.canvas,125,'gray');mergeRowOCR(row,rr.parsed,null,'MG:'+rr.raw,rr.confidence);mobileNameOCR=true}catch(e){row.raw+='｜MGERR:'+String(e.message||e)}
+              if(i%3===0){state.batchRows=consolidateRows(state.batchRawRows.slice(0),0);renderBatchResults();await new Promise(requestAnimationFrame)}
+            }
           }
         }catch(e){console.warn('mobile name OCR',e)}
       }
