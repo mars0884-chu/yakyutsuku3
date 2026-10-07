@@ -303,20 +303,63 @@ function splitWordGlyphs(src,rx0,rx1){
   return out
 }
 function glyphDice(a,b){let inter=0,na=0,nb=0;for(let i=0;i<a.bits.length;i++){const av=a.bits[i],bv=b.bits[i];if(av)na++;if(bv)nb++;if(av&&bv)inter++}return 2*inter/(na+nb+1e-6)}
-function glyphSimilarity(a,b){return glyphDice(a,b)*.76+cvFeatureSimilarity(cvDescriptor(a),cvDescriptor(b))*.24}
+function glyphShiftDice(a,b){let best=0;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){let inter=0,na=0,nb=0;for(let y=0;y<a.h;y++)for(let x=0;x<a.w;x++){const av=a.bits[y*a.w+x];if(av)na++;const bx=x-dx,by=y-dy,bv=(bx>=0&&bx<b.w&&by>=0&&by<b.h)?b.bits[by*b.w+bx]:0;if(bv)nb++;if(av&&bv)inter++}best=Math.max(best,2*inter/(na+nb+1e-6))}return best}
+function glyphSimilarity(a,b){return glyphShiftDice(a,b)*.82+cvFeatureSimilarity(cvDescriptor(a),cvDescriptor(b))*.18}
 function glyphToCanvas(bm,scale=4){
   const c=document.createElement('canvas');c.width=bm.w*scale;c.height=bm.h*scale;const g=c.getContext('2d'),id=g.createImageData(c.width,c.height);
   for(let y=0;y<c.height;y++)for(let x=0;x<c.width;x++){const v=bm.bits[Math.floor(y/scale)*bm.w+Math.floor(x/scale)]?0:255,i=(y*c.width+x)*4;id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255}g.putImageData(id,0,0);return c
 }
 function buildGlyphClusters(rows){
   const clusters=[];
-  const assign=bm=>{let best=-1,score=0;for(let i=0;i<clusters.length;i++){const s=glyphSimilarity(bm,clusters[i].bitmap);if(s>score){score=s;best=i}}if(best>=0&&score>=.88){clusters[best].count++;return best}clusters.push({bitmap:bm,count:1,char:'',confidence:0,votes:new Map()});return clusters.length-1};
+  const assign=bm=>{let best=-1,score=0;for(let i=0;i<clusters.length;i++){const s=glyphSimilarity(bm,clusters[i].bitmap);if(s>score){score=s;best=i}}if(best>=0&&score>=.84){clusters[best].count++;return best}clusters.push({bitmap:bm,count:1,char:'',confidence:0,votes:new Map()});return clusters.length-1};
   for(const r of rows){
     const sep=detectNameSeparator(r.canvas),sg=splitWordGlyphs(r.canvas,.07,Math.max(.14,sep.left-.008)),gg=splitWordGlyphs(r.canvas,Math.min(.30,sep.right+.008),.42);
     r.sGlyphs=sg.map(assign);r.gGlyphs=gg.map(assign);r.glyphCount=r.sGlyphs.length+r.gGlyphs.length
   }
   return clusters
 }
+
+function fieldShape(src,rx0,rx1){const m=rawWordMask(src,rx0,rx1,105);if(!m)return null;return glyphBitmap(m,m.minx,m.maxx+1,28)}
+function assignShapeToken(bm,clusters,threshold=.88){if(!bm)return-1;let best=-1,score=0;for(let i=0;i<clusters.length;i++){const s=glyphSimilarity(bm,clusters[i].bitmap);if(s>score){score=s;best=i}}if(best>=0&&score>=threshold){clusters[best].count++;return best}clusters.push({bitmap:bm,count:1});return clusters.length-1}
+function buildFieldTokens(rows){
+  const age=[],hand=[];
+  for(const r of rows){r.ageToken=assignShapeToken(fieldShape(r.canvas,.54,.70),age,.90);r.handToken=assignShapeToken(fieldShape(r.canvas,.77,.96),hand,.90)}
+  return{age,hand}
+}
+function playerHand(p){return String(p['投/打']||'').normalize('NFKC').replace('／','/').replace(/\s+/g,'')}
+function playerAge(p){return String(p['年齢']||'').match(/\d+/)?.[0]||''}
+function rowTokenAssignments(row,p){
+  const q=splitPlayerName(p['名前']),s=[...q.surname],g=[...q.given],out=new Map();
+  const put=(key,val)=>{if(!key||!val)return true;if(out.has(key)&&out.get(key)!==val)return false;out.set(key,val);return true};
+  for(let i=0;i<(row.sGlyphs||[]).length;i++)if(!put('g:'+row.sGlyphs[i],s[i]||''))return null;
+  for(let i=0;i<(row.gGlyphs||[]).length;i++)if(!put('g:'+row.gGlyphs[i],g[i]||''))return null;
+  if(row.ageToken>=0&&!put('a:'+row.ageToken,playerAge(p)))return null;
+  if(row.handToken>=0&&!put('h:'+row.handToken,playerHand(p)))return null;
+  return out
+}
+function initialOpaqueCandidates(row){
+  const sl=row.sGlyphs?.length||0,gl=row.gGlyphs?.length||0;
+  let pool=state.players.filter(p=>groupPlayerOK(p,row.group));
+  const exact=pool.filter(p=>{const q=splitPlayerName(p['名前']);return[...q.surname].length===sl&&[...q.given].length===gl});if(exact.length)pool=exact;
+  const out=[];for(const p of pool){const assign=rowTokenAssignments(row,p);if(assign)out.push({p,assign,score:0,meta:row.group?1:0})}return out
+}
+function intersectSets(a,b){if(a===null)return new Set(b);const out=new Set();for(const x of a)if(b.has(x))out.add(x);return out}
+function opaqueConstraintSolve(rows){
+  let sets=rows.map(initialOpaqueCandidates);
+  const tokenRows=new Map();for(let ri=0;ri<rows.length;ri++){const sample=sets[ri][0]?.assign||rowTokenAssignments(rows[ri],sets[ri][0]?.p||{});const keys=new Set();for(const id of rows[ri].sGlyphs||[])keys.add('g:'+id);for(const id of rows[ri].gGlyphs||[])keys.add('g:'+id);if(rows[ri].ageToken>=0)keys.add('a:'+rows[ri].ageToken);if(rows[ri].handToken>=0)keys.add('h:'+rows[ri].handToken);for(const k of keys){const a=tokenRows.get(k)||[];a.push(ri);tokenRows.set(k,a)}}
+  for(let iter=0;iter<12;iter++){let changed=0;
+    for(const [key,ris] of tokenRows){if(ris.length<2)continue;let allowed=null;for(const ri of ris){const vals=new Set();for(const c of sets[ri]){const v=c.assign.get(key);if(v)vals.add(v)}if(vals.size)allowed=intersectSets(allowed,vals)}if(!allowed||!allowed.size)continue;for(const ri of ris){const before=sets[ri].length;sets[ri]=sets[ri].filter(c=>!c.assign.has(key)||allowed.has(c.assign.get(key)));if(sets[ri].length!==before)changed+=before-sets[ri].length}}
+    // Multiple shared symbols between two rows: preserve correlations, not just per-symbol intersections.
+    const pairMap=new Map();for(const [key,ris] of tokenRows){if(ris.length<2)continue;for(let a=0;a<ris.length;a++)for(let b=a+1;b<ris.length;b++){const i=ris[a],j=ris[b],pk=i<j?i+','+j:j+','+i,arr=pairMap.get(pk)||[];arr.push(key);pairMap.set(pk,arr)}}
+    for(const [pk,keys0] of pairMap){const keys=[...new Set(keys0)];if(keys.length<2)continue;const [i,j]=pk.split(',').map(Number),sig=c=>keys.map(k=>c.assign.get(k)||'').join('\u0001'),support=new Set(sets[j].map(sig)),before=sets[i].length;sets[i]=sets[i].filter(c=>support.has(sig(c)));changed+=before-sets[i].length;const support2=new Set(sets[i].map(sig)),before2=sets[j].length;sets[j]=sets[j].filter(c=>support2.has(sig(c)));changed+=before2-sets[j].length}
+    const singletonPlayers=new Set(sets.filter(x=>x.length===1).map(x=>x[0].p._uid));for(let i=0;i<sets.length;i++)if(sets[i].length>1){const before=sets[i].length,keep=sets[i].filter(c=>!singletonPlayers.has(c.p._uid));if(keep.length){sets[i]=keep;changed+=before-keep.length}}
+    if(!changed)break
+  }
+  const tokenFreq=new Map();for(const arr of sets)for(const c of arr)for(const [k,v] of c.assign){const key=k+'='+v;tokenFreq.set(key,(tokenFreq.get(key)||0)+1)}
+  for(let i=0;i<rows.length;i++){const arr=sets[i];for(const c of arr){let info=0;for(const [k,v] of c.assign){const f=tokenFreq.get(k+'='+v)||1;info+=1/f}c.score=Math.min(1,.46+Math.min(.42,info*.12)+(arr.length===1?.12:0))}arr.sort((a,b)=>b.score-a.score);rows[i]._opaque=arr}
+  return sets
+}
+
 function groupPlayerOK(p,group){if(!group)return true;if(group==='投手')return p._position==='投手';if(group==='捕手')return p._position==='捕手';if(group==='外野手')return p._position==='外野手';if(group==='內野手')return['一壘手','二壘手','三壘手','游擊手'].includes(p._position);return true}
 function glyphCandidateMatch(row,clusters){
   const sl=row.sGlyphs?.length||0,gl=row.gGlyphs?.length||0;if(!sl&&!gl)return{match:null,candidates:[]};
@@ -334,14 +377,9 @@ function voteGlyphsFromRows(rows,clusters){
   }
   let changed=0;for(const cl of clusters){if(cl.char||!cl.votes.size)continue;const v=[...cl.votes.entries()].sort((a,b)=>b[1]-a[1]),a=v[0],b=v[1];if(a&&a[1]>=1.1&&a[1]>=(b?.[1]||0)*1.55){cl.char=a[0];cl.confidence=Math.min(78,48+a[1]*10);changed++}}return changed
 }
-async function classifyGlyphClusters(worker,clusters){
-  const whitelist=batchKanjiWhitelist();try{await worker.setParameters({tessedit_pageseg_mode:'10',tessedit_char_whitelist:whitelist,preserve_interword_spaces:'0'})}catch{}
-  const order=[...clusters.keys()].sort((a,b)=>clusters[b].count-clusters[a].count);
-  for(let k=0;k<order.length;k++){const i=order[k],cl=clusters[i];setBatchProgress(20+58*(k/Math.max(1,order.length)),'字形分類 '+(k+1)+'/'+order.length);try{const r=await recognizeText(worker,glyphToCanvas(cl.bitmap,5)),t=ocrNamePart(r.text),ch=[...t][0]||'';if(ch&&r.confidence>=48){cl.char=ch;cl.confidence=r.confidence}}catch{}if(k%8===0)await new Promise(requestAnimationFrame)}
-}
-async function glyphAnalyzeRows(rows,worker){
-  const clusters=buildGlyphClusters(rows);await classifyGlyphClusters(worker,clusters);for(let n=0;n<3;n++)if(!voteGlyphsFromRows(rows,clusters))break;
-  for(const r of rows){const cm=glyphCandidateMatch(r,clusters);r.match=cm.match||null;r.candidates=cm.candidates||[];r.score=r.match?.score||r.candidates?.[0]?.score||0;r.status=r.match?'確認':'候選';r.raw='GLYPH';r.parsed={pos:'',age:'',hand:''}}
+function glyphAnalyzeRows(rows){
+  const clusters=buildGlyphClusters(rows);buildFieldTokens(rows);const sets=opaqueConstraintSolve(rows);
+  for(let i=0;i<rows.length;i++){const r=rows[i],arr=sets[i]||[],a=arr[0],b=arr[1],margin=(a?.score||0)-(b?.score||0),strong=arr.length===1||(arr.length<=3&&(a?.score||0)>=.72&&margin>=.08);r.match=strong&&a?{...a}:null;r.candidates=arr.slice(0,12);r.score=r.match?.score||a?.score||0;r.status=r.match?'確認':'候選';r.raw='SHAPE';r.parsed={pos:'',age:'',hand:''}}
   return clusters
 }
 
@@ -381,16 +419,16 @@ async function runBatch(){
   if(state.players.length<1000){$('#batchStatus').textContent='完整名冊尚未載入，請先到「資料」按更新名冊。';return}
   $('#runBatch').disabled=true;let worker=null;
   try{
-    const screens=[],all=[];setBatchProgress(1,'切出固定欄位與字形…');
-    for(const f of state.batchFiles){const im=await loadImage(f),group=detectRosterGroup(im),rows=rowCrops(im,f.name,group);screens.push({file:f.name,footer:footerCrop(im,f.name),total:footerTotalCrop(im,f.name),group});all.push(...rows)}
+    const screens=[],all=[];setBatchProgress(1,'切出固定字形…');
+    for(const f of state.batchFiles){const im=await loadImage(f),group=detectRosterGroup(im),rows=rowCrops(im,f.name,group);screens.push({file:f.name,footer:footerCrop(im,f.name),group});all.push(...rows)}
     state.batchRawRows=all.map((r,i)=>({...r,firstIndex:i,status:'待分辨',raw:'',parsed:null,match:null,candidates:[],ocrConfidence:0,score:0}));state.batchRows=[];state.expectedTotal=0;renderBatchResults();
 
-    const ok=await ensureLocalOCR();if(!ok)throw new Error('本機字形分類器無法載入');
-    worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),35000,'本機字形分類器載入逾時');
+    setBatchProgress(12,'相同字形聚類…');glyphAnalyzeRows(state.batchRawRows);
+    state.batchRawRows=state.batchRawRows.filter(r=>r.glyphCount>0&&r.candidates?.length);
+    setBatchProgress(84,'整批資料庫約束求解…');
 
-    await glyphAnalyzeRows(state.batchRawRows,worker);
-    state.batchRawRows=state.batchRawRows.filter(r=>r.glyphCount>0);
-    const n=await tesseractFooterTotal(worker,screens);if(n>=20&&n<=200)state.expectedTotal=n;
+    // 只有頁尾總人數可選擇使用 Tesseract；姓名分辨完全不依賴 OCR。
+    if(await ensureLocalOCR()){try{worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),18000,'頁尾數字載入逾時');const n=await tesseractFooterTotal(worker,screens);if(n>=20&&n<=200)state.expectedTotal=n}catch(e){console.warn('footer only OCR',e)}}
 
     let rows=resolveUniqueCandidates(consolidateRows(state.batchRawRows,state.expectedTotal));rows=dedupeRecognizedRows(rows,state.expectedTotal);state.batchRows=rows;
     const matched=rows.filter(r=>r.match).length,inferred=rows.filter(r=>!r.match&&r.resolved).length;
