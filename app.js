@@ -182,6 +182,85 @@ function renderedWordBitmap(word,w,h,weight=700){const key=`${word}|${w}x${h}|${
 function bitmapDice(a,b,dx=0,dy=0){let inter=0,na=0,nb=0;for(let y=0;y<a.h;y++)for(let x=0;x<a.w;x++){const av=a.bits[y*a.w+x];if(av)na++;const bx=x-dx,by=y-dy,bv=(bx>=0&&bx<b.w&&by>=0&&by<b.h)?b.bits[by*b.w+bx]:0;if(bv)nb++;if(av&&bv)inter++}return(2*inter)/(na+nb+1e-6)}
 function visualWordSimilarity(target,word){if(!target||!word)return 0;let best=0;for(const weight of [600,700,800]){const tpl=renderedWordBitmap(word,target.w,target.h,weight);if(!tpl)continue;for(let dy=-1;dy<=1;dy++)for(let dx=-2;dx<=2;dx++){const sc=bitmapDice(target,tpl,dx,dy);if(sc>best)best=sc}}return best}
 function visualCandidateMatch(canvas,parsed){const sep=detectNameSeparator(canvas),surnameTarget=targetWordBitmap(canvas,.115,Math.max(.18,sep.left-.008),108),givenTarget=targetWordBitmap(canvas,Math.min(.50,sep.right+.008),.575,108);if(!surnameTarget&&!givenTarget)return null;let pool=state.players;const gates=[];if(parsed.pos)gates.push(p=>p._position===POSMAP[parsed.pos]);if(parsed.hand)gates.push(p=>String(p['投/打']||'').replace('／','/')===parsed.hand);for(const gate of gates){const n=pool.filter(gate);if(n.length)pool=n}if(surnameTarget){const n=pool.filter(p=>Math.abs([...splitPlayerName(p['名前']).surname].length-surnameTarget.charCount)<=1);if(n.length)pool=n}if(givenTarget){const n=pool.filter(p=>Math.abs([...splitPlayerName(p['名前']).given].length-givenTarget.charCount)<=1);if(n.length)pool=n}const scored=pool.map(p=>{const q=splitPlayerName(p['名前']),ss=surnameTarget?visualWordSimilarity(surnameTarget,q.surname):0,gs=givenTarget?visualWordSimilarity(givenTarget,q.given):0,den=(surnameTarget?.45:0)+(givenTarget?.55:0)||1,visual=(ss*.45+gs*.55)/den;let meta=0,bonus=0;if(parsed.pos&&p._position===POSMAP[parsed.pos]){meta++;bonus+=.025}if(parsed.hand&&String(p['投/打']||'').replace('／','/')===parsed.hand){meta++;bonus+=.035}if(parsed.age&&String(p['年齢']||'')===parsed.age)bonus+=.006;return{p,score:Math.min(1,visual+bonus),visualScore:visual,surnameScore:ss,givenScore:gs,nameScore:visual,meta}}).sort((a,b)=>b.score-a.score),best=scored[0],second=scored[1];if(!best)return null;const margin=best.score-(second?.score||0),accept=(best.visualScore>=.78&&margin>=.03)||(best.visualScore>=.71&&best.meta>=1&&margin>=.025)||(best.visualScore>=.67&&best.meta>=2&&margin>=.02);return{match:accept?best:null,candidates:scored.slice(0,12),margin,method:'visual'}}
+
+const CV_FONT_CANDIDATES=['"Hiragino Sans"','"Yu Gothic"','"Meiryo"','"Noto Sans JP"', 'sans-serif','serif'];
+const cvGlyphTemplateCache=new Map();
+function isIOSLike(){const ua=navigator.userAgent||'';return /iPad|iPhone|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)}
+function cvAvailableFonts(){if(state._cvFonts)return state._cvFonts;const out=[];for(const f of CV_FONT_CANDIDATES){try{if(f==='sans-serif'||f==='serif'||document.fonts?.check?.('24px '+f))out.push(f)}catch{}}state._cvFonts=[...new Set(out)].slice(0,3);if(!state._cvFonts.length)state._cvFonts=['sans-serif'];return state._cvFonts}
+function cvMaskRegion(src,rx0,rx1,threshold=108){
+  const sx=Math.max(0,Math.floor(src.width*rx0)),ex=Math.min(src.width,Math.ceil(src.width*rx1)),sw=Math.max(1,ex-sx),g=src.getContext('2d',{willReadFrequently:true}),id=g.getImageData(sx,0,sw,src.height).data,pts=[];
+  for(let y=0;y<src.height;y++)for(let x=0;x<sw;x++){const i=(y*sw+x)*4,l=id[i]*.299+id.data?.[i+1];}
+  for(let y=0;y<src.height;y++)for(let x=0;x<sw;x++){const i=(y*sw+x)*4,l=id[i]*.299+id[i+1]*.587+id[i+2]*.114;if(l>threshold)pts.push([x,y])}
+  if(!pts.length)return null;let minx=sw,miny=src.height,maxx=0,maxy=0;for(const [x,y] of pts){if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y}
+  minx=Math.max(0,minx-1);miny=Math.max(0,miny-1);maxx=Math.min(sw-1,maxx+1);maxy=Math.min(src.height-1,maxy+1);
+  const w=maxx-minx+1,h=maxy-miny+1,bits=new Uint8Array(w*h);for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=((miny+y)*sw+(minx+x))*4,l=id[i]*.299+id[i+1]*.587+id[i+2]*.114;bits[y*w+x]=l>threshold?1:0}
+  return{bits,w,h,splitCache:new Map(),ratio:w/Math.max(1,h)}
+}
+function cvNormalizeCell(bits,w,h,size=20){
+  let minx=w,miny=h,maxx=-1,maxy=-1;for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(bits[y*w+x]){if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y}
+  const out=new Uint8Array(size*size);if(maxx<minx||maxy<miny)return{bits:out,w:size,h:size};
+  const bw=maxx-minx+1,bh=maxy-miny+1,scale=Math.min((size-2)/bw,(size-2)/bh),dw=Math.max(1,Math.round(bw*scale)),dh=Math.max(1,Math.round(bh*scale)),ox=Math.floor((size-dw)/2),oy=Math.floor((size-dh)/2);
+  for(let yy=0;yy<dh;yy++)for(let xx=0;xx<dw;xx++){const sx=minx+Math.min(bw-1,Math.floor(xx/Math.max(scale,.001))),sy=miny+Math.min(bh-1,Math.floor(yy/Math.max(scale,.001)));if(bits[sy*w+sx])out[(oy+yy)*size+ox+xx]=1}
+  return{bits:out,w:size,h:size}
+}
+function cvDescriptor(bm){
+  const n=bm.w,feat=[];for(let y=0;y<n;y++){let v=0;for(let x=0;x<n;x++)v+=bm.bits[y*n+x];feat.push(v/n)}
+  for(let x=0;x<n;x++){let v=0;for(let y=0;y<n;y++)v+=bm.bits[y*n+x];feat.push(v/n)}
+  const z=4,cell=n/z;for(let gy=0;gy<z;gy++)for(let gx=0;gx<z;gx++){let v=0;for(let y=Math.floor(gy*cell);y<Math.floor((gy+1)*cell);y++)for(let x=Math.floor(gx*cell);x<Math.floor((gx+1)*cell);x++)v+=bm.bits[y*n+x];feat.push(v/(cell*cell))}
+  let ink=0;for(const b of bm.bits)ink+=b;feat.push(ink/(n*n));return feat
+}
+function cvFeatureSimilarity(a,b){if(!a||!b||a.length!==b.length)return 0;let d=0;for(let i=0;i<a.length;i++)d+=Math.abs(a[i]-b[i]);return Math.max(0,1-d/a.length)}
+function cvRenderedGlyphFeatures(ch){
+  if(cvGlyphTemplateCache.has(ch))return cvGlyphTemplateCache.get(ch);const out=[];
+  for(const family of cvAvailableFonts()){
+    const c=document.createElement('canvas');c.width=52;c.height=52;const g=c.getContext('2d',{willReadFrequently:true});g.fillStyle='#000';g.fillRect(0,0,52,52);g.fillStyle='#fff';g.textBaseline='middle';g.textAlign='center';g.font='700 36px '+family;g.fillText(ch,26,26);
+    const id=g.getImageData(0,0,52,52).data,bits=new Uint8Array(52*52);for(let i=0,j=0;i<id.length;i+=4,j++)bits[j]=id[i]>80?1:0;out.push(cvDescriptor(cvNormalizeCell(bits,52,52,20)))
+  }
+  cvGlyphTemplateCache.set(ch,out);return out
+}
+function cvSplitFeatures(target,count){
+  count=Math.max(1,Math.min(12,count|0));if(!target)return[];if(target.splitCache.has(count))return target.splitCache.get(count);
+  const out=[],step=target.w/count;for(let i=0;i<count;i++){const x0=Math.floor(i*step),x1=i===count-1?target.w:Math.floor((i+1)*step),w=Math.max(1,x1-x0),bits=new Uint8Array(w*target.h);for(let y=0;y<target.h;y++)for(let x=0;x<w;x++)bits[y*w+x]=target.bits[y*target.w+x0+x];out.push(cvDescriptor(cvNormalizeCell(bits,w,target.h,20)))}target.splitCache.set(count,out);return out
+}
+function cvWordScore(target,word){
+  const chars=[...String(word||'').replace(/\s+/g,'')];if(!target||!chars.length||chars.length>12)return 0;const tf=cvSplitFeatures(target,chars.length);let sum=0,min=1;
+  for(let i=0;i<chars.length;i++){let best=0;for(const tpl of cvRenderedGlyphFeatures(chars[i]))best=Math.max(best,cvFeatureSimilarity(tf[i],tpl));sum+=best;if(best<min)min=best}
+  const mean=sum/chars.length,expected=Math.max(.7,chars.length*.86),aspect=Math.exp(-Math.abs(Math.log(Math.max(.15,target.ratio)/expected))*.26);return(Math.max(0,mean*.78+min*.22))*aspect
+}
+function cvClassifyFinite(src,rx0,rx1,labels,threshold=108){
+  const target=cvMaskRegion(src,rx0,rx1,threshold);if(!target)return{value:'',score:0,margin:0};const arr=labels.map(v=>({value:v,score:cvWordScore(target,v)})).sort((a,b)=>b.score-a.score),a=arr[0],b=arr[1];if(!a)return{value:'',score:0,margin:0};return{value:a.value,score:a.score,margin:a.score-(b?.score||0)}
+}
+function cvParsedMeta(canvas){
+  const pos=cvClassifyFinite(canvas,.012,.105,['投','捕','一','二','三','遊','外'],105);
+  const age=cvClassifyFinite(canvas,.60,.75,['18歳','19歳','20歳','21歳','22歳','23歳','24歳','18','19','20','21','22','23','24'],105);
+  const hand=cvClassifyFinite(canvas,.78,.985,['右/右','右/左','左/左','左/右','右/両','左/両','右／右','右／左','左／左','左／右','右／両','左／両'],105);
+  const cleanAge=(String(age.value).match(/(18|19|20|21|22|23|24)/)||[])[1]||'',cleanHand=String(hand.value).replace('／','/');
+  return{pos:pos.score>=.53&&pos.margin>=.018?pos.value:'',age:age.score>=.55&&age.margin>=.015?cleanAge:'',hand:hand.score>=.54&&hand.margin>=.015?cleanHand:'',_cvMeta:{pos,age,hand}}
+}
+function cvCandidateMatch(canvas){
+  const sep=detectNameSeparator(canvas),surnameTarget=cvMaskRegion(canvas,.115,Math.max(.18,sep.left-.008),106),givenTarget=cvMaskRegion(canvas,Math.min(.50,sep.right+.008),.575,106),parsed=cvParsedMeta(canvas);
+  if(!surnameTarget&&!givenTarget)return{parsed,match:null,candidates:[],margin:0,method:'cv'};
+  let pool=state.players;
+  const pm=parsed._cvMeta?.pos,hm=parsed._cvMeta?.hand;
+  if(parsed.pos&&pm?.score>=.64&&pm?.margin>=.03){const n=pool.filter(p=>p._position===POSMAP[parsed.pos]);if(n.length>30)pool=n}
+  if(parsed.hand&&hm?.score>=.66&&hm?.margin>=.03){const n=pool.filter(p=>String(p['投/打']||'').replace('／','/')===parsed.hand);if(n.length>20)pool=n}
+  const sr=surnameTarget?.ratio||0,gr=givenTarget?.ratio||0;
+  const rough=pool.map(p=>{const q=splitPlayerName(p['名前']),sl=[...q.surname].length,gl=[...q.given].length;let penalty=0;if(sr)penalty+=Math.abs(sr-sl*.86)*.035;if(gr)penalty+=Math.abs(gr-gl*.86)*.03;let meta=0,bonus=0;if(parsed.pos&&p._position===POSMAP[parsed.pos]){meta++;bonus+=.018}if(parsed.hand&&String(p['投/打']||'').replace('／','/')===parsed.hand){meta++;bonus+=.022}if(parsed.age&&String(p['年齢']||'')===parsed.age){meta++;bonus+=.012}return{p,q,rough:bonus-penalty,meta,bonus}}).sort((a,b)=>b.rough-a.rough).slice(0,Math.min(900,pool.length));
+  const scored=rough.map(x=>{const ss=surnameTarget?cvWordScore(surnameTarget,x.q.surname):0,gs=givenTarget?cvWordScore(givenTarget,x.q.given):0,den=(surnameTarget?.46:0)+(givenTarget?.54:0)||1,visual=(ss*.46+gs*.54)/den,score=Math.max(0,Math.min(1,visual*.94+x.bonus));return{p:x.p,score,visualScore:visual,surnameScore:ss,givenScore:gs,nameScore:visual,meta:x.meta}}).sort((a,b)=>b.score-a.score);
+  const best=scored[0],second=scored[1],margin=(best?.score||0)-(second?.score||0);
+  const accept=!!best&&((best.visualScore>=.79&&margin>=.055)||(best.visualScore>=.75&&best.meta>=2&&margin>=.045)||(best.visualScore>=.73&&best.meta>=3&&margin>=.038));
+  const candidates=(best?.visualScore||0)>=.48?scored.slice(0,12):[];
+  return{parsed,match:accept?best:null,candidates,margin,method:'cv'}
+}
+async function cvAnalyzeRows(rows){
+  for(let i=0;i<rows.length;i++){const row=rows[i];setBatchProgress(4+56*(i/Math.max(1,rows.length)),'本機固定版面 CV '+(i+1)+'/'+rows.length);try{const r=cvCandidateMatch(row.canvas);row.parsed=r.parsed;row.match=null;row.candidates=r.candidates;row.score=r.candidates?.[0]?.score||0;row.status='候選';row.raw='CV';row.cvMargin=r.margin}catch(e){row.raw='CVERR:'+String(e.message||e);row.candidates=[]}if(i%6===0){state.batchRows=consolidateRows(rows.slice(0,i+1),0);renderBatchResults();await new Promise(requestAnimationFrame)}}
+}
+async function tesseractFooterTotal(worker,screens){
+  let best=0;try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'0123456789人合計投手野手'})}catch{}
+  for(const sc of screens){try{const r=await recognizeText(worker,binaryCanvas(sc.footer.canvas,125,{scale:3})),n=parseExpectedTotal(r.text);if(n>best)best=n}catch{}}
+  try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:''})}catch{}return best
+}
+
 function mergeParsedNameEvidence(a,b){a=a||{};b=b||{};return{...a,
   name:a.name||b.name||'',
   names:[...new Set([...(a.names||[]),...(b.names||[]),a.name,b.name].filter(Boolean))],
@@ -193,7 +272,7 @@ function mergeParsedNameEvidence(a,b){a=a||{};b=b||{};return{...a,
 }}
 function candidateMatch(parsed){const names=parsed.names?.length?parsed.names:[parsed.name],surnames=[...new Set([parsed.surname,...(parsed.surnames||[])].filter(Boolean))],givens=[...new Set([parsed.given,...(parsed.givens||[])].filter(Boolean))];let pool=state.players;const gates=[];if(parsed.pos)gates.push(p=>p._position===POSMAP[parsed.pos]);if(parsed.hand)gates.push(p=>String(p['投/打']||'').replace('／','/')===parsed.hand);for(const gate of gates){const narrowed=pool.filter(gate);if(narrowed.length>=1)pool=narrowed}const scored=pool.map(p=>{const pn=p['名前']||'',parts=splitPlayerName(pn),full=Math.max(...names.map(n=>nameSimilarity(n,pn)),0),sur=surnames.length?Math.max(...surnames.map(n=>nameSimilarity(n,parts.surname)),0):0,giv=givens.length?Math.max(...givens.map(n=>nameSimilarity(n,parts.given)),0):0,den=(surnames.length?0.54:0)+(givens.length?0.46:0)||1,part=(sur*.54+giv*.46)/den,ns=Math.max(full,part);let score=ns*.88,meta=0;if(parsed.hand&&String(p['投/打']||'').replace('／','/')===parsed.hand){score+=.055;meta++}if(parsed.pos&&p._position===POSMAP[parsed.pos]){score+=.04;meta++}if(parsed.age&&String(p['年齢']||'')===parsed.age)score+=.008;const sl=surnames[0]?.length||0,gl=givens[0]?.length||0;if(sl&&Math.abs([...parts.surname].length-[...surnames[0]].length)>1)score-=.06;if(gl&&Math.abs([...parts.given].length-[...givens[0]].length)>1)score-=.06;return{p,score,nameScore:ns,fullScore:full,surnameScore:sur,givenScore:giv,meta}}).sort((a,b)=>b.score-a.score),best=scored[0],second=scored[1];if(!best)return{match:null,candidates:[]};const margin=best.score-(second?.score||0),splitStrong=(surnames.length&&givens.length&&best.surnameScore>=.72&&best.givenScore>=.64);const accept=(best.nameScore>=.90&&margin>=.018)||(splitStrong&&margin>=.02)||(best.nameScore>=.74&&best.meta>=1&&margin>=.025)||(best.nameScore>=.68&&best.meta>=2&&margin>=.02);return{match:accept?best:null,candidates:scored.slice(0,12),margin}}
 function parseExpectedTotal(text){const t=cleanOCR(text);let m=t.match(/(?:合計|含計|会計|馬軒)[^0-9]{0,8}(\d{2,3})\s*人/);if(m)return +m[1];const nums=[...t.matchAll(/(\d{2,3})\s*人/g)].map(x=>+x[1]).filter(n=>n>=20&&n<=200);return nums.length?Math.max(...nums):0}
-function mergeEvidence(a,b){const pa=a.parsed||{},pb=b.parsed||{},parsed={...pa,names:[...new Set([...(pa.names||[]),...(pb.names||[])].filter(Boolean))],surnames:[...new Set([pa.surname,...(pa.surnames||[]),pb.surname,...(pb.surnames||[])].filter(Boolean))],givens:[...new Set([pa.given,...(pa.givens||[]),pb.given,...(pb.givens||[])].filter(Boolean))]};if(!parsed.age)parsed.age=pb.age;if(!parsed.hand)parsed.hand=pb.hand;if(!parsed.pos)parsed.pos=pb.pos;const cm=candidateMatch(parsed),keep=(b.ocrConfidence||0)>(a.ocrConfidence||0)?b:a;return{...keep,parsed,raw:[a.raw,b.raw].filter(Boolean).join(' || '),ocrConfidence:Math.max(a.ocrConfidence||0,b.ocrConfidence||0),match:cm.match,candidates:cm.candidates,score:cm.match?.score||cm.candidates?.[0]?.score||0,firstIndex:Math.min(a.firstIndex??9999,b.firstIndex??9999),sources:[...(a.sources||[`${a.file}#${a.row}`]),...(b.sources||[`${b.file}#${b.row}`])]}}
+function mergeEvidence(a,b){const pa=a.parsed||{},pb=b.parsed||{},parsed={...pa,names:[...new Set([...(pa.names||[]),...(pb.names||[])].filter(Boolean))],surnames:[...new Set([pa.surname,...(pa.surnames||[]),pb.surname,...(pb.surnames||[])].filter(Boolean))],givens:[...new Set([pa.given,...(pa.givens||[]),pb.given,...(pb.givens||[])].filter(Boolean))]};if(!parsed.age)parsed.age=pb.age;if(!parsed.hand)parsed.hand=pb.hand;if(!parsed.pos)parsed.pos=pb.pos;const hasText=parsed.names.length||parsed.surnames.length||parsed.givens.length,cm=hasText?candidateMatch(parsed):null,qa=(a.match?.score||a.candidates?.[0]?.score||0),qb=(b.match?.score||b.candidates?.[0]?.score||0),keep=qb>qa?b:a;const cq=(cm?.match?.score||cm?.candidates?.[0]?.score||0),chosen=cm?.candidates?.length&&cq>Math.max(qa,qb)?cm:{match:keep.match||null,candidates:keep.candidates||[]};return{...keep,parsed,raw:[a.raw,b.raw].filter(Boolean).join(' || '),ocrConfidence:Math.max(a.ocrConfidence||0,b.ocrConfidence||0),match:chosen.match||null,candidates:chosen.candidates||[],score:chosen.match?.score||chosen.candidates?.[0]?.score||0,firstIndex:Math.min(a.firstIndex??9999,b.firstIndex??9999),sources:[...(a.sources||[`${a.file}#${a.row}`]),...(b.sources||[`${b.file}#${b.row}`])]}}
 function consolidateRows(raw,expected=0){const clusters=[];for(const r0 of raw){const r={...r0},h=r.hash||dhash(binaryRegion(r.canvas,.105,.585,126,2));r.hash=h;let idx=-1,best=999;for(let i=0;i<clusters.length;i++){const d=ham(h,clusters[i].hash);if(d<best&&d<=7){best=d;idx=i}}if(idx>=0)clusters[idx]=mergeEvidence(clusters[idx],r);else clusters.push({...r,sources:[`${r.file}#${r.row}`]})}clusters.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));let out=clusters;if(expected&&out.length>expected)out=[...out].sort((a,b)=>(b.match?.score||b.candidates?.[0]?.score||0)-(a.match?.score||a.candidates?.[0]?.score||0)).slice(0,expected).sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));return out}
 function resolveUniqueCandidates(rows){for(const r of rows)r.resolved=null;const used=new Set(rows.filter(r=>r.match?.p?._uid).map(r=>r.match.p._uid)),pending=rows.filter(r=>!r.match);for(let guard=0;guard<rows.length;guard++){let pick=null;for(const r of pending){if(r.resolved)continue;const av=(r.candidates||[]).filter(x=>!used.has(x.p._uid));if(!av.length)continue;const a=av[0],b=av[1],gap=a.score-(b?.score||0),quality=a.score+gap*.45+a.meta*.015;const safe=(a.score>=.72&&gap>=.035)||(a.score>=.67&&a.meta>=1&&gap>=.04)||(a.score>=.64&&a.meta>=2&&gap>=.045);if(!safe)continue;if(!pick||quality>pick.quality)pick={r,a,gap,quality}}if(!pick)break;pick.r.resolved=pick.a;pick.r.status='推定';used.add(pick.a.p._uid)}return rows}
 function dedupeRecognizedRows(rows,expected=0){const seen=new Map(),rest=[];for(const r of rows){const p=r.match?.p||r.resolved?.p;if(p?._uid){const old=seen.get(p._uid),quality=(r.match?.score||r.resolved?.score||r.score||0)+(r.ocrConfidence||0)/5000;if(!old||quality>old.quality)seen.set(p._uid,{row:r,quality})}else rest.push(r)}let out=[...seen.values()].map(x=>x.row).concat(rest);out.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));if(expected&&out.length>expected)out=out.slice(0,expected);return out}
