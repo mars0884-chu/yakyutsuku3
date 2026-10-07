@@ -30,6 +30,9 @@ jobs:
           node --check scripts/vendor-cover.mjs
           node --check scripts/vendor-ocr.mjs
           node --check scripts/vendor-paddleocr.mjs
+          node --check scripts/smoke-recognition.mjs
+      - name: Verify desktop/mobile recognition coexistence
+        run: node scripts/smoke-recognition.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
