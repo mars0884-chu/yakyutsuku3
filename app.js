@@ -110,8 +110,11 @@ function renderGuides(){
   }
   root.querySelectorAll('[data-guide-id]').forEach(btn=>btn.onclick=()=>{state.guideTopic='chapter:'+btn.dataset.guideId;renderGuideTopics();renderGuides();window.scrollTo({top:0,behavior:'smooth'})})
 }
+let guideSearchBackup='';
+$('#showIdeaAll').onclick=()=>{guideSearchBackup=$('#guideQuery').value;$('#guideQuery').value='';state.guideTopic='chapter:idea';$('#showIdeaAll').classList.add('hidden');$('#backGuideSearch').classList.remove('hidden');renderGuideTopics();renderGuides();window.scrollTo({top:0,behavior:'smooth'})};
+$('#backGuideSearch').onclick=()=>{$('#guideQuery').value=guideSearchBackup||'';state.guideTopic='all';$('#backGuideSearch').classList.add('hidden');$('#showIdeaAll').classList.remove('hidden');renderGuideTopics();renderGuides();window.scrollTo({top:0,behavior:'smooth'})};
 $('#guideQuery').addEventListener('input',debounce(renderGuides));
-$('#clearGuide').onclick=()=>{$('#guideQuery').value='';state.guideTopic='all';renderGuideTopics();renderGuides()};
+$('#clearGuide').onclick=()=>{$('#guideQuery').value='';guideSearchBackup='';state.guideTopic='all';$('#backGuideSearch').classList.add('hidden');$('#showIdeaAll').classList.remove('hidden');renderGuideTopics();renderGuides()};
 
 function flattenCheats(){const out=[];for(const ch of state.cheats){for(const sec of ch.sections||[]){if(sec.type==='table'){for(const row of sec.rows||[])out.push({chapter:ch.title,title:sec.title,text:(row||[]).join('｜'),row,headers:sec.headers,source:sec.source})}else if(sec.type==='facts'){for(const row of sec.rows||[])out.push({chapter:ch.title,title:sec.title,text:(row||[]).join('｜'),row,headers:['項目','內容'],source:sec.source})}else for(const item of sec.items||[])out.push({chapter:ch.title,title:sec.title,text:item,source:sec.source})}}return out}
 function renderCheats(){const q=norm($('#cheatQuery').value);const rows=flattenCheats().filter(x=>!q||norm(`${x.chapter} ${x.title} ${x.text}`).includes(q)).slice(0,260);$('#cheatResults').innerHTML=rows.map(x=>`<article class="card"><h3>${esc(x.title)}</h3>${x.row?`<table><tr>${x.headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr><tr>${x.row.map(v=>`<td>${String(v).includes('\n')||/[0-9A-F]{8}/.test(String(v))?`<pre>${esc(v)}</pre>`:esc(v)}</td>`).join('')}</tr></table>`:`<p>${esc(x.text)}</p>`}${x.source?`<div class="meta"><a href="${esc(x.source)}" target="_blank" rel="noreferrer">來源</a></div>`:''}</article>`).join('')||'<div class="card">沒有符合的金手指資料。</div>'}
