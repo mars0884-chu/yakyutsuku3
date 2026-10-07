@@ -1,5 +1,5 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='2026.10.07-r4';
+const APP_VERSION='2026.10.07-r5';
 const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,batchSort:'screen',batchSortDir:'asc'};
 const HEADER_ZH={"名前":"姓名","年齢":"年齡","成長":"成長型","投/打":"投／打","出身":"出身地","高校":"高中","大学":"大學","社会人":"社會人","タイプ":"投手類型","ランク":"Rank","体力":"體力","球速":"球速","球威":"球威","制球":"控球","精神":"精神","守備":"守備","捕球":"接球","肩力":"臂力","送球":"傳球","スライダー":"滑球","速スラ":"高速滑球","カットB":"卡特球","カーブ":"曲球","Sカーブ":"S曲球","ドロップ":"Drop曲球","シュート":"噴射球","速シュート":"高速噴射球","シンカー":"伸卡球","スクリュー":"螺旋球","速シンカー":"高速伸卡球","サークルC":"圈指變速","2シーム":"二縫線","Cアップ":"變速球","フォーク":"指叉球","SFF":"快速指叉","縦スラ":"縱滑球","パーム":"掌心球","ナックル":"蝴蝶球","スキル1":"技能1","スキル2":"技能2","スキル3":"技能3","モデル":"原型","右巧":"對右巧打","左巧":"對左巧打","長打":"長打","バント":"短打","選球眼":"選球眼","走力":"跑力","走塁":"跑壘","リード":"配球","捕手":"捕手","一塁":"一壘","二塁":"二壘","三塁":"三壘","遊撃":"游擊","外野":"外野","リーグ":"聯盟／地區","アカデミー":"學院"};
 const BASE_COLS=['名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
@@ -90,9 +90,49 @@ function renderBatchPreview(){$('#batchPreview').innerHTML='';for(const f of sta
 function loadImage(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);res(im)};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('圖片解碼失敗'))};im.src=u})}
 function withTimeout(promise,ms,label='處理逾時'){let t;return Promise.race([promise,new Promise((_,rej)=>t=setTimeout(()=>rej(new Error(label)),ms))]).finally(()=>clearTimeout(t))}
 
-function rowCrops(img,fileName){const ratio=img.naturalWidth/img.naturalHeight;if(ratio<1.65)return[];const x0=.153,x1=.684,y0=.181,y1=.903,rows=11,rh=(y1-y0)/rows,out=[];for(let i=0;i<rows;i++){const y=y0+i*rh,c=document.createElement('canvas'),w=Math.round(img.naturalWidth*(x1-x0)),h=Math.round(img.naturalHeight*rh);c.width=w;c.height=h;c.getContext('2d',{willReadFrequently:true}).drawImage(img,Math.round(img.naturalWidth*x0),Math.round(img.naturalHeight*y),w,h,0,0,w,h);out.push({canvas:c,file:fileName,row:i+1})}return out}
-function footerCrop(img,fileName){const c=document.createElement('canvas'),sx=Math.round(img.naturalWidth*.025),sy=Math.round(img.naturalHeight*.885),sw=Math.round(img.naturalWidth*.965),sh=Math.max(1,img.naturalHeight-sy);c.width=sw;c.height=sh;c.getContext('2d',{willReadFrequently:true}).drawImage(img,sx,sy,sw,sh,0,0,sw,sh);return{canvas:c,file:fileName}}
-function footerTotalCrop(img,fileName){const c=document.createElement('canvas'),sx=Math.round(img.naturalWidth*.79),sy=Math.round(img.naturalHeight*.885),sw=Math.max(1,Math.round(img.naturalWidth*.205)),sh=Math.max(1,Math.round(img.naturalHeight*.11));c.width=sw;c.height=sh;c.getContext('2d',{willReadFrequently:true}).drawImage(img,sx,sy,sw,sh,0,0,sw,sh);return{canvas:c,file:fileName}}
+
+function locateRosterPanel(img){
+  const W=img.naturalWidth||img.width,H=img.naturalHeight||img.height,sw=240,sh=Math.max(80,Math.round(H*sw/W));
+  const c=document.createElement('canvas');c.width=sw;c.height=sh;
+  const g=c.getContext('2d',{willReadFrequently:true});g.imageSmoothingEnabled=false;g.drawImage(img,0,0,sw,sh);
+  const d=g.getImageData(0,0,sw,sh).data,n=sw*sh,mask=new Uint8Array(n),seen=new Uint8Array(n),stack=new Int32Array(n);
+  for(let i=0,j=0;i<d.length;i+=4,j++){const l=d[i]*.299+d[i+1]*.587+d[i+2]*.114;mask[j]=l<90?1:0}
+  let best=null;
+  for(let sy=0;sy<sh;sy++)for(let sx=0;sx<sw;sx++){
+    const seed=sy*sw+sx;if(!mask[seed]||seen[seed])continue;
+    let top=0,area=0,minx=sx,maxx=sx,miny=sy,maxy=sy;stack[top++]=seed;seen[seed]=1;
+    while(top){
+      const q=stack[--top],y=Math.floor(q/sw),x=q-y*sw;area++;if(x<minx)minx=x;if(x>maxx)maxx=x;if(y<miny)miny=y;if(y>maxy)maxy=y;
+      const add=(qq)=>{if(qq>=0&&qq<n&&mask[qq]&&!seen[qq]){seen[qq]=1;stack[top++]=qq}};
+      if(x>0)add(q-1);if(x+1<sw)add(q+1);if(y>0)add(q-sw);if(y+1<sh)add(q+sw);
+    }
+    const bw=maxx-minx+1,bh=maxy-miny+1,aspect=bw/Math.max(1,bh);
+    if(miny>sh*.2||aspect<1.35||area<sw*sh*.08||bw>sw*.92)continue;
+    if(!best||area>best.area)best={area,minx,miny,bw,bh};
+  }
+  if(!best)return{x:0,y:0,w:W,h:H};
+  const x=Math.round(best.minx*W/sw),y=Math.round(best.miny*H/sh),w=Math.round(best.bw*W/sw),h=Math.round(best.bh*H/sh),pad=Math.max(1,Math.round(w*.008));
+  return{x:Math.max(0,x-pad),y:Math.max(0,y),w:Math.min(W-Math.max(0,x-pad),w+pad*2),h:Math.min(H-y,h)};
+}
+function rowCrops(img,fileName){
+  const p=locateRosterPanel(img),body0=p.y+Math.round(p.h*.19),body1=p.y+Math.round(p.h*.995),rows=11,rh=(body1-body0)/rows,out=[];
+  const sx=p.x,sw=Math.max(1,Math.round(p.w*.69));
+  for(let i=0;i<rows;i++){
+    const y0=Math.round(body0+i*rh),y1=Math.round(body0+(i+1)*rh),h=Math.max(1,y1-y0),c=document.createElement('canvas');
+    c.width=sw;c.height=h;c.getContext('2d',{willReadFrequently:true}).drawImage(img,sx,y0,sw,h,0,0,sw,h);
+    out.push({canvas:c,file:fileName,row:i+1});
+  }
+  return out
+}
+function footerCrop(img,fileName){
+  const p=locateRosterPanel(img),W=img.naturalWidth||img.width,H=img.naturalHeight||img.height,sx=p.x,sy=Math.min(H-1,p.y+p.h+Math.max(1,Math.round(p.h*.008))),sw=Math.max(1,Math.min(W-sx,Math.round(p.w*.99))),sh=Math.max(1,Math.min(H-sy,Math.round(p.h*.16))),c=document.createElement('canvas');
+  c.width=sw;c.height=sh;c.getContext('2d',{willReadFrequently:true}).drawImage(img,sx,sy,sw,sh,0,0,sw,sh);return{canvas:c,file:fileName}
+}
+function footerTotalCrop(img,fileName){
+  const p=locateRosterPanel(img),W=img.naturalWidth||img.width,H=img.naturalHeight||img.height,sx=Math.max(0,p.x+Math.round(p.w*.67)),sy=Math.min(H-1,p.y+p.h+Math.max(1,Math.round(p.h*.008))),sw=Math.max(1,Math.min(W-sx,Math.round(p.w*.31))),sh=Math.max(1,Math.min(H-sy,Math.round(p.h*.16))),c=document.createElement('canvas');
+  c.width=sw;c.height=sh;c.getContext('2d',{willReadFrequently:true}).drawImage(img,sx,sy,sw,sh,0,0,sw,sh);return{canvas:c,file:fileName}
+}
+
 function grayPixels(src){const g=src.getContext('2d',{willReadFrequently:true}),d=g.getImageData(0,0,src.width,src.height),a=new Uint8Array(src.width*src.height);for(let i=0,j=0;i<d.data.length;i+=4,j++)a[j]=Math.round(d.data[i]*.299+d.data[i+1]*.587+d.data[i+2]*.114);return a}
 function binaryCanvas(src,threshold=125,{cropName=false,scale=3}={}){let sx=0,sw=src.width;if(cropName){sx=Math.round(src.width*.115);sw=Math.round(src.width*.49)}const tmp=document.createElement('canvas');tmp.width=sw;tmp.height=src.height;tmp.getContext('2d',{willReadFrequently:true}).drawImage(src,sx,0,sw,src.height,0,0,sw,src.height);const g=tmp.getContext('2d',{willReadFrequently:true}),id=g.getImageData(0,0,sw,tmp.height),gray=new Uint8Array(sw*tmp.height);for(let i=0,j=0;i<id.data.length;i+=4,j++)gray[j]=Math.round(id.data[i]*.299+id.data[i+1]*.587+id.data[i+2]*.114);
   // 遊戲姓名欄中間有固定白色方塊。它不是文字；若不移除會被 OCR 當成一個假漢字。
