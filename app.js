@@ -378,6 +378,49 @@ function grayRegion(src,rx0,rx1,scale=5,contrast=1.8){
   const id=g.getImageData(0,0,sw,tmp.height);for(let i=0;i<id.data.length;i+=4){const l=id.data[i]*.299+id.data[i+1]*.587+id.data[i+2]*.114,v=Math.max(0,Math.min(255,Math.round((l-128)*contrast+128)));id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255}g.putImageData(id,0,0);
   const out=document.createElement('canvas');out.width=sw*scale;out.height=tmp.height*scale;const og=out.getContext('2d');og.imageSmoothingEnabled=true;og.drawImage(tmp,0,0,out.width,out.height);return out
 }
+function makeBatchOCRPage(rows,mode='gray'){
+  const scale=3,gap=55,bodyHeight=Math.max(36,...rows.map(r=>r.canvas.height))*scale,stride=bodyHeight+gap;
+  const c=document.createElement('canvas');c.width=900;c.height=Math.max(150,rows.length*stride);
+  const g=c.getContext('2d',{willReadFrequently:true});g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);
+  for(let i=0;i<rows.length;i++){
+    const src=rows[i].canvas,sep=detectNameSeparator(src),s0=.115,s1=Math.max(.18,sep.left-.008),n0=Math.min(.50,sep.right+.008),n1=.575;
+    const crop=(a,b)=>mode==='gray'?grayRegion(src,a,b,scale,1.35):binaryRegion(src,a,b,125,scale);
+    const surname=crop(s0,s1),given=crop(n0,n1),yy=i*stride+(bodyHeight-surname.height)/2;
+    g.save();g.filter='invert(1)';g.drawImage(surname,12,yy);g.drawImage(given,355,i*stride+(bodyHeight-given.height)/2);g.restore()
+  }
+  return{canvas:c,stride}
+}
+function parseBatchOCRPage(tsv,text,rows,stride){
+  const got=rows.map(()=>({s:[],g:[]}));
+  const lines=String(tsv||'').split(/\r?\n/);
+  for(let i=1;i<lines.length;i++){
+    const a=lines[i].split('\t');if(a[0]!=='5'||a.length<12)continue;
+    const part=ocrNamePart(a.slice(11).join('\t'));if(!part)continue;
+    const x=Number(a[6]),y=Number(a[7]),h=Number(a[9]);if(!Number.isFinite(x+y+h))continue;
+    const idx=Math.max(0,Math.min(rows.length-1,Math.floor((y+h*.45)/stride)));
+    got[idx][x<332?'s':'g'].push({x,part})
+  }
+  const parsed=got.map(item=>({surname:ocrNamePart(item.s.sort((a,b)=>a.x-b.x).map(x=>x.part).join('')),given:ocrNamePart(item.g.sort((a,b)=>a.x-b.x).map(x=>x.part).join(''))}));
+  if(parsed.some(x=>x.surname||x.given))return parsed;
+  // Older OCR engines may not return TSV: only use positional text if lines align exactly.
+  const raw=String(text||'').split(/\r?\n/).filter(x=>x.trim());
+  if(raw.length!==rows.length)return parsed;
+  return raw.map(line=>{const bits=line.trim().split(/\s+/);return{surname:ocrNamePart(bits[0]||''),given:ocrNamePart(bits.slice(1).join(''))}})
+}
+async function recognizeBatchOCRPage(worker,rows,mode='gray'){
+  if(!rows.length)return 0;
+  const page=makeBatchOCRPage(rows,mode);
+  const result=await worker.recognize(page.canvas,{}, {text:true,tsv:true});
+  const parts=parseBatchOCRPage(result?.data?.tsv,result?.data?.text,rows,page.stride);
+  let filled=0;
+  for(let i=0;i<rows.length;i++){
+    const {surname,given}=parts[i]||{};if(!surname&&!given)continue;
+    const name=(surname+' '+given).trim(),parsed={name,names:[name],surname,given,surnames:surname?[surname]:[],givens:given?[given]:[],age:'',hand:'',pos:'',text:name};
+    mergeRowOCR(rows[i],parsed,null,'PAGE:'+name,Number(result?.data?.confidence||0));filled++
+  }
+  page.canvas.width=1;page.canvas.height=1;
+  return filled
+}
 async function recognizeNameTesseractFast(worker,canvas,threshold=125,mode='binary'){
   const sep=detectNameSeparator(canvas),mk=(a,b)=>mode==='gray'?grayRegion(canvas,a,b,5,1.8):binaryRegion(canvas,a,b,threshold,5);
   const a=await recognizeText(worker,mk(.115,Math.max(.18,sep.left-.008)));
@@ -554,10 +597,17 @@ async function runBatch(){
         try{
           worker=await withTimeout(Tesseract.createWorker('jpn',1,{workerPath:'./vendor/tesseract/worker.min.js',corePath:'./vendor/tesseract-core',langPath:'./vendor/lang'}),45000,'手機 OCR 載入逾時');
           {const n=await tesseractFooterTotal(worker,screens);if(n>=20&&n<=200)state.expectedTotal=n;}
-          try{await worker.setParameters({tessedit_pageseg_mode:'8',tessedit_char_whitelist:batchKanjiWhitelist(),user_defined_dpi:'300'})}catch{}
+          try{await worker.setParameters({tessedit_pageseg_mode:'6',tessedit_char_whitelist:'',user_defined_dpi:'300'})}catch{}
+          let pageNum=0;
+          for(const sc of screens){
+            pageNum++;setBatchProgress(63+17*pageNum/Math.max(1,screens.length),'手機整頁姓名 OCR '+pageNum+'/'+screens.length);
+            try{await recognizeBatchOCRPage(worker,state.batchRawRows.filter(r=>r.file===sc.file),'gray')}catch(e){console.warn('page name OCR',e)}
+            await new Promise(requestAnimationFrame)
+          }
+          try{await worker.setParameters({tessedit_pageseg_mode:'8',tessedit_char_whitelist:'',user_defined_dpi:'300'})}catch{}
           const uncertain=state.batchRawRows.filter(r=>!r.match||r.score<.84||((r.candidates?.[0]?.score||0)-(r.candidates?.[1]?.score||0))<.045);
           for(let i=0;i<uncertain.length;i++){
-            const row=uncertain[i];setBatchProgress(66+18*(i/Math.max(1,uncertain.length)),'手機姓名 OCR '+(i+1)+'/'+uncertain.length);
+            const row=uncertain[i];setBatchProgress(81+10*(i/Math.max(1,uncertain.length)),'手機補強 '+(i+1)+'/'+uncertain.length);
             try{
               const rr=await recognizeNameTesseractFast(worker,row.canvas,125,'binary');
               mergeRowOCR(row,rr.parsed,null,'M:'+rr.raw,rr.confidence);
@@ -574,7 +624,7 @@ async function runBatch(){
           if(hard.length){
             try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:batchKanjiWhitelist(),user_defined_dpi:'300'})}catch{}
             for(let i=0;i<hard.length;i++){
-              const row=hard[i];setBatchProgress(85+10*(i/Math.max(1,hard.length)),'手機灰階 OCR '+(i+1)+'/'+hard.length);
+              const row=hard[i];setBatchProgress(92+6*(i/Math.max(1,hard.length)),'手機難字複核 '+(i+1)+'/'+hard.length);
               try{const rr=await recognizeNameTesseractFast(worker,row.canvas,125,'gray');mergeRowOCR(row,rr.parsed,null,'MG:'+rr.raw,rr.confidence);mobileNameOCR=true}catch(e){row.raw+='｜MGERR:'+String(e.message||e)}
               if(i%3===0){state.batchRows=consolidateRows(state.batchRawRows.slice(0),0);renderBatchResults();await new Promise(requestAnimationFrame)}
             }
