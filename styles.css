@@ -54,3 +54,24 @@ main{max-width:1480px;margin:auto;padding:14px}.view{display:none}.view.active{d
 .guide-search-cell small{display:block;opacity:.72;margin-bottom:3px}
 .guide-search-cell b{display:block;white-space:normal;overflow-wrap:anywhere}
 @media(max-width:700px){.guide-search-grid{grid-template-columns:1fr}}
+
+
+.batch-mobile-list{display:none}
+@media(max-width:700px){
+  .batch-desktop-table{display:none}
+  .batch-mobile-list{display:grid;gap:6px}
+  .batch-group>h3{font-size:18px;margin:12px 2px 6px}
+  .batch-mobile-card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px 10px}
+  .batch-mobile-head{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:7px;align-items:start}
+  .batch-mobile-num{font-size:12px;color:var(--muted);padding-top:2px}
+  .batch-mobile-status{font-size:12px;font-weight:800;padding-top:2px;white-space:nowrap}
+  .batch-mobile-name{min-width:0;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
+  .batch-mobile-name .name-link{display:inline;font-size:15px}
+  .batch-mobile-name .candidate-note{max-width:none;white-space:normal;line-height:1.3;margin-top:3px}
+  .batch-mobile-name .candidate-only{max-width:none;white-space:normal;line-height:1.35}
+  .batch-mobile-rank{font-size:14px;min-width:22px;text-align:center}
+  .batch-mobile-meta{display:flex;gap:5px 9px;flex-wrap:wrap;margin:5px 0 0 61px;color:var(--muted);font-size:12px}
+  .batch-mobile-meta span{white-space:nowrap}
+  .batch-actions{gap:6px}
+  .batch-actions select{max-width:110px;padding:8px 7px}
+}
