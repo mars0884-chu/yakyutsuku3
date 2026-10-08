@@ -504,13 +504,26 @@ function batchCompare(a,b,key){const pa=batchDisplayPlayer(a),pb=batchDisplayPla
 function sortBatchRows(rows){let out=[...rows].sort((a,b)=>batchCompare(a,b,state.batchSort));if(state.batchSortDir==='desc'&&['screen','name','rank'].includes(state.batchSort))out.reverse();if(state.batchSortDir==='asc'&&!['screen','name','rank'].includes(state.batchSort))out.reverse();return out}
 function setBatchSort(key){if(state.batchSort===key)state.batchSortDir=state.batchSortDir==='asc'?'desc':'asc';else{state.batchSort=key;state.batchSortDir=['screen','name','rank'].includes(key)?'asc':'desc'}renderBatchResults()}
 function batchGroupName(p,r){const pos=p?._position||POSMAP[r?.parsed?.pos]||'';if(pos==='投手')return'投手';if(pos==='捕手')return'捕手';if(['一壘手','二壘手','三壘手','游擊手'].includes(pos))return'內野手';if(pos==='外野手')return'外野手';return'其他'}
+const BATCH_COMPACT=['_screen','_status','名前','ランク','年齢','投/打','_position'];
 const BATCH_COMMON=['_screen','_status','名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','_position'];
 const BATCH_PITCH=[...BATCH_COMMON,'タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
 const BATCH_BAT=[...BATCH_COMMON,'体力','右巧','左巧','長打','バント','選球眼','走力','走塁','精神','守備','捕球','肩力','送球','リード','捕手','一塁','二塁','三塁','遊撃','外野','スキル1','スキル2','スキル3','モデル'];
 function batchHeaderLabel(k){return k==='_screen'?'#':k==='_status'?'狀態':k==='_position'?'守位':(HEADER_ZH[k]||k)}
 function batchSortArrow(k){return state.batchSort===k?(state.batchSortDir==='asc'?' ↑':' ↓'):''}
-function batchCell(r,p,k,displayIndex){if(k==='_screen')return String(displayIndex+1);if(k==='_status')return r.match?'確認':r.resolved?'推定':'候選';if(k==='_position')return esc(p?._position||POSMAP[r.parsed?.pos]||'—');if(k==='名前'){if(!p){const c=(r.candidates||[]).slice(0,3);return c.length?`<span class="candidate-only">候選：${c.map(x=>esc(x.p['名前'])).join(' / ')}</span>`:'未辨識'}const alts=(r.candidates||[]).filter(x=>x.p._uid!==p._uid).slice(0,2),alt=alts.length?`<small class="candidate-note">次選：${alts.map(x=>esc(x.p['名前'])).join(' / ')}</small>`:'';return `<span class="name-link" data-uid="${esc(p._uid)}">${esc(p['名前'])}</span>${alt}`}return esc(p?.[k]||'—')}
-function renderBatchGroup(title,rows,cols){const sorted=sortBatchRows(rows),sortable=new Set(['screen','name','rank','年齢','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野']);let h=`<section class="batch-group"><h3>${esc(title)} <small>${rows.length}</small></h3><div class="table-shell"><table class="data-table batch-detail-table"><thead><tr>`;for(const k of cols){const sk=k==='_screen'?'screen':k==='名前'?'name':k==='ランク'?'rank':k;h+=sortable.has(sk)?`<th class="sortable" data-sort="${esc(sk)}">${esc(batchHeaderLabel(k))}${batchSortArrow(sk)}</th>`:`<th>${esc(batchHeaderLabel(k))}</th>`}h+='</tr></thead><tbody>';sorted.forEach((r,i)=>{const p=batchDisplayPlayer(r);h+='<tr>'+cols.map(k=>`<td class="${k==='名前'?'name':''} ${k==='_status'?(r.match?'good':r.resolved?'estimate':'unresolved'):''}">${batchCell(r,p,k,i)}</td>`).join('')+'</tr>'});h+='</tbody></table></div></section>';return h}
+function batchCell(r,p,k,displayIndex){if(k==='_screen')return String(displayIndex+1);if(k==='_status')return r.match?'確認':r.resolved?'推定':'候選';if(k==='_position')return esc(p?._position||POSMAP[r.parsed?.pos]||'—');if(k==='名前'){if(!p){const c=(r.candidates||[]).slice(0,3);return c.length?'<span class="candidate-list">'+c.map(x=>'<span class="candidate-option" data-uid="'+esc(x.p._uid)+'">'+esc(x.p['名前'])+'</span>').join('')+'</span>':'未辨識'}const alts=(r.candidates||[]).filter(x=>x.p._uid!==p._uid).slice(0,2),alt=alts.length?`<small class="candidate-note">次選：${alts.map(x=>esc(x.p['名前'])).join(' / ')}</small>`:'';return `<span class="name-link" data-uid="${esc(p._uid)}">${esc(p['名前'])}</span>${alt}`}return esc(p?.[k]||'—')}
+function renderBatchGroup(title,rows,cols){
+  const sorted=sortBatchRows(rows),compact=BATCH_COMPACT,sortable=new Set(['screen','name','rank','年齢']);
+  let h='<section class="batch-group"><h3>'+esc(title)+' <small>'+rows.length+'</small></h3><div class="table-shell batch-compact-shell"><table class="data-table batch-detail-table"><thead><tr>';
+  for(const k of compact){const sk=k==='_screen'?'screen':k==='名前'?'name':k==='ランク'?'rank':k;h+=sortable.has(sk)?'<th class="sortable" data-sort="'+esc(sk)+'">'+esc(batchHeaderLabel(k))+batchSortArrow(sk)+'</th>':'<th>'+esc(batchHeaderLabel(k))+'</th>'}
+  h+='</tr></thead><tbody>';
+  sorted.forEach((r,i)=>{const p=batchDisplayPlayer(r);h+='<tr>'+compact.map(k=>'<td class="'+(k==='名前'?'name':'')+' '+(k==='_status'?(r.match?'good':r.resolved?'estimate':'unresolved'):'')+'">'+batchCell(r,p,k,i)+'</td>').join('')+'</tr>'});
+  h+='</tbody></table></div><div class="batch-mobile-list">';
+  sorted.forEach((r,i)=>{const p=batchDisplayPlayer(r),name=batchCell(r,p,'名前',i),status=batchCell(r,p,'_status',i);
+    const metadata=p?['Rank '+(p['ランク']||'—'),p._position||'守位未明',String(p['年齢']||'—')+'歲',p['投/打']||'—']:['守位待核對'];
+    h+='<article class="batch-player-card"><span class="batch-card-status '+(r.match?'good':r.resolved?'estimate':'unresolved')+'">'+esc(status)+'</span><div class="batch-card-name">'+name+'</div><div class="batch-card-meta">'+metadata.map(v=>'<span>'+esc(v)+'</span>').join('')+'</div></article>';
+  });
+  return h+'</div></section>'
+}
 async function recognizeText(worker,canvas){const r=await worker.recognize(canvas);return{text:cleanOCR(r?.data?.text||''),confidence:Number(r?.data?.confidence||0)}}
 async function runBatch(){
   if(!state.batchFiles.length){alert('請先選擇截圖。');return}
@@ -595,9 +608,9 @@ async function runBatch(){
 $('#runBatch').onclick=runBatch;
 function renderBatchResults(){
   const matched=state.batchRows.filter(r=>r.match).length,inferred=state.batchRows.filter(r=>!r.match&&r.resolved).length;
-  $('#batchSummary').textContent=state.batchRows.length?`結果 ${state.batchRows.length}${state.expectedTotal?` / 最多 ${state.expectedTotal}`:''}｜確認 ${matched}｜推定 ${inferred}｜候選 ${state.batchRows.length-matched-inferred}`:'';
+  $('#batchSummary').textContent=state.batchRows.length?`結果 ${state.batchRows.length} 列${state.expectedTotal?'／名單 '+state.expectedTotal+' 人':''}｜確認 ${matched}｜推定 ${inferred}｜待核對 ${state.batchRows.length-matched-inferred}`:'';
   const groups={投手:[],捕手:[],內野手:[],外野手:[],其他:[]};for(const r of state.batchRows){const p=batchDisplayPlayer(r);groups[batchGroupName(p,r)].push(r)}
-  let h='';for(const key of ['投手','捕手','內野手','外野手','其他'])if(groups[key].length)h+=renderBatchGroup(key,groups[key],key==='投手'?BATCH_PITCH:BATCH_BAT);
+  let h='';for(const key of ['投手','捕手','內野手','外野手','其他'])if(groups[key].length)h+=renderBatchGroup(key,groups[key],BATCH_COMPACT);
   $('#batchTable').innerHTML=h;
   $('#batchTable').querySelectorAll('[data-uid]').forEach(td=>td.onclick=()=>openPlayer(td.dataset.uid));
   $('#batchTable').querySelectorAll('th[data-sort]').forEach(th=>th.onclick=()=>setBatchSort(th.dataset.sort));
