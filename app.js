@@ -645,9 +645,19 @@ async function runBatch(){
           try{await worker.setParameters({tessedit_pageseg_mode:'6',tessedit_char_whitelist:'',user_defined_dpi:'300'})}catch{}
           let pageNum=0;
           for(const sc of screens){
-            pageNum++;setBatchProgress(63+17*pageNum/Math.max(1,screens.length),'手機整頁姓名 OCR '+pageNum+'/'+screens.length);
-            try{await recognizeBatchOCRPage(worker,state.batchRawRows.filter(r=>r.file===sc.file),'gray')}catch(e){console.warn('page name OCR',e)}
+            pageNum++;setBatchProgress(63+10*pageNum/Math.max(1,screens.length),'手機整頁姓名 OCR '+pageNum+'/'+screens.length);
+            try{const found=await recognizeBatchOCRPage(worker,state.batchRawRows.filter(r=>r.file===sc.file),'gray');if(found)mobileNameOCR=true}catch(e){console.warn('page name OCR',e)}
             await new Promise(requestAnimationFrame)
+          }
+          // Second sparse-text page pass only for low-resolution game panels.
+          const tinyScreens=screens.filter(sc=>{const row=state.batchRawRows.find(r=>r.file===sc.file);return row&&row.canvas.width<420});
+          if(tinyScreens.length){
+            try{await worker.setParameters({tessedit_pageseg_mode:'11',tessedit_char_whitelist:'',user_defined_dpi:'300'})}catch{}
+            for(let i=0;i<tinyScreens.length;i++){
+              const sc=tinyScreens[i];setBatchProgress(74+6*(i+1)/tinyScreens.length,'小圖字形補強 '+(i+1)+'/'+tinyScreens.length);
+              try{const found=await recognizeBatchOCRPage(worker,state.batchRawRows.filter(r=>r.file===sc.file),'gray');if(found)mobileNameOCR=true}catch(e){console.warn('small-image page OCR',e)}
+              await new Promise(requestAnimationFrame)
+            }
           }
           try{await worker.setParameters({tessedit_pageseg_mode:'8',tessedit_char_whitelist:'',user_defined_dpi:'300'})}catch{}
           const uncertain=state.batchRawRows.filter(r=>!r.match||r.score<.84||((r.candidates?.[0]?.score||0)-(r.candidates?.[1]?.score||0))<.045).sort((a,b)=>(a.score||0)-(b.score||0)).slice(0,Math.min(16,Math.ceil(state.batchRawRows.length*.20)));
