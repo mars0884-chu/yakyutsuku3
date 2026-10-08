@@ -387,21 +387,21 @@ async function recognizeNameTesseractFast(worker,canvas,threshold=125,mode='bina
 }
 
 async function tesseractFooterTotal(worker,screens){
-  const totals=[];
+  const totals=[],validated=[];
   try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'',preserve_interword_spaces:'1'})}catch{}
   for(const sc of screens){
     try{
-      // Native grayscale was confirmed against the 48/88/111-image footers.
-      const r=await recognizeText(worker,grayRegion(sc.footer.canvas,0,1,3,1)),n=parseExpectedTotal(r.text);
-      if(n>=20&&n<=200){totals.push(n);continue}
-      const r2=await recognizeText(worker,grayRegion(sc.total.canvas,0,1,3,1)),n2=parseExpectedTotal(r2.text);
-      if(n2>=20&&n2<=200){totals.push(n2);continue}
-      const fallback=await recognizeText(worker,binaryCanvas(sc.footer.canvas,125,{scale:3})),nf=parseExpectedTotal(fallback.text);
-      if(nf>=20&&nf<=200)totals.push(nf)
+      const r=await recognizeText(worker,grayRegion(sc.footer.canvas,0,1,3,1)),s=r.text;
+      let n=parseExpectedTotal(s);
+      const p=(s.match(/投手[^0-9]{0,8}(\d{1,3})\s*人/)||[])[1],
+            b=(s.match(/野手[^0-9]{0,8}(\d{1,3})\s*人/)||[])[1];
+      if(n>=20&&n<=200){totals.push(n);if(p&&b&&(+p)+(+b)===n)validated.push(n)}
+      else{const fr=await recognizeText(worker,grayRegion(sc.total.canvas,0,1,3,1)),nf=parseExpectedTotal(fr.text);if(nf>=20&&nf<=200)totals.push(nf)}
+      // Stop after two independently confirmed screenshots, not 10 slow OCR passes.
+      if(validated.length>=2&&validated[validated.length-1]===validated[validated.length-2])break
     }catch(e){console.warn('footer OCR',e)}
   }
-  try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:''})}catch{}
-  return chooseExpectedTotal(totals,state.expectedTotal)
+  return chooseExpectedTotal(validated.length?validated:totals,state.expectedTotal)
 }
 function mergeParsedNameEvidence(a,b){a=a||{};b=b||{};return{...a,
   name:a.name||b.name||'',
