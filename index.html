@@ -42,6 +42,12 @@
   <div class="batch-actions">
     <label class="filebtn">選擇截圖<input id="batchFiles" type="file" accept="image/*" multiple></label>
     <button id="runBatch" class="primary">開始找人</button>
+    <select id="batchSortSelect" aria-label="批次結果排序">
+      <option value="screen">畫面順序</option>
+      <option value="rank">Rank</option>
+      <option value="年齢">年齡</option>
+      <option value="name">姓名</option>
+    </select>
     <button id="clearBatch">清除</button>
   </div>
   <div id="batchStatus" class="statusline">可一次選多張 OFFICE MENU 名單截圖。</div>
