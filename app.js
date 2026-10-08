@@ -153,13 +153,26 @@ function locateRosterPanel(img){
   const x=Math.round(best.minx*W/sw),y=Math.round(best.miny*H/sh),w=Math.round(best.bw*W/sw),h=Math.round(best.bh*H/sh),pad=Math.max(1,Math.round(w*.008));
   return{x:Math.max(0,x-pad),y:Math.max(0,y),w:Math.min(W-Math.max(0,x-pad),w+pad*2),h:Math.min(H-y,h)};
 }
+function locateRosterRowGrid(img,p){
+  const W=img.naturalWidth||img.width,H=img.naturalHeight||img.height,nom=p.y+Math.round(p.h*.19),pitch=p.w*.0398;
+  const x0=Math.max(0,p.x+Math.round(p.w*.020)),x1=Math.min(W,p.x+Math.round(p.w*.062));
+  const lo=Math.max(0,Math.round(nom-p.w*.012)),hi=Math.min(H-1,Math.round(nom+p.w*.045));
+  if(hi-lo<4||x1-x0<2)return{top:nom,pitch};
+  const c=document.createElement('canvas');c.width=x1-x0;c.height=hi-lo+1;
+  const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(img,x0,lo,c.width,c.height,0,0,c.width,c.height);
+  const d=g.getImageData(0,0,c.width,c.height).data,sig=[];
+  for(let y=0;y<c.height;y++){let bright=0;for(let x=0;x<c.width;x++){const k=(y*c.width+x)*4,l=d[k]*.299+d[k+1]*.587+d[k+2]*.114;if(l>182)bright++}sig.push(bright/c.width)}
+  const peak=Math.max(...sig),threshold=Math.max(.10,peak*.32);let first=-1;
+  for(let i=0;i+2<sig.length;i++)if(sig[i]>threshold&&sig[i+1]>threshold&&sig[i+2]>threshold){first=i;break}
+  return{top:first<0?nom:Math.round(lo+first-p.w*.004),pitch}
+}
 function rowCrops(img,fileName){
-  const p=locateRosterPanel(img),body0=p.y+Math.round(p.h*.19),body1=p.y+Math.round(p.h*.995),rows=11,rh=(body1-body0)/rows,out=[];
-  const sx=p.x,sw=Math.max(1,Math.round(p.w*.69));
+  const p=locateRosterPanel(img),grid=locateRosterRowGrid(img,p),rows=11,out=[];
+  const sx=p.x,sw=Math.max(1,Math.round(p.w*.69)),H=img.naturalHeight||img.height;
   for(let i=0;i<rows;i++){
-    const y0=Math.round(body0+i*rh),y1=Math.round(body0+(i+1)*rh),h=Math.max(1,y1-y0),c=document.createElement('canvas');
+    const y0=Math.max(0,Math.round(grid.top+i*grid.pitch)),y1=Math.min(H,Math.round(grid.top+(i+1)*grid.pitch)),h=Math.max(1,y1-y0),c=document.createElement('canvas');
     c.width=sw;c.height=h;c.getContext('2d',{willReadFrequently:true}).drawImage(img,sx,y0,sw,h,0,0,sw,h);
-    out.push({canvas:c,file:fileName,row:i+1});
+    out.push({canvas:c,file:fileName,row:i+1})
   }
   return out
 }
