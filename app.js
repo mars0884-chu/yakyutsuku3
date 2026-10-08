@@ -385,8 +385,13 @@ function cvFooterTotal(totalCanvas){
 function mergeRowOCR(row,parsed,cm,raw,confidence=0){
   const merged=mergeParsedNameEvidence(row.parsed,parsed),textCM=candidateMatch(merged),vis=visualCandidateMatch(row.canvas,merged);
   const options=[row.match?{match:row.match,candidates:row.candidates||[]}:null,cm,textCM,vis].filter(Boolean),quality=o=>o.match?.score||o.candidates?.[0]?.score||0;
-  options.sort((a,b)=>quality(b)-quality(a));const best=options[0]||{match:null,candidates:row.candidates||[]};
-  row.parsed=merged;row.match=best.match||null;row.candidates=best.candidates?.length?best.candidates:(row.candidates||[]);row.score=row.match?.score||row.candidates?.[0]?.score||0;row.ocrConfidence=Math.max(row.ocrConfidence||0,confidence||0);row.raw=[row.raw,raw].filter(Boolean).join('｜');row.status=row.match?'確認':'候選';
+  options.sort((a,b)=>quality(b)-quality(a));
+  const textEvidence=!!(parsed?.surname&&parsed?.given),textStrong=textEvidence&&textCM?.match&&textCM.match.nameScore>=.80&&textCM.margin>=.025;
+  // A corroborated actual OCR name overrides visual-only glyph guessing.
+  const best=textStrong?textCM:options[0]||{match:null,candidates:row.candidates||[]};
+  row.parsed=merged;row.match=best.match||null;row.candidates=best.candidates?.length?best.candidates:(row.candidates||[]);
+  row.score=row.match?.score||row.candidates?.[0]?.score||0;row.ocrConfidence=Math.max(row.ocrConfidence||0,confidence||0);
+  row.raw=[row.raw,raw].filter(Boolean).join('｜');row.status=row.match?'確認':'候選';
 }
 function grayRegion(src,rx0,rx1,scale=5,contrast=1.8){
   const sx=Math.max(0,Math.round(src.width*rx0)),ex=Math.min(src.width,Math.round(src.width*rx1)),sw=Math.max(1,ex-sx),tmp=document.createElement('canvas');
@@ -578,8 +583,12 @@ function consolidateRows(raw,expected=0){
   return out
 }
 function resolveUniqueCandidates(rows){for(const r of rows)r.resolved=null;const used=new Set(rows.filter(r=>r.match?.p?._uid).map(r=>r.match.p._uid)),pending=rows.filter(r=>!r.match);for(let guard=0;guard<rows.length;guard++){let pick=null;for(const r of pending){if(r.resolved)continue;const av=(r.candidates||[]).filter(x=>!used.has(x.p._uid));if(!av.length)continue;const a=av[0],b=av[1],gap=a.score-(b?.score||0),quality=a.score+gap*.45+a.meta*.015;const safe=(a.score>=.72&&gap>=.035)||(a.score>=.67&&a.meta>=1&&gap>=.04)||(a.score>=.64&&a.meta>=2&&gap>=.045);if(!safe)continue;if(!pick||quality>pick.quality)pick={r,a,gap,quality}}if(!pick)break;pick.r.resolved=pick.a;pick.r.status='推定';used.add(pick.a.p._uid)}return rows}
-function dedupeRecognizedRows(rows,expected=0){const seen=new Map(),rest=[];for(const r of rows){const p=r.match?.p||r.resolved?.p;if(p?._uid){const old=seen.get(p._uid),quality=(r.match?.score||r.resolved?.score||r.score||0)+(r.ocrConfidence||0)/5000;if(!old||quality>old.quality)seen.set(p._uid,{row:r,quality})}else rest.push(r)}let out=[...seen.values()].map(x=>x.row).concat(rest);out.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));// Never truncate by expected count: an unverified row may be a real player.
-  if(expected&&out.length>expected)console.warn('待核對跨頁重複列',out.length-expected);return out}
+function dedupeRecognizedRows(rows,expected=0){
+  // Only aligned image evidence is allowed to merge records in consolidateRows.
+  // Never discard distinct row crops merely because OCR guessed the same player twice.
+  if(expected&&rows.length!==expected)console.warn('頁尾名單',expected,'辨識結果',rows.length,'待核對差異',rows.length-expected);
+  return rows
+}
 function batchDisplayPlayer(r){return r.match?.p||r.resolved?.p||null}
 const GRADE_SCORE={'SS':15,'S+':14,'S':13,'A+':12,'A':11,'B+':10,'B':9,'C+':8,'C':7,'D+':6,'D':5,'E+':4,'E':3,'F':2,'G':1};
 function gradeScore(v){const t=String(v??'').trim().toUpperCase();if(t in GRADE_SCORE)return GRADE_SCORE[t];const n=parseFloat(t);return Number.isFinite(n)?n:-999}
