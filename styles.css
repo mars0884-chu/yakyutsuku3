@@ -54,3 +54,27 @@ main{max-width:1480px;margin:auto;padding:14px}.view{display:none}.view.active{d
 .guide-search-cell small{display:block;opacity:.72;margin-bottom:3px}
 .guide-search-cell b{display:block;white-space:normal;overflow-wrap:anywhere}
 @media(max-width:700px){.guide-search-grid{grid-template-columns:1fr}}
+
+/* 批次找人：手機優先精簡清單，能力資料按需展開 */
+.batch-mobile-group{display:none}
+@media(max-width:700px){
+  .batch-group:not(.batch-mobile-group){display:none}
+  .batch-mobile-group{display:block}
+  .batch-groups{gap:9px}
+  .batch-mobile-group>h3{margin:8px 2px 5px}
+  .batch-mobile-list{display:grid;gap:5px}
+  .batch-mobile-row{background:#fff;border:1px solid var(--line);border-radius:10px;min-width:0}
+  .batch-mobile-row summary{display:flex;align-items:center;gap:9px;padding:10px;cursor:pointer;list-style:none;min-width:0}
+  .batch-mobile-row summary::-webkit-details-marker{display:none}
+  .batch-mobile-number{width:20px;flex-shrink:0;color:var(--muted);font-size:12px;text-align:center}
+  .batch-mobile-primary{min-width:0;flex:1}
+  .batch-mobile-primary b{display:block;font-size:15px;overflow-wrap:anywhere;color:var(--ink)}
+  .batch-mobile-primary small{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+  .batch-mobile-primary .batch-mobile-candidates{color:var(--warn);line-height:1.4}
+  .batch-mobile-chevron{color:var(--muted)}
+  .batch-mobile-details{border-top:1px solid var(--line);padding:9px 11px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .batch-mobile-details>div{min-width:0;display:grid;gap:3px}
+  .batch-mobile-details small{font-size:11px;color:var(--muted)}
+  .batch-mobile-details span{font-size:13px;overflow-wrap:anywhere}
+  .batch-mobile-details p{grid-column:1/-1;margin:3px 0;font-size:13px}
+}
