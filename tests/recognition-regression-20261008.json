@@ -1,0 +1,71 @@
+{
+  "version": "2026-10-08-r11-test",
+  "branch": "test/iphone-regression-layout-20261008",
+  "production_updated": false,
+  "constraints": {
+    "recognizer": "local-only image geometry + CV + locally bundled Tesseract; ChatGPT/AI ground-truth checking must never be used to generate runtime results",
+    "release_gate": "Do not deploy until completed iPhone/desktop full-flow recognition accuracy and performance regression pass on previously unseen lists",
+    "do_not_hardcode_sample_names": true
+  },
+  "fixtures": [
+    {
+      "fixture": "333.zip",
+      "known_total": 48,
+      "visible_rows": 56,
+      "unique_after_overlap": 48,
+      "overlaps": [
+        6,
+        2
+      ],
+      "count_pass": true
+    },
+    {
+      "fixture": "封存.zip",
+      "known_total": 88,
+      "visible_rows": 106,
+      "unique_after_overlap": 88,
+      "overlaps": [
+        1,
+        5,
+        1,
+        4,
+        1,
+        6
+      ],
+      "count_pass": true
+    },
+    {
+      "fixture": "222.zip",
+      "known_total": 111,
+      "visible_rows": 116,
+      "unique_after_overlap": 111,
+      "overlaps": [
+        1,
+        2,
+        2
+      ],
+      "count_pass": true
+    }
+  ],
+  "identity_probe": {
+    "fixture": "333.zip",
+    "method": "real-photo adaptive local Tesseract PSM6 surname/given regions; minimal normalized edit-distance and character-bag match against entire real 3,767-player roster; no manually selected/filtered candidate pool",
+    "visible_row_top1": 50,
+    "visible_row_top3": 54,
+    "rows": 56,
+    "exact_OCR_name_rows": 35,
+    "blank_OCR_name_rows": 2,
+    "important_limit": "Not the deployed app's actual candidateMatch and not iPhone Edge full-flow performance; no general or mobile 90% claim."
+  },
+  "ui_changes": [
+    "compact mobile cards",
+    "7-column desktop results",
+    "name-click full player sheet",
+    "search and 289-item guide features remain untouched"
+  ],
+  "outstanding": [
+    "Actual iPhone Edge end-to-end execution, results, memory and completion time unverified",
+    "Remaining ambiguous/cropped names including two empty full-page OCR rows in 48-person fixture",
+    "Candidate-vs-confirmed calibration on new, not previously labeled lists"
+  ]
+}
