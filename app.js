@@ -511,8 +511,9 @@ function rowCandidateAgreement(a,b){
   const A=new Set((a.candidates||[]).slice(0,5).map(x=>x.p?._uid).filter(Boolean)),B=(b.candidates||[]).slice(0,5).map(x=>x.p?._uid).filter(Boolean);
   if(B.some(x=>A.has(x)))return .72;
   const pa=a.parsed||{},pb=b.parsed||{};
-  if(pa.pos&&pb.pos&&pa.pos!==pb.pos)return -.35;
-  if(pa.hand&&pb.hand&&pa.hand!==pb.hand)return -.35;
+  const pm=pa._cvMeta?.pos,qm=pb._cvMeta?.pos,hm=pa._cvMeta?.hand,hn=pb._cvMeta?.hand;
+  if(pa.pos&&pb.pos&&pa.pos!==pb.pos&&pm?.score>=.76&&qm?.score>=.76&&pm?.margin>=.06&&qm?.margin>=.06)return -.35;
+  if(pa.hand&&pb.hand&&pa.hand!==pb.hand&&hm?.score>=.76&&hn?.score>=.76&&hm?.margin>=.06&&hn?.margin>=.06)return -.35;
   return 0
 }
 function rowOCRAgreement(a,b){
@@ -614,7 +615,8 @@ async function runBatch(){
   $('#runBatch').disabled=true;let paddle=null,worker=null,mobileNameOCR=false;
   try{
     const screens=[],all=[];setBatchProgress(1,'分析固定版面…');
-    const orderedFiles=[...state.batchFiles].sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
+    const fileOrder=n=>{const m=String(n).match(/^(?:IMG[_-])?(\d+)(?=\.|\D|$)/i);return m?Number(m[1]):Infinity};
+    const orderedFiles=[...state.batchFiles].sort((a,b)=>fileOrder(a.name)-fileOrder(b.name)||a.name.localeCompare(b.name,undefined,{numeric:true}));
     for(const f of orderedFiles){const im=await loadImage(f),rows=rowCrops(im,f.name).filter(r=>nameInkRatio(r.canvas)>.045);screens.push({file:f.name,footer:footerCrop(im,f.name),total:footerTotalCrop(im,f.name)});all.push(...rows)}
     state.batchRawRows=all.map((r,i)=>({...r,firstIndex:i,status:'待辨識',raw:'',parsed:null,match:null,candidates:[],ocrConfidence:0,score:0}));state.batchRows=[];state.expectedTotal=0;const cvTotals=screens.map(sc=>cvFooterTotal(sc.total.canvas)).filter(n=>n>=20&&n<=200);if(cvTotals.length){const freq=new Map();for(const n of cvTotals)freq.set(n,(freq.get(n)||0)+1);state.expectedTotal=[...freq.entries()].sort((a,b)=>b[1]-a[1]||b[0]-a[0])[0][0]}renderBatchResults();
 
@@ -639,7 +641,7 @@ async function runBatch(){
             await new Promise(requestAnimationFrame)
           }
           try{await worker.setParameters({tessedit_pageseg_mode:'8',tessedit_char_whitelist:'',user_defined_dpi:'300'})}catch{}
-          const uncertain=state.batchRawRows.filter(r=>!r.match||r.score<.84||((r.candidates?.[0]?.score||0)-(r.candidates?.[1]?.score||0))<.045).sort((a,b)=>(a.score||0)-(b.score||0)).slice(0,Math.min(28,Math.ceil(state.batchRawRows.length*.28)));
+          const uncertain=state.batchRawRows.filter(r=>!r.match||r.score<.84||((r.candidates?.[0]?.score||0)-(r.candidates?.[1]?.score||0))<.045).sort((a,b)=>(a.score||0)-(b.score||0)).slice(0,Math.min(16,Math.ceil(state.batchRawRows.length*.20)));
           for(let i=0;i<uncertain.length;i++){
             const row=uncertain[i];setBatchProgress(81+10*(i/Math.max(1,uncertain.length)),'手機補強 '+(i+1)+'/'+uncertain.length);
             try{
@@ -654,7 +656,7 @@ async function runBatch(){
             }catch(e){row.raw+='｜MERR:'+String(e.message||e)}
             if(i%12===0)await new Promise(requestAnimationFrame)
           }
-          const hard=state.batchRawRows.filter(r=>{const gap=(r.candidates?.[0]?.score||0)-(r.candidates?.[1]?.score||0);return !r.match&&(r.score<.80||gap<.035)}).sort((a,b)=>(a.score||0)-(b.score||0)).slice(0,12);
+          const hard=state.batchRawRows.filter(r=>{const gap=(r.candidates?.[0]?.score||0)-(r.candidates?.[1]?.score||0);return !r.match&&(r.score<.80||gap<.035)}).sort((a,b)=>(a.score||0)-(b.score||0)).slice(0,6);
           if(hard.length){
             try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:batchKanjiWhitelist(),user_defined_dpi:'300'})}catch{}
             for(let i=0;i<hard.length;i++){
