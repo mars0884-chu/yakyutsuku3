@@ -213,9 +213,12 @@ function setBatchProgress(percent,text){
   $('#batchStatus').textContent=`${text||''}${p? `｜${p}%`:''}`;
 }
 function nameInkRatio(src){
-  const g=src.getContext('2d',{willReadFrequently:true}),x0=Math.floor(src.width*.10),x1=Math.floor(src.width*.59),id=g.getImageData(x0,0,Math.max(1,x1-x0),src.height).data;
-  let hi=0,lo=0;for(let i=0;i<id.length;i+=4){const l=id[i]*.299+id[i+1]*.587+id[i+2]*.114;if(l>145)hi++;if(l<95)lo++}
-  return Math.min(hi,lo)/Math.max(1,id.length/4)
+  // The position symbol has a light background even when the name is blue/selected.
+  // Name luminance alone drops selected players and admits footer-border noise.
+  const x0=Math.floor(src.width*.012),x1=Math.floor(src.width*.09);
+  const d=src.getContext('2d',{willReadFrequently:true}).getImageData(x0,0,Math.max(1,x1-x0),src.height).data;
+  let bright=0;for(let i=0;i<d.length;i+=4){const l=d[i]*.299+d[i+1]*.587+d[i+2]*.114;if(l>190)bright++}
+  return bright/Math.max(1,d.length/4)
 }
 function paddlePartCanvas(src,part,threshold=122){
   const sep=detectNameSeparator(src);
@@ -581,7 +584,7 @@ async function runBatch(){
   try{
     const screens=[],all=[];setBatchProgress(1,'分析固定版面…');
     const orderedFiles=[...state.batchFiles].sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
-    for(const f of orderedFiles){const im=await loadImage(f),rows=rowCrops(im,f.name).filter(r=>nameInkRatio(r.canvas)>.006);screens.push({file:f.name,footer:footerCrop(im,f.name),total:footerTotalCrop(im,f.name)});all.push(...rows)}
+    for(const f of orderedFiles){const im=await loadImage(f),rows=rowCrops(im,f.name).filter(r=>nameInkRatio(r.canvas)>.045);screens.push({file:f.name,footer:footerCrop(im,f.name),total:footerTotalCrop(im,f.name)});all.push(...rows)}
     state.batchRawRows=all.map((r,i)=>({...r,firstIndex:i,status:'待辨識',raw:'',parsed:null,match:null,candidates:[],ocrConfidence:0,score:0}));state.batchRows=[];state.expectedTotal=0;const cvTotals=screens.map(sc=>cvFooterTotal(sc.total.canvas)).filter(n=>n>=20&&n<=200);if(cvTotals.length){const freq=new Map();for(const n of cvTotals)freq.set(n,(freq.get(n)||0)+1);state.expectedTotal=[...freq.entries()].sort((a,b)=>b[1]-a[1]||b[0]-a[0])[0][0]}renderBatchResults();
 
     // 所有平台先跑同一套固定版面 CV；不需要 PaddleOCR / Tesseract 才能產生候選。
