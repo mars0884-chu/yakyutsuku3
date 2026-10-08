@@ -495,7 +495,8 @@ function consolidateRows(raw,expected=0){
   return out
 }
 function resolveUniqueCandidates(rows){for(const r of rows)r.resolved=null;const used=new Set(rows.filter(r=>r.match?.p?._uid).map(r=>r.match.p._uid)),pending=rows.filter(r=>!r.match);for(let guard=0;guard<rows.length;guard++){let pick=null;for(const r of pending){if(r.resolved)continue;const av=(r.candidates||[]).filter(x=>!used.has(x.p._uid));if(!av.length)continue;const a=av[0],b=av[1],gap=a.score-(b?.score||0),quality=a.score+gap*.45+a.meta*.015;const safe=(a.score>=.72&&gap>=.035)||(a.score>=.67&&a.meta>=1&&gap>=.04)||(a.score>=.64&&a.meta>=2&&gap>=.045);if(!safe)continue;if(!pick||quality>pick.quality)pick={r,a,gap,quality}}if(!pick)break;pick.r.resolved=pick.a;pick.r.status='推定';used.add(pick.a.p._uid)}return rows}
-function dedupeRecognizedRows(rows,expected=0){const seen=new Map(),rest=[];for(const r of rows){const p=r.match?.p||r.resolved?.p;if(p?._uid){const old=seen.get(p._uid),quality=(r.match?.score||r.resolved?.score||r.score||0)+(r.ocrConfidence||0)/5000;if(!old||quality>old.quality)seen.set(p._uid,{row:r,quality})}else rest.push(r)}let out=[...seen.values()].map(x=>x.row).concat(rest);out.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));if(expected&&out.length>expected)out=out.slice(0,expected);return out}
+function dedupeRecognizedRows(rows,expected=0){const seen=new Map(),rest=[];for(const r of rows){const p=r.match?.p||r.resolved?.p;if(p?._uid){const old=seen.get(p._uid),quality=(r.match?.score||r.resolved?.score||r.score||0)+(r.ocrConfidence||0)/5000;if(!old||quality>old.quality)seen.set(p._uid,{row:r,quality})}else rest.push(r)}let out=[...seen.values()].map(x=>x.row).concat(rest);out.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));// 人數不一致時保留原始證據，不可為了符合頁尾而任意刪人。
+return out}
 function batchDisplayPlayer(r){return r.match?.p||r.resolved?.p||null}
 const GRADE_SCORE={'SS':15,'S+':14,'S':13,'A+':12,'A':11,'B+':10,'B':9,'C+':8,'C':7,'D+':6,'D':5,'E+':4,'E':3,'F':2,'G':1};
 function gradeScore(v){const t=String(v??'').trim().toUpperCase();if(t in GRADE_SCORE)return GRADE_SCORE[t];const n=parseFloat(t);return Number.isFinite(n)?n:-999}
@@ -510,6 +511,18 @@ const BATCH_BAT=[...BATCH_COMMON,'体力','右巧','左巧','長打','バント'
 function batchHeaderLabel(k){return k==='_screen'?'#':k==='_status'?'狀態':k==='_position'?'守位':(HEADER_ZH[k]||k)}
 function batchSortArrow(k){return state.batchSort===k?(state.batchSortDir==='asc'?' ↑':' ↓'):''}
 function batchCell(r,p,k,displayIndex){if(k==='_screen')return String(displayIndex+1);if(k==='_status')return r.match?'確認':r.resolved?'推定':'候選';if(k==='_position')return esc(p?._position||POSMAP[r.parsed?.pos]||'—');if(k==='名前'){if(!p){const c=(r.candidates||[]).slice(0,3);return c.length?`<span class="candidate-only">候選：${c.map(x=>esc(x.p['名前'])).join(' / ')}</span>`:'未辨識'}const alts=(r.candidates||[]).filter(x=>x.p._uid!==p._uid).slice(0,2),alt=alts.length?`<small class="candidate-note">次選：${alts.map(x=>esc(x.p['名前'])).join(' / ')}</small>`:'';return `<span class="name-link" data-uid="${esc(p._uid)}">${esc(p['名前'])}</span>${alt}`}return esc(p?.[k]||'—')}
+function renderBatchMobileGroup(title,rows){
+  const sorted=sortBatchRows(rows);let h='<section class="batch-group batch-mobile-group"><h3>'+esc(title)+' <small>'+rows.length+'</small></h3><div class="batch-mobile-list">';
+  for(let i=0;i<sorted.length;i++){
+    const r=sorted[i],p=batchDisplayPlayer(r),status=r.match?'確認':r.resolved?'推定':'候選',name=p?.['名前']||'尚未確認';
+    const options=(r.candidates||[]).slice(0,3).map(c=>c.p?.['名前']).filter(Boolean).join('／');
+    h+='<details class="batch-mobile-row"><summary><span class="batch-mobile-number">'+(i+1)+'</span><span class="batch-mobile-primary"><b>'+esc(name)+'</b><small>'+esc(status)+(p?' · '+esc(p['ランク']||'—'):'')+(p?' · '+esc(p['年齢']||'—')+'歲':'')+'</small>'+(status==='候選'?'<small class="batch-mobile-candidates">'+esc(options||'無可靠候選')+'</small>':'')+'</span><span class="batch-mobile-chevron">⌄</span></summary><div class="batch-mobile-details">';
+    if(p){for(const k of [...new Set([...BATCH_PITCH,...BATCH_BAT])]){if(k.startsWith('_')||k==='名前'||!p[k])continue;h+='<div><small>'+esc(batchHeaderLabel(k))+'</small><span>'+esc(p[k])+'</span></div>'}}
+    else h+='<p>候選僅供核對，不當成已辨識成功。</p>';
+    h+='</div></details>';
+  }
+  return h+'</div></section>'
+}
 function renderBatchGroup(title,rows,cols){const sorted=sortBatchRows(rows),sortable=new Set(['screen','name','rank','年齢','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野']);let h=`<section class="batch-group"><h3>${esc(title)} <small>${rows.length}</small></h3><div class="table-shell"><table class="data-table batch-detail-table"><thead><tr>`;for(const k of cols){const sk=k==='_screen'?'screen':k==='名前'?'name':k==='ランク'?'rank':k;h+=sortable.has(sk)?`<th class="sortable" data-sort="${esc(sk)}">${esc(batchHeaderLabel(k))}${batchSortArrow(sk)}</th>`:`<th>${esc(batchHeaderLabel(k))}</th>`}h+='</tr></thead><tbody>';sorted.forEach((r,i)=>{const p=batchDisplayPlayer(r);h+='<tr>'+cols.map(k=>`<td class="${k==='名前'?'name':''} ${k==='_status'?(r.match?'good':r.resolved?'estimate':'unresolved'):''}">${batchCell(r,p,k,i)}</td>`).join('')+'</tr>'});h+='</tbody></table></div></section>';return h}
 async function recognizeText(worker,canvas){const r=await worker.recognize(canvas);return{text:cleanOCR(r?.data?.text||''),confidence:Number(r?.data?.confidence||0)}}
 async function runBatch(){
@@ -548,7 +561,7 @@ async function runBatch(){
               }
               mobileNameOCR=true;
             }catch(e){row.raw+='｜MERR:'+String(e.message||e)}
-            if(i%3===0){state.batchRows=consolidateRows(state.batchRawRows.slice(0),0);renderBatchResults();await new Promise(requestAnimationFrame)}
+            if(i%8===0)await new Promise(resolve=>requestAnimationFrame(resolve))
           }
           const hard=state.batchRawRows.filter(r=>{const gap=(r.candidates?.[0]?.score||0)-(r.candidates?.[1]?.score||0);return !r.match&&(r.score<.80||gap<.035)});
           if(hard.length){
@@ -556,7 +569,7 @@ async function runBatch(){
             for(let i=0;i<hard.length;i++){
               const row=hard[i];setBatchProgress(85+10*(i/Math.max(1,hard.length)),'手機灰階 OCR '+(i+1)+'/'+hard.length);
               try{const rr=await recognizeNameTesseractFast(worker,row.canvas,125,'gray');mergeRowOCR(row,rr.parsed,null,'MG:'+rr.raw,rr.confidence);mobileNameOCR=true}catch(e){row.raw+='｜MGERR:'+String(e.message||e)}
-              if(i%3===0){state.batchRows=consolidateRows(state.batchRawRows.slice(0),0);renderBatchResults();await new Promise(requestAnimationFrame)}
+              if(i%8===0)await new Promise(resolve=>requestAnimationFrame(resolve))
             }
           }
         }catch(e){console.warn('mobile name OCR',e)}
@@ -595,9 +608,9 @@ async function runBatch(){
 $('#runBatch').onclick=runBatch;
 function renderBatchResults(){
   const matched=state.batchRows.filter(r=>r.match).length,inferred=state.batchRows.filter(r=>!r.match&&r.resolved).length;
-  $('#batchSummary').textContent=state.batchRows.length?`結果 ${state.batchRows.length}${state.expectedTotal?` / 最多 ${state.expectedTotal}`:''}｜確認 ${matched}｜推定 ${inferred}｜候選 ${state.batchRows.length-matched-inferred}`:'';
+  $('#batchSummary').textContent=state.batchRows.length?`結果 ${state.batchRows.length}${state.expectedTotal?' / 畫面合計 '+state.expectedTotal:''}｜確認 ${matched}｜推定 ${inferred}｜候選 ${state.batchRows.length-matched-inferred}`+(state.expectedTotal&&state.batchRows.length!==state.expectedTotal?'｜人數未對齊，仍需核對跨頁':''):'';
   const groups={投手:[],捕手:[],內野手:[],外野手:[],其他:[]};for(const r of state.batchRows){const p=batchDisplayPlayer(r);groups[batchGroupName(p,r)].push(r)}
-  let h='';for(const key of ['投手','捕手','內野手','外野手','其他'])if(groups[key].length)h+=renderBatchGroup(key,groups[key],key==='投手'?BATCH_PITCH:BATCH_BAT);
+  let h='';for(const key of ['投手','捕手','內野手','外野手','其他'])if(groups[key].length)h+=renderBatchGroup(key,groups[key],key==='投手'?BATCH_PITCH:BATCH_BAT)+renderBatchMobileGroup(key,groups[key]);
   $('#batchTable').innerHTML=h;
   $('#batchTable').querySelectorAll('[data-uid]').forEach(td=>td.onclick=()=>openPlayer(td.dataset.uid));
   $('#batchTable').querySelectorAll('th[data-sort]').forEach(th=>th.onclick=()=>setBatchSort(th.dataset.sort));
