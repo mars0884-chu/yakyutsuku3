@@ -387,17 +387,22 @@ async function recognizeNameTesseractFast(worker,canvas,threshold=125,mode='bina
 }
 
 async function tesseractFooterTotal(worker,screens){
-  const totals=[];try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'0123456789人合計投手野手'})}catch{}
+  const totals=[];
+  try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:'',preserve_interword_spaces:'1'})}catch{}
   for(const sc of screens){
     try{
-      let r=await recognizeText(worker,grayRegion(sc.footer.canvas,0,1,3,1.35)),n=parseExpectedTotal(r.text);
-      if(!(n>=20&&n<=200)){r=await recognizeText(worker,binaryCanvas(sc.footer.canvas,125,{scale:3}));n=parseExpectedTotal(r.text)}
-      if(n>=20&&n<=200)totals.push(n)
-    }catch{}
+      // Native grayscale was confirmed against the 48/88/111-image footers.
+      const r=await recognizeText(worker,grayRegion(sc.footer.canvas,0,1,3,1)),n=parseExpectedTotal(r.text);
+      if(n>=20&&n<=200){totals.push(n);continue}
+      const r2=await recognizeText(worker,grayRegion(sc.total.canvas,0,1,3,1)),n2=parseExpectedTotal(r2.text);
+      if(n2>=20&&n2<=200){totals.push(n2);continue}
+      const fallback=await recognizeText(worker,binaryCanvas(sc.footer.canvas,125,{scale:3})),nf=parseExpectedTotal(fallback.text);
+      if(nf>=20&&nf<=200)totals.push(nf)
+    }catch(e){console.warn('footer OCR',e)}
   }
-  try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:''})}catch{}return chooseExpectedTotal(totals,state.expectedTotal)
+  try{await worker.setParameters({tessedit_pageseg_mode:'7',tessedit_char_whitelist:''})}catch{}
+  return chooseExpectedTotal(totals,state.expectedTotal)
 }
-
 function mergeParsedNameEvidence(a,b){a=a||{};b=b||{};return{...a,
   name:a.name||b.name||'',
   names:[...new Set([...(a.names||[]),...(b.names||[]),a.name,b.name].filter(Boolean))],
@@ -495,7 +500,8 @@ function consolidateRows(raw,expected=0){
   return out
 }
 function resolveUniqueCandidates(rows){for(const r of rows)r.resolved=null;const used=new Set(rows.filter(r=>r.match?.p?._uid).map(r=>r.match.p._uid)),pending=rows.filter(r=>!r.match);for(let guard=0;guard<rows.length;guard++){let pick=null;for(const r of pending){if(r.resolved)continue;const av=(r.candidates||[]).filter(x=>!used.has(x.p._uid));if(!av.length)continue;const a=av[0],b=av[1],gap=a.score-(b?.score||0),quality=a.score+gap*.45+a.meta*.015;const safe=(a.score>=.72&&gap>=.035)||(a.score>=.67&&a.meta>=1&&gap>=.04)||(a.score>=.64&&a.meta>=2&&gap>=.045);if(!safe)continue;if(!pick||quality>pick.quality)pick={r,a,gap,quality}}if(!pick)break;pick.r.resolved=pick.a;pick.r.status='推定';used.add(pick.a.p._uid)}return rows}
-function dedupeRecognizedRows(rows,expected=0){const seen=new Map(),rest=[];for(const r of rows){const p=r.match?.p||r.resolved?.p;if(p?._uid){const old=seen.get(p._uid),quality=(r.match?.score||r.resolved?.score||r.score||0)+(r.ocrConfidence||0)/5000;if(!old||quality>old.quality)seen.set(p._uid,{row:r,quality})}else rest.push(r)}let out=[...seen.values()].map(x=>x.row).concat(rest);out.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));if(expected&&out.length>expected)out=out.slice(0,expected);return out}
+function dedupeRecognizedRows(rows,expected=0){const seen=new Map(),rest=[];for(const r of rows){const p=r.match?.p||r.resolved?.p;if(p?._uid){const old=seen.get(p._uid),quality=(r.match?.score||r.resolved?.score||r.score||0)+(r.ocrConfidence||0)/5000;if(!old||quality>old.quality)seen.set(p._uid,{row:r,quality})}else rest.push(r)}let out=[...seen.values()].map(x=>x.row).concat(rest);out.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));// Never truncate by expected count: an unverified row may be a real player.
+  if(expected&&out.length>expected)console.warn('待核對跨頁重複列',out.length-expected);return out}
 function batchDisplayPlayer(r){return r.match?.p||r.resolved?.p||null}
 const GRADE_SCORE={'SS':15,'S+':14,'S':13,'A+':12,'A':11,'B+':10,'B':9,'C+':8,'C':7,'D+':6,'D':5,'E+':4,'E':3,'F':2,'G':1};
 function gradeScore(v){const t=String(v??'').trim().toUpperCase();if(t in GRADE_SCORE)return GRADE_SCORE[t];const n=parseFloat(t);return Number.isFinite(n)?n:-999}
@@ -531,7 +537,8 @@ async function runBatch(){
   $('#runBatch').disabled=true;let paddle=null,worker=null,mobileNameOCR=false;
   try{
     const screens=[],all=[];setBatchProgress(1,'分析固定版面…');
-    for(const f of state.batchFiles){const im=await loadImage(f),rows=rowCrops(im,f.name).filter(r=>nameInkRatio(r.canvas)>.006);screens.push({file:f.name,footer:footerCrop(im,f.name),total:footerTotalCrop(im,f.name)});all.push(...rows)}
+    const orderedFiles=[...state.batchFiles].sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
+    for(const f of orderedFiles){const im=await loadImage(f),rows=rowCrops(im,f.name).filter(r=>nameInkRatio(r.canvas)>.006);screens.push({file:f.name,footer:footerCrop(im,f.name),total:footerTotalCrop(im,f.name)});all.push(...rows)}
     state.batchRawRows=all.map((r,i)=>({...r,firstIndex:i,status:'待辨識',raw:'',parsed:null,match:null,candidates:[],ocrConfidence:0,score:0}));state.batchRows=[];state.expectedTotal=0;const cvTotals=screens.map(sc=>cvFooterTotal(sc.total.canvas)).filter(n=>n>=20&&n<=200);if(cvTotals.length){const freq=new Map();for(const n of cvTotals)freq.set(n,(freq.get(n)||0)+1);state.expectedTotal=[...freq.entries()].sort((a,b)=>b[1]-a[1]||b[0]-a[0])[0][0]}renderBatchResults();
 
     // 所有平台先跑同一套固定版面 CV；不需要 PaddleOCR / Tesseract 才能產生候選。
