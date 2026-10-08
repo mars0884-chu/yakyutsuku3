@@ -356,7 +356,7 @@ function cvCandidateMatch(canvas){
   return{parsed,match:accept?best:null,candidates,margin,method:'cv'}
 }
 async function cvAnalyzeRows(rows){
-  for(let i=0;i<rows.length;i++){const row=rows[i];setBatchProgress(4+56*(i/Math.max(1,rows.length)),'本機固定版面 CV '+(i+1)+'/'+rows.length);try{const r=cvCandidateMatch(row.canvas);row.parsed=r.parsed;row.match=r.match||null;row.candidates=r.candidates;row.score=row.match?.score||r.candidates?.[0]?.score||0;row.status=row.match?'確認':'候選';row.raw='CV';row.cvMargin=r.margin}catch(e){row.raw='CVERR:'+String(e.message||e);row.candidates=[]}if(i%6===0){state.batchRows=consolidateRows(rows.slice(0,i+1),0);renderBatchResults();await new Promise(requestAnimationFrame)}}
+  for(let i=0;i<rows.length;i++){const row=rows[i];setBatchProgress(4+56*(i/Math.max(1,rows.length)),'本機固定版面 CV '+(i+1)+'/'+rows.length);try{const r=cvCandidateMatch(row.canvas);row.parsed=r.parsed;row.match=r.match||null;row.candidates=r.candidates;row.score=row.match?.score||r.candidates?.[0]?.score||0;row.status=row.match?'確認':'候選';row.raw='CV';row.cvMargin=r.margin}catch(e){row.raw='CVERR:'+String(e.message||e);row.candidates=[]}if(i%11===0){await new Promise(requestAnimationFrame)}}
 }
 function cvFooterTotal(totalCanvas){
   const labels=[];for(let n=20;n<=200;n++)labels.push(String(n)+'人');
@@ -379,7 +379,7 @@ function grayRegion(src,rx0,rx1,scale=5,contrast=1.8){
   const out=document.createElement('canvas');out.width=sw*scale;out.height=tmp.height*scale;const og=out.getContext('2d');og.imageSmoothingEnabled=true;og.drawImage(tmp,0,0,out.width,out.height);return out
 }
 function makeBatchOCRPage(rows,mode='gray'){
-  const scale=3,gap=55,bodyHeight=Math.max(36,...rows.map(r=>r.canvas.height))*scale,stride=bodyHeight+gap;
+  const sourceWidth=rows[0].canvas.width/0.69,scale=Math.max(3,Math.min(8,Math.round(2700/Math.max(250,sourceWidth)))),gap=55,bodyHeight=Math.max(17,...rows.map(r=>r.canvas.height))*scale,stride=bodyHeight+gap;
   const c=document.createElement('canvas');c.width=900;c.height=Math.max(150,rows.length*stride);
   const g=c.getContext('2d',{willReadFrequently:true});g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);
   for(let i=0;i<rows.length;i++){
@@ -618,7 +618,7 @@ async function runBatch(){
               }
               mobileNameOCR=true;
             }catch(e){row.raw+='｜MERR:'+String(e.message||e)}
-            if(i%3===0){state.batchRows=consolidateRows(state.batchRawRows.slice(0),0);renderBatchResults();await new Promise(requestAnimationFrame)}
+            if(i%12===0)await new Promise(requestAnimationFrame)
           }
           const hard=state.batchRawRows.filter(r=>{const gap=(r.candidates?.[0]?.score||0)-(r.candidates?.[1]?.score||0);return !r.match&&(r.score<.80||gap<.035)});
           if(hard.length){
@@ -626,7 +626,7 @@ async function runBatch(){
             for(let i=0;i<hard.length;i++){
               const row=hard[i];setBatchProgress(92+6*(i/Math.max(1,hard.length)),'手機難字複核 '+(i+1)+'/'+hard.length);
               try{const rr=await recognizeNameTesseractFast(worker,row.canvas,125,'gray');mergeRowOCR(row,rr.parsed,null,'MG:'+rr.raw,rr.confidence);mobileNameOCR=true}catch(e){row.raw+='｜MGERR:'+String(e.message||e)}
-              if(i%3===0){state.batchRows=consolidateRows(state.batchRawRows.slice(0),0);renderBatchResults();await new Promise(requestAnimationFrame)}
+              if(i%12===0)await new Promise(requestAnimationFrame)
             }
           }
         }catch(e){console.warn('mobile name OCR',e)}
