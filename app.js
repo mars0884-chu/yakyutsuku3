@@ -484,21 +484,26 @@ function chooseExpectedTotal(values,fallback=0){
 }
 function parseExpectedTotal(text){const t=cleanOCR(text);let m=t.match(/(?:合計|含計|会計|馬軒)[^0-9]{0,8}(\d{2,3})\s*人/);if(m)return +m[1];const nums=[...t.matchAll(/(\d{2,3})\s*人/g)].map(x=>+x[1]).filter(n=>n>=20&&n<=200);return nums.length?Math.max(...nums):0}
 function mergeEvidence(a,b){const pa=a.parsed||{},pb=b.parsed||{},parsed={...pa,names:[...new Set([...(pa.names||[]),...(pb.names||[])].filter(Boolean))],surnames:[...new Set([pa.surname,...(pa.surnames||[]),pb.surname,...(pb.surnames||[])].filter(Boolean))],givens:[...new Set([pa.given,...(pa.givens||[]),pb.given,...(pb.givens||[])].filter(Boolean))]};if(!parsed.age)parsed.age=pb.age;if(!parsed.hand)parsed.hand=pb.hand;if(!parsed.pos)parsed.pos=pb.pos;const hasText=parsed.names.length||parsed.surnames.length||parsed.givens.length,cm=hasText?candidateMatch(parsed):null,qa=(a.match?.score||a.candidates?.[0]?.score||0),qb=(b.match?.score||b.candidates?.[0]?.score||0),keep=qb>qa?b:a;const cq=(cm?.match?.score||cm?.candidates?.[0]?.score||0),chosen=cm?.candidates?.length&&cq>Math.max(qa,qb)?cm:{match:keep.match||null,candidates:keep.candidates||[]};return{...keep,parsed,raw:[a.raw,b.raw].filter(Boolean).join(' || '),ocrConfidence:Math.max(a.ocrConfidence||0,b.ocrConfidence||0),match:chosen.match||null,candidates:chosen.candidates||[],score:chosen.match?.score||chosen.candidates?.[0]?.score||0,firstIndex:Math.min(a.firstIndex??9999,b.firstIndex??9999),sources:[...(a.sources||[`${a.file}#${a.row}`]),...(b.sources||[`${b.file}#${b.row}`])]}}
-function rowNameSignature(canvas){
-  const sep=detectNameSeparator(canvas);
-  const parts=[
-    cvMaskRegion(canvas,.115,Math.max(.18,sep.left-.008),108),
-    cvMaskRegion(canvas,Math.min(.50,sep.right+.008),.575,108)
-  ];
-  return parts.map(p=>p?cvDescriptor(cvNormalizeCell(p.bits,p.w,p.h,28)):null)
+function rowNameBitmap(canvas){
+  const W=250,H=35,x0=Math.round(canvas.width*.112),x1=Math.round(canvas.width*.58);
+  const c=document.createElement('canvas');c.width=W;c.height=H;
+  const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(canvas,x0,0,Math.max(1,x1-x0),canvas.height,0,0,W,H);
+  const d=g.getImageData(0,0,W,H).data,bits=new Uint8Array(W*H);let ink=0;
+  for(let i=0;i<W*H;i++){const j=i*4,l=d[j]*.299+d[j+1]*.587+d[j+2]*.114;if(l>135){bits[i]=1;ink++}}
+  return{bits,ink}
 }
 function rowNameSimilarity(a,b){
-  const sa=a._nameSig||(a._nameSig=rowNameSignature(a.canvas)),sb=b._nameSig||(b._nameSig=rowNameSignature(b.canvas));
-  let sum=0,n=0,min=1;
-  for(let i=0;i<2;i++)if(sa[i]&&sb[i]){const v=cvFeatureSimilarity(sa[i],sb[i]);sum+=v;n++;if(v<min)min=v}
-  if(!n)return 0;
-  const mean=sum/n;
-  return n===2?mean*.85+min*.15:mean*.90
+  const A=a._overlapMask||(a._overlapMask=rowNameBitmap(a.canvas)),B=b._overlapMask||(b._overlapMask=rowNameBitmap(b.canvas));
+  if(!A.ink||!B.ink)return 0;const W=250,H=35,den=A.ink+B.ink;let best=0;
+  for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){
+    let common=0;
+    for(let y=Math.max(0,dy);y<Math.min(H,H+dy);y++){
+      const ai=y*W,bi=(y-dy)*W;
+      for(let x=Math.max(0,dx);x<Math.min(W,W+dx);x++)if(A.bits[ai+x]&&B.bits[bi+x-dx])common++
+    }
+    const score=2*common/den;if(score>best)best=score
+  }
+  return best
 }
 function rowCandidateAgreement(a,b){
   const ida=a.match?.p?._uid||a.resolved?.p?._uid,idb=b.match?.p?._uid||b.resolved?.p?._uid;
@@ -510,19 +515,26 @@ function rowCandidateAgreement(a,b){
   if(pa.hand&&pb.hand&&pa.hand!==pb.hand)return -.35;
   return 0
 }
-function rowOverlapScore(a,b){
-  const visual=rowNameSimilarity(a,b),agree=rowCandidateAgreement(a,b);
-  return {visual,agree,score:Math.max(0,Math.min(1.15,visual+Math.max(0,agree)*.12))};
+function rowOCRAgreement(a,b){
+  const A=a.parsed||{},B=b.parsed||{};
+  const agree=(as,bs)=>{let best=0;for(const x of as.filter(Boolean))for(const y of bs.filter(Boolean))best=Math.max(best,nameSimilarity(x,y));return best};
+  const surn=agree([...new Set([A.surname,...(A.surnames||[])])],[...new Set([B.surname,...(B.surnames||[])])]);
+  const given=agree([...new Set([A.given,...(A.givens||[])])],[...new Set([B.given,...(B.givens||[])])]);
+  return surn&&given?(surn+given)/2:0
 }
 function pageOverlapCandidates(prev,next){
   const max=Math.min(10,prev.length,next.length),out=[{k:0,score:0,min:1,strict:true}];
   for(let k=1;k<=max;k++){
-    const ss=[];let agree=0,bad=false;
-    for(let i=0;i<k;i++){const z=rowOverlapScore(prev[prev.length-k+i],next[i]);ss.push(z.score);agree+=z.agree;if(z.agree<0)bad=true}
-    const mean=ss.reduce((a,x)=>a+x,0)/k,min=Math.min(...ss),avgAgree=agree/k;
-    const strict=!bad&&(k===1?mean>=.985:(mean>=.90&&min>=.79));
-    const supported=!bad&&k>=2&&mean>=.77&&min>=.68&&avgAgree>=.18;
-    if(strict||supported)out.push({k,score:mean+(supported&&!strict?-.035:0),min,strict,supported,avgAgree});
+    const pairs=[];let bad=false;
+    for(let i=0;i<k;i++){
+      const a=prev[prev.length-k+i],b=next[i],visual=rowNameSimilarity(a,b),ocr=rowOCRAgreement(a,b),candidate=rowCandidateAgreement(a,b);
+      if(candidate<0)bad=true;pairs.push({visual,ocr,candidate})
+    }
+    const mean=pairs.reduce((a,x)=>a+x.visual,0)/k,min=Math.min(...pairs.map(x=>x.visual)),
+          ocrMean=pairs.reduce((a,x)=>a+x.ocr,0)/k,strong=pairs.filter(x=>x.ocr>=.88||x.candidate>=.72).length;
+    const strict=!bad&&(k===1?mean>=.90:mean>=.89&&min>=.86);
+    const supported=!bad&&(k===1?((mean>=.80&&ocrMean>=.65)||(mean>=.63&&ocrMean>=.93)||(mean>=.80&&pairs[0].candidate>=.72)):(mean>=.59&&min>=.52&&strong>=Math.min(2,k)&&ocrMean>=.64));
+    if(strict||supported)out.push({k,score:mean+(strict?.1:ocrMean*.045),min,strict,supported,ocrMean})
   }
   return out.sort((a,b)=>(b.strict?1:0)-(a.strict?1:0)||b.score-a.score||b.k-a.k)
 }
