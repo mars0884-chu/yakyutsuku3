@@ -16,6 +16,7 @@
    const c=rowCanvas(aligned,number,dy),m=yt3ClaudeGlyph.match(c,players,category),sc=m.candidates?.[0]?.score;
    if(!Number.isFinite(sc))continue;
    if(!best||sc>best.score)best={canvas:c,m,score:sc};
+   if(dy===-2&&m.match&&sc>=.70&&m.margin>=.18)return best;
   }
   return best;
  }

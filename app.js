@@ -1,5 +1,5 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='2026.10.09-r19';
+const APP_VERSION='2026.10.09-r20';
 const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,batchSort:'screen',batchSortDir:'asc'};
 const HEADER_ZH={"名前":"姓名","年齢":"年齡","成長":"成長型","投/打":"投／打","出身":"出身地","高校":"高中","大学":"大學","社会人":"社會人","タイプ":"投手類型","ランク":"Rank","体力":"體力","球速":"球速","球威":"球威","制球":"控球","精神":"精神","守備":"守備","捕球":"接球","肩力":"臂力","送球":"傳球","スライダー":"滑球","速スラ":"高速滑球","カットB":"卡特球","カーブ":"曲球","Sカーブ":"S曲球","ドロップ":"Drop曲球","シュート":"噴射球","速シュート":"高速噴射球","シンカー":"伸卡球","スクリュー":"螺旋球","速シンカー":"高速伸卡球","サークルC":"圈指變速","2シーム":"二縫線","Cアップ":"變速球","フォーク":"指叉球","SFF":"快速指叉","縦スラ":"縱滑球","パーム":"掌心球","ナックル":"蝴蝶球","スキル1":"技能1","スキル2":"技能2","スキル3":"技能3","モデル":"原型","右巧":"對右巧打","左巧":"對左巧打","長打":"長打","バント":"短打","選球眼":"選球眼","走力":"跑力","走塁":"跑壘","リード":"配球","捕手":"捕手","一塁":"一壘","二塁":"二壘","三塁":"三壘","遊撃":"游擊","外野":"外野","リーグ":"聯盟／地區","アカデミー":"學院"};
 const BASE_COLS=['名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
@@ -100,7 +100,7 @@ const originalGuideRowSearch=guideRowSearch;
 function guideSectionCompact(sec){
   const title=String(sec.title||'');
   if(title==='經營企劃組合表（條件・組合・結果）'){
-    return `<section class="guide-section"><details class="guide-legacy-repeat"><summary>舊版組合簡表 ${sec.rows?.length||0} 筆（已整合至「完整逆引」，點此對照原表）</summary>${originalGuideSectionHTML(sec)}</details></section>`;
+    return '';
   }
   if(title==='經營企劃完整逆引：條件／需求道具／取得地／組合／效果'){
     const names=sec.headers||[];
@@ -113,7 +113,7 @@ function guideSectionCompact(sec){
 }
 function guideChapterCompact(ch){
  const expand=ch.id==='idea'?`<button type="button" class="guide-expand-all" data-expand-idea>${state.guideExpandAll?'全部收合':'全部展開'}</button>`:'';
- const intro=ch.id==='idea'?'原始 289 筆收錄；其中 75 筆簡表與完整逆引重疊，已合併顯示。保留兩份原文可供對照。':ch.summary||'';
+ const intro=ch.id==='idea'?'289 筆原始資料已整理；重複的 75 筆簡表不再顯示，保留可搜尋的完整逆引與日文來源。':ch.summary||'';
  return `<article class="guide-chapter"><div class="guide-chapter-head"><h2>${esc(ch.title)}</h2>${expand}<p>${esc(intro)}</p></div>${(ch.sections||[]).map(guideSectionHTML).join('')}</article>`;
 }
 function guideRowClean(book,query){return originalGuideRowSearch(book,query).filter(x=>x.section!=='經營企劃組合表（條件・組合・結果）');}
@@ -654,7 +654,8 @@ async function checkAppUpdate(manual=false){
   if(manual){showUpdateBar(`已是最新版 ${APP_VERSION}`,100,false);setTimeout(hideUpdateBar,1200)}
   return false
 }
-async function waitForSWState(sw,target='installed',ms=12000){if(!sw||sw.state===target)return;await withTimeout(new Promise(resolve=>sw.addEventListener('statechange',()=>{if(sw.state===target||sw.state==='activated'||sw.state==='redundant')resolve()},{once:false})),ms,'Service Worker 更新逾時')}
+if('serviceWorker'in navigator)navigator.serviceWorker.addEventListener('message',event=>{const data=event.data;if(data?.type!=='YT3_CACHE_PROGRESS'||$('#updateBar')?.classList.contains('hidden'))return;const done=Number(data.done)||0,total=Math.max(1,Number(data.total)||1);$('#updateProgress').value=Math.min(84,15+69*done/total);$('#updateText').textContent='下載離線檔案 '+done+'/'+total});
+ async function waitForSWState(sw,target='installed',ms=60000){if(!sw||sw.state===target)return;await withTimeout(new Promise(resolve=>sw.addEventListener('statechange',()=>{if(sw.state===target||sw.state==='activated'||sw.state==='redundant')resolve()},{once:false})),ms,'Service Worker 更新逾時')}
 async function applyAppUpdate(){
   const started=Date.now();
   const clock=setInterval(()=>{const el=$('#updateText');if(!el)return;const base=el.textContent.replace(/｜已等待 \d+ 秒.*$/,'');if(!/失敗|已是最新版/.test(base))el.textContent=base+'｜已等待 '+Math.floor((Date.now()-started)/1000)+' 秒（網路下載無法預估剩餘時間）';},1000);
@@ -665,13 +666,13 @@ async function applyAppUpdate(){
       const regs=await navigator.serviceWorker.getRegistrations();
       for(const reg of regs){
         try{
-          await withTimeout(reg.update(),25000,'Safari 快取檢查逾時');$('#updateProgress').value=45;
+          await withTimeout(reg.update(),90000,'Safari 更新超過 90 秒');$('#updateProgress').value=Math.max(45,$('#updateProgress').value);
           if(reg.installing)await waitForSWState(reg.installing);
           const waiting=reg.waiting;if(waiting){changed=true;waiting.postMessage({type:'SKIP_WAITING'})}
         }catch(e){console.warn('sw update',e)}
       }
     }
-    $('#updateProgress').value=70;
+    $('#updateProgress').value=Math.max(85,$('#updateProgress').value);
     await withTimeout(Promise.all([
       fetch(`./VERSION?t=${Date.now()}`,{cache:'no-store'}),
       fetch(`./index.html?t=${Date.now()}`,{cache:'no-store'}),

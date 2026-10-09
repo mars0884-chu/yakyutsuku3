@@ -1,9 +1,8 @@
 /* やきゅつく3 r18: full roster 16x16 non-AI glyph matching. Never restrict to 8x8 shortlist. */
 (function(){'use strict';
-const base=window.yt3ClaudeGlyph;
 let chars=null,glyphs=null;
 const cache=new WeakMap();let rosterCache=new WeakMap();
-async function init(){await base.init();if(glyphs)return true;
+async function init(){if(glyphs)return true;
  const rsp=await fetch('./engine/claude-glyphs-16.json');if(!rsp.ok)throw Error('16x16 字形資料載入失敗');
  const pack=await rsp.json(),raw=atob(pack.data);chars=new Map([...pack.chars].map((c,i)=>[c,i]));glyphs=[];
  for(let i=0;i<[...pack.chars].length;i++){const a=new Float32Array(256);let sum=0;for(let j=0;j<256;j++){a[j]=raw.charCodeAt(i*256+j);sum+=a[j]};let e=0;const mean=sum/256;for(let j=0;j<256;j++){a[j]-=mean;e+=a[j]*a[j]};const inv=1/Math.sqrt(e+1e-8);for(let j=0;j<256;j++)a[j]*=inv;glyphs.push(a)}return true;
