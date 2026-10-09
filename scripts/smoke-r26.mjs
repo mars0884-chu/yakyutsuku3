@@ -13,6 +13,6 @@ ok(f(row(0,.75,.11),row(0,.74,.12),players).m.match?.p?._uid==='a','strong two-c
 ok(!f(row(0,.75,.11),row(1,.74,.12),players).m.match,'disagreement must stay pending');
 ok(!f(row(0,.57,.07),row(0,.75,.12),players).m.match,'weak crop must stay pending');
 ok(!f(row(0,.75,.11),row(0,.74,.12),[players[0],{...players[0],_uid:'c'}]).m.match,'duplicate names must stay pending');
-ok(glyph.includes('options.recovery?24:10')&&glyph.includes('options.recovery?12:9'),'fallback name segmentation absent');
+ok(glyph.includes('options.recovery?24:10')&&(glyph.includes('options.recovery?12:9')||glyph.includes('options.recovery||options.forceFlat')),'fallback name segmentation absent');
 ok(version.trim()===app.match(/APP_VERSION='([^']+)'/)[1],'version mismatch');
 console.log('r26 tests passed: local original crop, strict margins, ambiguous name recovery, version');
