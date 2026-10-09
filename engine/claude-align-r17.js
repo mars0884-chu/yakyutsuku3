@@ -20,6 +20,16 @@ return best;
 }
 function normalize(image){const loc=locate(image);if(loc.score<.35)return{canvas:null,loc,valid:false};const {s,x,y}=loc;
 const out=document.createElement('canvas');out.width=405;out.height=252;
-const ctx=out.getContext('2d',{willReadFrequently:true});ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';ctx.drawImage(image,x,y-19*s,405*s,252*s,0,0,405,252);
+const ctx=out.getContext('2d',{willReadFrequently:true}),src=getPixels(image),pixels=ctx.createImageData(405,252);
+const sample=(ix,iy)=>src.gray[Math.max(0,Math.min(src.h-1,iy))*src.w+Math.max(0,Math.min(src.w-1,ix))];
+// Deterministic grayscale resampling instead of browser-specific Canvas interpolation.
+for(let oy=0;oy<252;oy++)for(let ox=0;ox<405;ox++){
+ const fx=x+(ox+.5)*s-.5,fy=y-19*s+(oy+.5)*s-.5;
+ const xx=Math.floor(fx),yy=Math.floor(fy),u=fx-xx,v=fy-yy;
+ const a=sample(xx,yy)*(1-u)+sample(xx+1,yy)*u,b=sample(xx,yy+1)*(1-u)+sample(xx+1,yy+1)*u;
+ const z=Math.max(0,Math.min(255,Math.round(a*(1-v)+b*v))),i=(oy*405+ox)*4;
+ pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=z;pixels.data[i+3]=255;
+}
+ctx.putImageData(pixels,0,0);
 return{canvas:out,loc,valid:true};}
 window.yt3ClaudeAlign={init,locate,normalize};})();
