@@ -39,6 +39,8 @@ jobs:
         run: node scripts/smoke-overlap-r21.mjs
       - name: Check active r18 CV and Safari update
         run: node scripts/smoke-r18.mjs
+      - name: Verify r22 matching and deduplicated guide data
+        run: node scripts/smoke-r22.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail

@@ -25,6 +25,37 @@ function feature(row,side,k,off,dy){const key=`${side}/${k}/${off}/${dy}`;let v=
 function cs(row,side,k,off,dy,ch){const idx=chars.get(ch);if(idx===undefined)return -.35;const key=`${side}/${k}/${off}/${dy}`;let scores=row.scores.get(key);if(!scores){scores=new Float32Array(glyphs.length);row.scores.set(key,scores)}const found=scores[idx];if(found)return found-2;const a=feature(row,side,k,off,dy),g=glyphs[idx];let s=0;for(let i=0;i<256;i++)s+=a[i]*g[i];scores[idx]=s+2;return s;}
 function endInk(row,side,k,off,dy,threshold){const origin=side==='R'?row.right:row.left,x0=origin+off+16*k-1;if(x0<0||x0+16>Math.min(row.width-1,161))return 0;if(side==='L'&&row.block&&x0+14>=row.block[0])return 0;let ink=0;for(let y=0;y<16;y++)for(let x=0;x<16;x++){const ax=x0+x,ay=Math.max(0,Math.min(17,y+dy));if(row.gray[ay*row.width+ax]>threshold)ink++}return ink;}
 function seq(row,side,word,dy,threshold){if(!word.length)return -1;let best=-4;for(const off of [-2,-1,0,1,2]){let sum=0;for(let i=0;i<word.length;i++)sum+=cs(row,side,i,off,dy,word[i]);const score=sum/word.length-(endInk(row,side,word.length,off,dy,threshold)>=12?.25:0);best=Math.max(best,score)}return best;}
+
+/* Local glyph-spacing refinement for ambiguous rows only: no OCR, remote calls, or answers.
+   The regularization penalty prevents free per-character fitting to unrelated names. */
+function seqAdjusted(row,side,word,dy,threshold){
+ if(!word.length)return -1;
+ let best=-4;
+ for(const off of [-2,0,2]){
+  let sum=0;
+  for(let i=0;i<word.length;i++){
+   const center=cs(row,side,i,off,dy,word[i]);
+   const prev=cs(row,side,i,off-1,dy,word[i])-.035;
+   const next=cs(row,side,i,off+1,dy,word[i])-.035;
+   sum+=Math.max(center,prev,next);
+  }
+  const score=sum/word.length-(endInk(row,side,word.length,off,dy,threshold)>=12?.25:0);
+  best=Math.max(best,score);
+ }
+ return best;
+}
+function fineCandidate(row,t,splitMode,threshold){
+ let best=-4;
+ for(const dy of [-1,0,1]){
+  let score;
+  if(splitMode){
+   const l=seqAdjusted(row,'L',t.S,dy,threshold),r=seqAdjusted(row,'R',t.G,dy,threshold);
+   score=(l*t.S.length+r*t.G.length)/(t.S.length+t.G.length);
+  }else score=seqAdjusted(row,'L',t.S.concat(t.G),dy,threshold);
+  best=Math.max(best,score);
+ }
+ return best;
+}
 function handFeature(row,x0,dy){const v=new Float32Array(256);let sum=0;for(let yy=0;yy<16;yy++)for(let xx=0;xx<16;xx++){const x=Math.max(0,Math.min(row.width-1,x0+xx)),y=Math.max(0,Math.min(17,yy+dy));const a=row.gray[y*row.width+x];v[yy*16+xx]=a;sum+=a;}let en=0;const mean=sum/256;for(let k=0;k<256;k++){v[k]-=mean;en+=v[k]*v[k]}const inv=1/Math.sqrt(en+1e-8);for(let k=0;k<256;k++)v[k]*=inv;return v;}
 function readHand(row,threshold){if(row.width<270)return null;let o=-1;for(let x=205;x<267;x++){let n=0;for(let y=2;y<14;y++)if(row.gray[y*row.width+x]>threshold)n++;if(n>=2){o=x;break}}if(o<0)return null;
  const labels=['右','左','両'];const classify=x=>{let best=[];for(const ch of labels){const t=glyphs[chars.get(ch)];if(!t)continue;let sc=-9;for(const dx of [-2,-1,0,1,2]){const a=handFeature(row,x+dx-1,0);let v=0;for(let k=0;k<256;k++)v+=a[k]*t[k];sc=Math.max(sc,v)}best.push({ch,sc})}best.sort((a,b)=>b.sc-a.sc);return{v:best[0]?.ch||'',s:best[0]?.sc||0,margin:(best[0]?.sc||0)-(best[1]?.sc||0)}};
@@ -36,10 +67,28 @@ function match(canvas,players,category){if(!glyphs)throw Error('離線 16x16 字
   let score=-4;for(const dy of [-1,0,1]){let s;if(canSplit){const l=seq(row,'L',S,dy,threshold),r=seq(row,'R',G,dy,threshold);s=(l*S.length+r*G.length)/(S.length+G.length)}else s=seq(row,'L',S.concat(G),dy,threshold);score=Math.max(score,s)}
   if(Number.isFinite(score)&&score>-.7){const handed=String(t.p['投/打']||'').replace('／','/');const handAdjustment=hand?.reliable&&(handed==='右/右'||handed==='左/右'||handed==='右/左'||handed==='左/左'||handed==='右/両'||handed==='左/両')?(handed===hand.guess?.06:-.06):0;scored.push({p:t.p,name:t.name,score:score+handAdjustment,visualScore:score,handScore:handAdjustment});}
  }
- scored.sort((a,b)=>b.score-a.score);const top=scored.slice(0,5),best=top[0],second=top[1],margin=(best?.score??-9)-(second?.score??-9);
+ scored.sort((a,b)=>b.score-a.score);
+ const baseline=scored[0],baselineGap=(baseline?.score??-9)-(scored[1]?.score??-9);
+ const alreadyStrong=!!baseline&&baseline.score>=.60&&baselineGap>=.14;
+ // The coarse search still evaluates every eligible player first. Fine fitting
+ // only reorders ambiguous top candidates and cannot turn weak evidence into confirmation.
+ if(!alreadyStrong&&baseline?.score>=.35){
+  for(const item of scored.slice(0,14)){
+   const t={S:split(item.name)[0],G:split(item.name)[1]};
+   const fine=fineCandidate(row,t,canSplit,threshold);
+   if(Number.isFinite(fine)){
+    item.score+=Math.max(0,Math.min(.065,(fine-item.visualScore)*.38));
+    item.fineScore=fine;
+   }
+  }
+  scored.sort((a,b)=>b.score-a.score);
+ }
+ const top=scored.slice(0,5),best=top[0],second=top[1],margin=(best?.score??-9)-(second?.score??-9);
  const duplicates=best?eligible.filter(x=>canon(x.name)===canon(best.name)).length:0;
- const confident=!!best&&best.score>=.60&&margin>=.14&&duplicates===1;
+ const confident=!!best&&duplicates===1&&(alreadyStrong
+  ?best.score>=.60&&margin>=.14
+  :best.score>=.65&&margin>=.15&&best.visualScore>=.55);
  row.features.clear();row.scores.clear();cache.delete(canvas); // release large per-row CV caches before next photo
- return{candidates:top,match:confident?best:null,margin,hand,method:'Claude 16x16 full-roster direct'};
+ return{candidates:top,match:confident?best:null,margin,hand,method:'16x16 pixel glyph + uncertain-row fine spacing'};
 }
 window.yt3ClaudeGlyph={init,match};})();

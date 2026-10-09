@@ -87,6 +87,18 @@
       "SEGA太郎怎們養才會強阿（snA=65）：可確認 PS2 討論串及標題，細節目前 403，育成條件未核實。"
     ],
     "limits": "混有 DC、NDS、2003 等別代內容；403、未索引、登入限制不等於不存在。",
-    "newly_readable_fulltext": "2018-09-09 PS2 三代玩家長文 snA=214 內容含投手實戰樣本；原有改名原型已收，本次補 14 位能力／球種摘要；明確屬玩家紀錄，不視為各年齡固定數值。"
+    "newly_readable_fulltext": "2018-09-09 PS2 三代玩家長文 snA=214 內容含投手實戰樣本；原有改名原型已收，本次補 14 位能力／球種摘要；明確屬玩家紀錄，不視為各年齡固定數值。",
+    "additional_verified": "2018 PS2 三代長文 snA=214 可讀到尚未確定初期值的先發、中繼、救援推薦候選；已依類型整合入 OB／架空章，與 14 位有能力紀錄者分開，不杜撰 Rank／數值。",
+    "dedup_20261009": {
+      "planning_table_overlap_removed": 75,
+      "exact_row_duplicates_removed": 31,
+      "alias_sections_merged": 2,
+      "alias_unique_names": 18,
+      "chapter_counts_recomputed": true
+    },
+    "excluded_cross_generation": [
+      "NDS版 2008/2009 年的自創選手、養成與隱玉卡規則，不套用 PS2 やきゅつく3。",
+      "名稱含模擬職棒3但上下文含 2003 年版者列為待版本複核，不直接當作 PS2 三代公式。"
+    ]
   }
 }

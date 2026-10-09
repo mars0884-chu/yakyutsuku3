@@ -182,5 +182,13 @@
     "status": "indexed_partial",
     "priority": 3,
     "note": "搜尋摘要可確認 PS2 版討論存在；回文細節目前 403，不能當成已整理出訓練配方。"
+  },
+  {
+    "name": "巴哈姆特：2018 PS2 模擬職棒3 實戰與球員清單",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=214&tnum=1",
+    "role": "PCSX2、改名原型及投手能力/無數值候選",
+    "status": "verified_fulltext",
+    "priority": 2,
+    "note": "已取得 PS2 標記全文；拆分改名原型、14 位投手能力樣本與未附數值的推薦候選。數值屬玩家當時紀錄，不能視為一律固定初始能力。"
   }
 ]

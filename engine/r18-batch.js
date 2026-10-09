@@ -11,13 +11,19 @@
  const frame=()=>new Promise(resolve=>setTimeout(resolve,0));
  const update=(num,message)=>{byId('batchStatus').textContent=`${message}｜${Math.min(100,Math.round(num))}%`};
  const rowCanvas=(img,n,dy)=>{const c=document.createElement('canvas');c.width=280;c.height=16;const y=Math.round(41+15.9*(n-1))-1+dy;c.getContext('2d',{willReadFrequently:true}).drawImage(img,0,y,280,16,0,0,280,16);return c};
- function matchAligned(aligned,number,players,category){let best=null;
+ function matchAligned(aligned,number,players,category){let best=null,confirmed=null;
   for(const dy of [-2,-1,0,1]){
    const c=rowCanvas(aligned,number,dy),m=yt3ClaudeGlyph.match(c,players,category),sc=m.candidates?.[0]?.score;
    if(!Number.isFinite(sc))continue;
-   if(!best||sc>best.score)best={canvas:c,m,score:sc};
-   if(dy===-2&&m.match&&sc>=.70&&m.margin>=.18)return best;
+   const v={canvas:c,m,score:sc};
+   if(!best||sc>best.score)best=v;
+   if(m.match&&(!confirmed||sc>confirmed.score))confirmed=v;
+   if(dy===-2&&m.match&&sc>=.70&&m.margin>=.18)return v;
   }
+  // A slightly higher raw score must not discard an already-confirmed name
+  // when both alignments agree on the same top identity.
+  if(best&&!best.m.match&&confirmed&&confirmed.score>=best.score-.055&&
+     best.m.candidates?.[0]?.p?._uid===confirmed.m.match?.p?._uid)return confirmed;
   return best;
  }
  const output=(r,i)=>({canvas:r.canvas,file:r.file,row:r.row,firstIndex:i,
@@ -60,12 +66,16 @@
         item={canvas:item.canvas,m:full,score:fs};
     }
     if(!item||!item.m?.candidates?.length){const m=yt3ClaudeGlyph.match(copy.canvas,state.players,'');item={canvas:copy.canvas,m,score:m.candidates?.[0]?.score||-9}}
-    if((!item.m?.candidates?.length||(item.m.candidates[0]?.score??-9)<.40)&&s.copies.length>1){
+    if((!item.m?.match||!item.m?.candidates?.length||(item.m.candidates[0]?.score??-9)<.65)&&s.copies.length>1){
       for(const other of s.copies){if(other===copy)continue;
         const a=aligned[other.imageIndex];let attempt=null;
         if(a?.valid&&a.loc?.score>=.65&&other.originalRow>=1&&other.originalRow<=11)attempt=matchAligned(a.canvas,other.originalRow,state.players,s.category);
         if(!attempt||!attempt.m?.candidates?.length){const m=yt3ClaudeGlyph.match(other.canvas,state.players,'');attempt={canvas:other.canvas,m,score:m.candidates?.[0]?.score||-9}}
-        if((attempt.m?.candidates?.length||0)>0&&(!item.m?.candidates?.length||attempt.score>item.score+.06))item=attempt;
+        if((attempt.m?.candidates?.length||0)>0){
+          const same=attempt.m.candidates[0]?.p?._uid===item.m?.candidates?.[0]?.p?._uid;
+          if(!item.m?.candidates?.length||attempt.score>item.score+.055||
+            (attempt.m.match&&!item.m.match&&same&&attempt.score>=item.score-.055))item=attempt;
+        }
       }
     }
     const m=item.m;
