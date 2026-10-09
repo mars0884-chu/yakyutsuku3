@@ -190,5 +190,45 @@
     "status": "verified_fulltext",
     "priority": 2,
     "note": "已取得 PS2 標記全文；拆分改名原型、14 位投手能力樣本與未附數值的推薦候選。數值屬玩家當時紀錄，不能視為一律固定初始能力。"
+  },
+  {
+    "name": "巴哈：遊戲初期節省薪資的辦法",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=53",
+    "role": "2005 年 PS2 初期年薪控制舊文；全文待核",
+    "status": "indexed_partial",
+    "priority": 3,
+    "note": "搜尋索引可確認 PS2 標籤及 2005-08-04 發文資訊；正文目前 403，細節不可視為已取得。"
+  },
+  {
+    "name": "巴哈：發現鈴木一郎和 B．邦茲！！",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=57",
+    "role": "PS2 改名／外國球員歷史玩家討論；全文待核",
+    "status": "indexed_partial",
+    "priority": 3,
+    "note": "搜尋可找到 PS2 標籤和主題，但無法完整取回原文；不增加未核實姓名對應。"
+  },
+  {
+    "name": "巴哈：發現一個可靠消息!",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=145",
+    "role": "2007 年 PS2 玩家攻略線索；全文待核",
+    "status": "indexed_partial",
+    "priority": 4,
+    "note": "標題及 2007-05-05 日期可檢索，正文 403；具體消息未經核實。"
+  },
+  {
+    "name": "巴哈：我終於在第六年拿到冠軍了",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=82",
+    "role": "PS2 六年奪冠隊伍配置實戰串；全文待核",
+    "status": "indexed_partial",
+    "priority": 4,
+    "note": "搜尋摘要能確認玩家提及第六年冠軍與部分球員位置，但正文 403，無法驗證完整組隊策略；不混入已確認攻略。"
+  },
+  {
+    "name": "巴哈：2003 交換球員成功率（排除跨代）",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=11",
+    "role": "2003 年 PS2 系列舊文：非 2005 三代可證實",
+    "status": "cross_version_excluded",
+    "priority": 5,
+    "note": "發表於 2003-12-09，早於 PS2 やきゅつく3 上市；不可把原帖交易公式自動套入三代。"
   }
 ]

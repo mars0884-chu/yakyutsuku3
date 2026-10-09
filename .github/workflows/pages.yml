@@ -41,6 +41,8 @@ jobs:
         run: node scripts/smoke-r18.mjs
       - name: Verify r22 matching and deduplicated guide data
         run: node scripts/smoke-r22.mjs
+      - name: Verify semantic guide consolidation
+        run: node scripts/smoke-guides-r23.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
