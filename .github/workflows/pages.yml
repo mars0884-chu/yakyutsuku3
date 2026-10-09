@@ -47,6 +47,8 @@ jobs:
         run: node scripts/smoke-r24.mjs
       - name: Check strict r26 original-crop candidate recovery
         run: node scripts/smoke-r26.mjs
+      - name: Verify r27 semantic deduplication
+        run: node scripts/smoke-r27.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
