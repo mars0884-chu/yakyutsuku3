@@ -31,6 +31,8 @@ jobs:
           node --check scripts/vendor-ocr.mjs
           node --check scripts/vendor-paddleocr.mjs
           node --check scripts/smoke-recognition.mjs
+          for file in engine/*.js; do node --check "$file"; done
+          node -e "const f=require('fs'); const p=JSON.parse(f.readFileSync('engine/claude-glyphs.json','utf8')); if([...p.chars].length!==1029||!p.data?.length)process.exit(1);"
       - name: Verify desktop/mobile recognition coexistence
         run: node scripts/smoke-recognition.mjs
       - name: Build complete 3,767-player roster
