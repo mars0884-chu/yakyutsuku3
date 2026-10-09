@@ -4,15 +4,33 @@
 const oldPair=window.yt3OverlapPair;
 const maskCache=new WeakMap();
 const W=170,H=24;
+/* Match actual text, not a selected row's bright rectangular background.
+   Read source pixels and deterministically resize in JavaScript (same on Safari/Chrome/Edge). */
 function mask(row){
- let a=maskCache.get(row.canvas);if(a)return a;
- const c=row.canvas,sw=c.width,sh=c.height,src=c.getContext('2d',{willReadFrequently:true});
- const sx=Math.round(sw*.108),ex=Math.round(sw*.575),sy=Math.round(sh*.08),ey=Math.round(sh*.85);
- const cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d',{willReadFrequently:true});
- g.imageSmoothingEnabled=true;g.imageSmoothingQuality='medium';g.drawImage(c,sx,sy,Math.max(1,ex-sx),Math.max(1,ey-sy),0,0,W,H);
- const d=g.getImageData(0,0,W,H).data,b=new Uint8Array(W*H);let n=0;
- for(let i=0,j=0;j<b.length;i+=4,j++){const v=d[i]*.299+d[i+1]*.587+d[i+2]*.114;if(v>138){b[j]=1;n++}}
- a={bits:b,ink:n};maskCache.set(row.canvas,a);return a;
+ let cached=maskCache.get(row.canvas);if(cached)return cached;
+ const c=row.canvas,sw=c.width,sh=c.height,ctx=c.getContext('2d',{willReadFrequently:true});
+ const rgba=ctx.getImageData(0,0,sw,sh).data,gray=new Uint8Array(W*H);
+ const left=sw*.108,right=sw*.575,top=sh*.08,bottom=sh*.85;
+ const lum=(x,y)=>{const k=(y*sw+x)*4;return Math.round(rgba[k]*.299+rgba[k+1]*.587+rgba[k+2]*.114)};
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+   const fx=left+(x+.5)*(right-left)/W-.5,fy=top+(y+.5)*(bottom-top)/H-.5;
+   const ax=Math.max(0,Math.min(sw-1,Math.floor(fx))),ay=Math.max(0,Math.min(sh-1,Math.floor(fy)));
+   const bx=Math.min(sw-1,ax+1),by=Math.min(sh-1,ay+1);
+   const u=Math.max(0,Math.min(1,fx-ax)),v=Math.max(0,Math.min(1,fy-ay));
+   gray[y*W+x]=Math.round((lum(ax,ay)*(1-u)+lum(bx,ay)*u)*(1-v)+(lum(ax,by)*(1-u)+lum(bx,by)*u)*v);
+ }
+ const hist=new Uint16Array(256);for(const p of gray)hist[p]++;
+ // Median means selected (bright) rows become dark-on-light, ordinary rows light-on-dark.
+ let acc=0,bg=0;for(let b=0;b<256;b++){acc+=hist[b];if(acc>=gray.length*.5){bg=b;break}}
+ const bright=bg>=140,bits=new Uint8Array(W*H),delta=bright?Math.max(27,Math.min(52,bg*.19)):Math.max(29,Math.min(58,(255-bg)*.17));
+ let ink=0;
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+  const k=y*W+x,lit=gray[k];
+  if(bright?lit<bg-delta:lit>bg+delta){bits[k]=1;ink++}
+ }
+ // Empty/filled bands are not unique names and must never create overlap evidence.
+ if(ink<36||ink>bits.length*.46){bits.fill(0);ink=0}
+ cached={bits,ink};maskCache.set(row.canvas,cached);return cached;
 }
 function pixelMatch(row1,row2){
  const a=mask(row1),b=mask(row2);if(!a.ink||!b.ink)return 0;
@@ -51,7 +69,9 @@ function analyze(inputs){
  const parent=Array.from({length:n},(_,i)=>i),find=i=>parent[i]===i?i:(parent[i]=find(parent[i])),join=(i,j)=>{i=find(i);j=find(j);if(i!==j)parent[j]=i};
  const edges=[];
  for(let i=0;i<pages.length-1;i++){
-  const a=pages[i],b=pages[i+1],px=choosePixel(a,b),fallback=oldPair(a,b);
+  const a=pages[i],b=pages[i+1],sameTab=!categories[i]||!categories[i+1]||categories[i]===categories[i+1];
+  if(!sameTab)continue;
+  const px=choosePixel(a,b),fallback=oldPair(a,b);
   let chosen=px;
   if(!chosen&&fallback?.k){
     const k=fallback.k;let trusted=fallback.avg>=.81&&fallback.min>=.76;
@@ -80,4 +100,5 @@ function analyze(inputs){
 window.yt3OfflineOverlapsV14=analyze;
 window.yt3PixelOverlap=choosePixel;
 window.yt3PixelOverlapDebug=(a,b)=>choosePixel(a,b,true);
+window.yt3RowPixelSimilarity=(a,b)=>pixelMatch(a,b);
 })();

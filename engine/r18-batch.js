@@ -52,12 +52,19 @@
      item=matchAligned(info.canvas,number,state.players,s.category);
     // Missing/weak first pass: retry only the same row from its source image,
     // never shift to a different physical player or use answer labels.
-    if(!item||!item.m?.candidates?.length){const m=yt3ClaudeGlyph.match(copy.canvas,state.players,s.category);item={canvas:copy.canvas,m,score:m.candidates?.[0]?.score||-9}}
+    if(item&&s.category&&(!item.m.match||(item.m.margin||0)<.16||(item.score||0)<.67)){
+      // Position tabs are visual hints, not hard truth: retry the entire roster only for uncertain rows.
+      const full=yt3ClaudeGlyph.match(item.canvas,state.players,'');
+      const fs=full.candidates?.[0]?.score??-9;
+      if(full.candidates?.length&&(fs>=item.score+.02||(!item.m.match&&full.match)))
+        item={canvas:item.canvas,m:full,score:fs};
+    }
+    if(!item||!item.m?.candidates?.length){const m=yt3ClaudeGlyph.match(copy.canvas,state.players,'');item={canvas:copy.canvas,m,score:m.candidates?.[0]?.score||-9}}
     if((!item.m?.candidates?.length||(item.m.candidates[0]?.score??-9)<.40)&&s.copies.length>1){
       for(const other of s.copies){if(other===copy)continue;
         const a=aligned[other.imageIndex];let attempt=null;
         if(a?.valid&&a.loc?.score>=.65&&other.originalRow>=1&&other.originalRow<=11)attempt=matchAligned(a.canvas,other.originalRow,state.players,s.category);
-        if(!attempt||!attempt.m?.candidates?.length){const m=yt3ClaudeGlyph.match(other.canvas,state.players,s.category);attempt={canvas:other.canvas,m,score:m.candidates?.[0]?.score||-9}}
+        if(!attempt||!attempt.m?.candidates?.length){const m=yt3ClaudeGlyph.match(other.canvas,state.players,'');attempt={canvas:other.canvas,m,score:m.candidates?.[0]?.score||-9}}
         if((attempt.m?.candidates?.length||0)>0&&(!item.m?.candidates?.length||attempt.score>item.score+.06))item=attempt;
       }
     }
@@ -74,7 +81,8 @@
    state.batchRawRows=results;state.batchRows=results;state.expectedTotal=0;renderBatchResults();
    const confirmed=results.filter(r=>r.match).length;
    const failed=aligned.filter(x=>!x.valid||x.loc.score<.65).length;
-   update(100,`完成：${grouped.rawRows} 原始列 → ${grouped.uniqueRows} 個不同列位；確認 ${confirmed}、候選 ${results.length-confirmed}${failed?'；'+failed+' 張表頭改用備援':''}｜全程本機、無 AI`);
+   const overlapCount=grouped.overlaps.reduce((n,e)=>n+e.k,0);
+   update(100,`完成：${grouped.rawRows} 原始列 → ${grouped.uniqueRows} 個不同列位（跨頁去重 ${overlapCount}）；確認 ${confirmed}、候選 ${results.length-confirmed}${failed?'；'+failed+' 張表頭改用備援':''}｜全程本機、無 AI`);
   }catch(error){console.error(error);byId('batchStatus').textContent='辨識未完成：'+String(error?.message||error)}
   finally{runButton.disabled=false}
  };

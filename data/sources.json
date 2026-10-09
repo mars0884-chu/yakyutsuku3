@@ -174,5 +174,13 @@
     "status": "indexed_partial",
     "priority": 3,
     "note": "索引可見企劃案資料與攻略網站 1～3，正文目前 403，外部目標網站尚未查核。"
+  },
+  {
+    "name": "巴哈姆特：SEGA太郎怎們養才會強阿?",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=65",
+    "role": "PS2 SEGA 太郎養成舊串／待取正文",
+    "status": "indexed_partial",
+    "priority": 3,
+    "note": "搜尋摘要可確認 PS2 版討論存在；回文細節目前 403，不能當成已整理出訓練配方。"
   }
 ]
