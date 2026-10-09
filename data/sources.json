@@ -230,5 +230,21 @@
     "status": "cross_version_excluded",
     "priority": 5,
     "note": "發表於 2003-12-09，早於 PS2 やきゅつく3 上市；不可把原帖交易公式自動套入三代。"
+  },
+  {
+    "name": "Wazap：名も無きOB選手／無名 OB 原型",
+    "url": "https://wazap.com/cheat/%E5%90%8D%E3%82%82%E7%84%A1%E3%81%8D%EF%BC%AF%EF%BC%A2%E9%81%B8%E6%89%8B/126773/",
+    "role": "2005 年改名原型 19 筆；已與巴哈 2018 整合",
+    "status": "source_crosscheck",
+    "priority": 2,
+    "note": "和巴哈 2018 PS2 長文交叉去重，統一至架空／OB 原型對照表，仍保留來源。"
+  },
+  {
+    "name": "巴哈精華：初期經營法（版本待核）",
+    "url": "https://forum.gamer.com.tw/G2.php?bsn=6035&lorder=1&parent=54&sn=55",
+    "role": "2006 編輯的舊版經營攻略；涉及「2003年版」",
+    "status": "version_ambiguous",
+    "priority": 4,
+    "note": "已從 PS2 三代已確認開局章移至資料研究章，等取得版本上下文與對照後再恢復適用性。"
   }
 ]

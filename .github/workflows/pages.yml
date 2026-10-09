@@ -43,6 +43,8 @@ jobs:
         run: node scripts/smoke-r22.mjs
       - name: Verify semantic guide consolidation
         run: node scripts/smoke-guides-r23.mjs
+      - name: Verify r24 recognition consensus and source consolidation
+        run: node scripts/smoke-r24.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail

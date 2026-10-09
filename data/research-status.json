@@ -116,5 +116,16 @@
       "skills_repeated_direction_removed": 1
     },
     "fulltext_new": "本輪未取得上列 2005–2007 文章正文，不稱新增完整攻略；上一輪 2018 PS2 可讀長文已整理入 models 章。"
+  },
+  "bahamut_20261010_recheck": {
+    "fulltext": "巴哈 snA=214（2018／PS2）原文全文再次核對：補收未列出的 20 位投手玩家樣本，與既有14筆整合。Wazap 2005 改名原型和巴哈 2018 交叉整理，移除兩個表互相重複的別名。",
+    "data_merged": {
+      "new_pitcher_notes": 20,
+      "new_from_wazap": 19,
+      "new_from_2018": 17,
+      "alias_total": 54
+    },
+    "version_warning": "巴哈精華初期經營法出現「2003年版」，原文所涉遊戲代別無法僅憑標題保證。已移至版本待核，不能直接作 PS2 三代已確認開局攻略。",
+    "no_new_confirmed_sources": "本輪專門檢索 PS2／技能／球探／金手指後，新可讀內容仍集中於已知 2018 長文和 2006 精華。其他 NDS 版與 DC 一二代內容不匯入本專案；未索引／受阻來源不視為不存在。"
   }
 }
