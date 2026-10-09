@@ -123,7 +123,9 @@
       "new_pitcher_notes": 20,
       "new_from_wazap": 19,
       "new_from_2018": 17,
-      "alias_total": 54
+      "alias_total": 35,
+      "alias_rows_merged": 19,
+      "alias_conflicts": 0
     },
     "version_warning": "巴哈精華初期經營法出現「2003年版」，原文所涉遊戲代別無法僅憑標題保證。已移至版本待核，不能直接作 PS2 三代已確認開局攻略。",
     "no_new_confirmed_sources": "本輪專門檢索 PS2／技能／球探／金手指後，新可讀內容仍集中於已知 2018 長文和 2006 精華。其他 NDS 版與 DC 一二代內容不匯入本專案；未索引／受阻來源不視為不存在。"

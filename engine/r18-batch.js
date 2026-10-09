@@ -39,7 +39,7 @@
   pooled.sort((a,b)=>b.score-a.score);
   const top=pooled[0],second=pooled[1],gap=(top?.score??-9)-(second?.score??-9);
   if(!top||top.topVotes<Math.max(3,Math.ceil(valid.length*.75))||top.score<.66||gap<.145)return best;
-  const clean=s=>String(s||'').normalize('NFKC').replace(/[\\s　]/g,'').replaceAll('藪','薮').replaceAll('髙','高').replaceAll('﨑','崎');
+  const clean=s=>String(s||'').normalize('NFKC').replace(/\s/g,'').replaceAll('藪','薮').replaceAll('髙','高').replaceAll('﨑','崎');
   // One visual name must not accidentally represent multiple roster records.
   if(players.filter(p=>clean(p['名前'])===clean(top.p['名前'])).length!==1)return best;
   const supporting=valid.filter(a=>a.m.candidates[0]?.p?._uid===top.p._uid).sort((a,b)=>b.score-a.score)[0];
