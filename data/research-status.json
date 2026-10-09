@@ -129,5 +129,16 @@
     },
     "version_warning": "巴哈精華初期經營法出現「2003年版」，原文所涉遊戲代別無法僅憑標題保證。已移至版本待核，不能直接作 PS2 三代已確認開局攻略。",
     "no_new_confirmed_sources": "本輪專門檢索 PS2／技能／球探／金手指後，新可讀內容仍集中於已知 2018 長文和 2006 精華。其他 NDS 版與 DC 一二代內容不匯入本專案；未索引／受阻來源不視為不存在。"
+  },
+  "bahamut_external_20261010": {
+    "confirmed_external_links": [
+      "巴哈 sn=470 提及 Ikasumi 經營 Memo 與 kiyopf1005/keiei.html；後者是目前失效的 Geocities 日本頁。",
+      "巴哈 sn=850 提及 Ikasumi 與 datapot.com/pw/vs/index.php；後者未取得可驗證正文。"
+    ],
+    "verified_archive": "2005 2ch《プロ野球チームをつくろう！３(やきゅつく)20年目》正文可讀，列出五個地區的 引っ越し屋＋Memo 候選與中国・四国猜想；另有試作失敗的回報，因此只收為未確認考古資料。",
+    "historical_reference": "kiyopf1005/yakyutuku.html 在 2005 年串為攻略模板，2006 年第40年串已記為失效。",
+    "existing_readable_external": "Ikasumi攻略メモ與網站原本已在攻略中，只補上巴哈歷史來源，不重複登錄規則。",
+    "limits": "巴哈精華區相關網站 1～3、Geocities Japan 舊正文、datapot 目前無法可靠取得，不等於原內容不存在；NDS／DC 版本需排除。",
+    "recognition_evaluation": "本輪新增原始列裁切交叉證據與姓／名分隔回復流程，尚未完成 92列實機真實姓名正確率驗證；不得以確認數作準確率。"
   }
 }

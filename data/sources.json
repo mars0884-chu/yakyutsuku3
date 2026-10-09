@@ -246,5 +246,45 @@
     "status": "version_ambiguous",
     "priority": 4,
     "note": "已從 PS2 三代已確認開局章移至資料研究章，等取得版本上下文與對照後再恢復適用性。"
+  },
+  {
+    "name": "2005 PS2《やきゅつく3》20年目討論串",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1123809103",
+    "role": "引越し屋＋各地 Memo 商店進出的歷史討論；未確認配方",
+    "status": "historical_fulltext_unverified_claim",
+    "priority": 3,
+    "note": "原文可讀，但貼文中有試不成功的回報；網站標示為未確認歷史配方候選。"
+  },
+  {
+    "name": "巴哈外部連結／kiyopf1005 経営企画",
+    "url": "http://www.geocities.jp/kiyopf1005/keiei.html",
+    "role": "已失效的三代經營企劃外站",
+    "status": "historical_reference_unavailable",
+    "priority": 4,
+    "note": "巴哈 sn=470 索引保留 URL；Geocities 日本舊頁目前不可閱讀，不能當作已取回正文。"
+  },
+  {
+    "name": "PS2 やきゅつく3 攻略テンプレ／kiyopf1005",
+    "url": "http://www.geocities.jp/kiyopf1005/yakyutuku.html",
+    "role": "2005 年引用的攻略模板",
+    "status": "historical_reference_unavailable",
+    "priority": 4,
+    "note": "2005 年 2ch 第20年串提及，2006 年第40年串明言已死鏈。"
+  },
+  {
+    "name": "巴哈外部參考／datapot 球員資料",
+    "url": "https://datapot.com/pw/vs/index.php",
+    "role": "PS2 OB／架空選手歷史推薦連結",
+    "status": "external_link_unverified",
+    "priority": 4,
+    "note": "巴哈 sn=850 同時推薦 Ikasumi 和此站，目前無法檢索確認內容，暫不匯入球員資料。"
+  },
+  {
+    "name": "巴哈：三代兩個經營企劃外站原帖",
+    "url": "https://forum.gamer.com.tw/Co.php?bsn=6035&sn=470",
+    "role": "舊外部站來源：Ikasumi＋Geocities",
+    "status": "search_indexed_partial",
+    "priority": 3,
+    "note": "索引可取得兩個完整歷史 URL，直接閱讀正文 403，不假稱已讀取全文。"
   }
 ]

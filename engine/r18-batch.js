@@ -48,6 +48,22 @@
  }
  window.yt3VoteAligned=voteAligned;
 
+
+ // Only accept weak-name corroboration when the original row crop agrees.
+ function reconcileRowCrops(primary,alternate,players){
+  if(!alternate?.m?.candidates?.length)return primary;
+  if(!primary?.m?.candidates?.length)return alternate;
+  if(primary.m.match)return primary;
+  const a=primary.m.candidates[0],b=alternate.m.candidates[0];
+  if(a.p?._uid!==b.p?._uid)return primary;
+  if(alternate.m.match&&alternate.score>=primary.score-.04)return alternate;
+  if(primary.score<.68||alternate.score<.68||(primary.m.margin||0)<.105||(alternate.m.margin||0)<.105)return primary;
+  const norm=s=>String(s||'').normalize('NFKC').replace(/\s/g,'');
+  if(players.filter(p=>norm(p['名前'])===norm(a.p['名前'])).length!==1)return primary;
+  return{...primary,m:{...primary.m,match:a,method:'independent crop corroboration'}};
+ }
+ window.yt3ReconcileRowCrops=reconcileRowCrops;
+
  function matchAligned(aligned,number,players,category){let best=null,confirmed=null,attempts=[];
   for(const dy of [-2,-1,0,1]){
    const c=rowCanvas(aligned,number,dy),m=yt3ClaudeGlyph.match(c,players,category),sc=m.candidates?.[0]?.score;
@@ -103,6 +119,15 @@
         item={canvas:item.canvas,m:full,score:fs};
     }
     if(!item||!item.m?.candidates?.length){const m=yt3ClaudeGlyph.match(copy.canvas,state.players,'');item={canvas:copy.canvas,m,score:m.candidates?.[0]?.score||-9}}
+    if(item&&!item.m.match&&item.m.candidates?.length){
+      const raw=yt3ClaudeGlyph.match(copy.canvas,state.players,'');
+      item=reconcileRowCrops(item,{canvas:copy.canvas,m:raw,score:raw.candidates?.[0]?.score??-9},state.players);
+      if(!item.m.match&&item.score>=.4){
+        const alt=yt3ClaudeGlyph.match(item.canvas,state.players,'',{recovery:true});
+        if(alt.match&&alt.candidates?.[0]?.p?._uid===item.m.candidates?.[0]?.p?._uid&&
+          alt.candidates[0].score>=item.score-.04)item={canvas:item.canvas,m:alt,score:alt.candidates[0].score};
+      }
+    }
     if((!item.m?.match||!item.m?.candidates?.length||(item.m.candidates[0]?.score??-9)<.65)&&s.copies.length>1){
       for(const other of s.copies){if(other===copy)continue;
         const a=aligned[other.imageIndex];let attempt=null;
