@@ -94,6 +94,43 @@ function renderGuideSearchHits(hits){
     return '<article class="card guide-search-hit"><div class="meta">'+esc(x.chapter)+' › '+esc(x.section)+'</div><p>'+esc(x.item)+'</p>'+(x.source?'<div class="meta"><a href="'+esc(x.source)+'" target="_blank" rel="noreferrer">來源</a></div>':'')+'</article>';
   }).join('')
 }
+
+const originalGuideSectionHTML=guideSectionHTML;
+const originalGuideRowSearch=guideRowSearch;
+function guideSectionCompact(sec){
+  const title=String(sec.title||'');
+  if(title==='經營企劃組合表（條件・組合・結果）'){
+    return `<section class="guide-section"><details class="guide-legacy-repeat"><summary>舊版組合簡表 ${sec.rows?.length||0} 筆（已整合至「完整逆引」，點此對照原表）</summary>${originalGuideSectionHTML(sec)}</details></section>`;
+  }
+  if(title==='經營企劃完整逆引：條件／需求道具／取得地／組合／效果'){
+    const names=sec.headers||[];
+    return `<section class="guide-section"><h3>${esc(title)}（${sec.rows?.length||0} 筆）</h3><div class="guide-plan-grid">${(sec.rows||[]).map(row=>{
+      const extras=row.slice(2).map((value,index)=>`<div class="guide-plan-extra"><small>${esc(names[index+2]||'內容')}</small><span>${esc(value||'—')}</span></div>`).join('');
+      return `<details class="guide-plan-entry" ${state.guideExpandAll?'open':''}><summary><strong>${esc(row[0]||'—')}</strong><span>${esc(row[1]||'—')}</span></summary>${extras}</details>`;
+    }).join('')}</div>${sec.source?`<details class="guide-source"><summary>資料來源</summary><a href="${esc(sec.source)}" target="_blank" rel="noreferrer">原文</a></details>`:''}</section>`;
+  }
+  return originalGuideSectionHTML(sec);
+}
+function guideChapterCompact(ch){
+ const expand=ch.id==='idea'?`<button type="button" class="guide-expand-all" data-expand-idea>${state.guideExpandAll?'全部收合':'全部展開'}</button>`:'';
+ const intro=ch.id==='idea'?'原始 289 筆收錄；其中 75 筆簡表與完整逆引重疊，已合併顯示。保留兩份原文可供對照。':ch.summary||'';
+ return `<article class="guide-chapter"><div class="guide-chapter-head"><h2>${esc(ch.title)}</h2>${expand}<p>${esc(intro)}</p></div>${(ch.sections||[]).map(guideSectionHTML).join('')}</article>`;
+}
+function guideRowClean(book,query){return originalGuideRowSearch(book,query).filter(x=>x.section!=='經營企劃組合表（條件・組合・結果）');}
+function guideSearchCompact(hits){
+ return hits.slice(0,180).map(x=>{
+ const heads=x.headers||[];
+ const special=x.kind==='row'&&heads[0]==='No.'&&x.row?.[1];
+ const title=x.kind==='row'?(special?x.row[1]:x.row?.[0]):x.item;
+ const fields=x.kind==='row'?(x.row||[]).slice(special?2:1).map((v,i)=>`<span><strong>${esc(heads[i+(special?2:1)]||'內容')}：</strong>${esc(v||'—')}</span>`).join(''):'';
+ return `<article class="guide-quick-item"><div class="guide-quick-heading"><b>${esc(title||'—')}</b><small>${esc(x.chapter)} › ${esc(x.section)}</small></div>${fields?`<div class="guide-quick-data">${fields}</div>`:''}${x.source?`<div class="guide-source"><a href="${esc(x.source)}" target="_blank" rel="noreferrer">來源</a></div>`:''}</article>`;
+ }).join('');
+}
+guideSectionHTML=guideSectionCompact;
+guideChapterDetail=guideChapterCompact;
+guideRowSearch=guideRowClean;
+renderGuideSearchHits=guideSearchCompact;
+
 function renderGuides(){
   const q=$('#guideQuery').value.trim(),root=$('#guideResults'),book=visibleGuideBook();
   if(q){
@@ -101,7 +138,7 @@ function renderGuides(){
     root.innerHTML=hits.length?'<div class="guide-search-summary">找到 '+hits.length+' 筆；以下直接顯示命中的條件／組合／取得地／效果。</div>'+renderGuideSearchHits(hits):'<div class="card">沒有符合的攻略。</div>';
     return
   }
-  if(state.guideTopic.startsWith('chapter:')){const id=state.guideTopic.slice(8),ch=book.find(x=>x.id===id);if(ch){root.innerHTML=guideChapterDetail(ch);return}state.guideTopic='all'}
+  if(state.guideTopic.startsWith('chapter:')){const id=state.guideTopic.slice(8),ch=book.find(x=>x.id===id);if(ch){root.innerHTML=guideChapterDetail(ch);const e=root.querySelector('[data-expand-idea]');if(e)e.onclick=()=>{state.guideExpandAll=!state.guideExpandAll;renderGuides()};return}state.guideTopic='all'}
   const cat=GUIDE_CATEGORIES.find(c=>c.id===state.guideTopic)||GUIDE_CATEGORIES[0];
   if(cat.id==='all'){
     root.innerHTML=GUIDE_CATEGORIES.slice(1).map(c=>{const list=c.chapters.map(id=>book.find(x=>x.id===id)).filter(Boolean);return list.length?'<section class="guide-index-group"><h2>'+esc(c.title)+'</h2><div class="guide-index-grid">'+list.map(guideChapterCard).join('')+'</div></section>':''}).join('')||'<div class="card">目前沒有攻略內容。</div>';
@@ -111,7 +148,7 @@ function renderGuides(){
   root.querySelectorAll('[data-guide-id]').forEach(btn=>btn.onclick=()=>{state.guideTopic='chapter:'+btn.dataset.guideId;renderGuideTopics();renderGuides();window.scrollTo({top:0,behavior:'smooth'})})
 }
 let guideSearchBackup='';
-$('#showIdeaAll').onclick=()=>{guideSearchBackup=$('#guideQuery').value;$('#guideQuery').value='';state.guideTopic='chapter:idea';$('#showIdeaAll').classList.add('hidden');$('#backGuideSearch').classList.remove('hidden');renderGuideTopics();renderGuides();window.scrollTo({top:0,behavior:'smooth'})};
+$('#showIdeaAll').onclick=()=>{guideSearchBackup=$('#guideQuery').value;$('#guideQuery').value='';state.guideTopic='chapter:idea';state.guideExpandAll=true;$('#showIdeaAll').classList.add('hidden');$('#backGuideSearch').classList.remove('hidden');renderGuideTopics();renderGuides();window.scrollTo({top:0,behavior:'smooth'})};
 $('#backGuideSearch').onclick=()=>{$('#guideQuery').value=guideSearchBackup||'';state.guideTopic='all';$('#backGuideSearch').classList.add('hidden');$('#showIdeaAll').classList.remove('hidden');renderGuideTopics();renderGuides();window.scrollTo({top:0,behavior:'smooth'})};
 $('#guideQuery').addEventListener('input',debounce(renderGuides));
 $('#clearGuide').onclick=()=>{$('#guideQuery').value='';guideSearchBackup='';state.guideTopic='all';$('#backGuideSearch').classList.add('hidden');$('#showIdeaAll').classList.remove('hidden');renderGuideTopics();renderGuides()};
@@ -619,6 +656,8 @@ async function checkAppUpdate(manual=false){
 }
 async function waitForSWState(sw,target='installed',ms=12000){if(!sw||sw.state===target)return;await withTimeout(new Promise(resolve=>sw.addEventListener('statechange',()=>{if(sw.state===target||sw.state==='activated'||sw.state==='redundant')resolve()},{once:false})),ms,'Service Worker 更新逾時')}
 async function applyAppUpdate(){
+  const started=Date.now();
+  const clock=setInterval(()=>{const el=$('#updateText');if(!el)return;const base=el.textContent.replace(/｜已等待 \d+ 秒.*$/,'');if(!/失敗|已是最新版/.test(base))el.textContent=base+'｜已等待 '+Math.floor((Date.now()-started)/1000)+' 秒（網路下載無法預估剩餘時間）';},1000);
   try{
     showUpdateBar('取得最新版…',15,false);
     let changed=false;
@@ -626,24 +665,25 @@ async function applyAppUpdate(){
       const regs=await navigator.serviceWorker.getRegistrations();
       for(const reg of regs){
         try{
-          await reg.update();$('#updateProgress').value=45;
+          await withTimeout(reg.update(),25000,'Safari 快取檢查逾時');$('#updateProgress').value=45;
           if(reg.installing)await waitForSWState(reg.installing);
           const waiting=reg.waiting;if(waiting){changed=true;waiting.postMessage({type:'SKIP_WAITING'})}
         }catch(e){console.warn('sw update',e)}
       }
     }
     $('#updateProgress').value=70;
-    await Promise.all([
+    await withTimeout(Promise.all([
       fetch(`./VERSION?t=${Date.now()}`,{cache:'no-store'}),
       fetch(`./index.html?t=${Date.now()}`,{cache:'no-store'}),
       fetch(`./app.js?t=${Date.now()}`,{cache:'no-store'})
-    ]);
+    ]),30000,'更新檔案下載超過 30 秒');
     $('#updateProgress').value=92;$('#updateText').textContent='套用新版…';
     if(changed&&'serviceWorker'in navigator){
       await Promise.race([new Promise(resolve=>navigator.serviceWorker.addEventListener('controllerchange',resolve,{once:true})),new Promise(resolve=>setTimeout(resolve,1800))]);
     }
     $('#updateProgress').value=100;location.replace(`./?updated=${Date.now()}`);
-  }catch(e){showUpdateBar('更新失敗：'+(e.message||e),0,true)}
+  }catch(e){showUpdateBar('更新失敗：'+(e.message||e)+'｜可以再次按「立即更新」',0,true)}
+  finally{clearInterval(clock)}
 }
 $('#updateBtn').onclick=()=>checkAppUpdate(true);$('#applyUpdate').onclick=applyAppUpdate;
 window.addEventListener('load',()=>{setTimeout(()=>checkAppUpdate(false),700);setInterval(()=>checkAppUpdate(false),10*60*1000)});
