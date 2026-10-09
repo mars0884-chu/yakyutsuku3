@@ -9727,9 +9727,24 @@
           ]
         ],
         "source": "https://ameblo.jp/skillove/"
+      },
+      {
+        "title": "巴哈姆特：3代球員的技藝（索引可讀／全文待補核）",
+        "type": "facts",
+        "rows": [
+          [
+            "發動規則",
+            "巴哈姆特公開搜尋索引可確認：球員在比賽中達成特定條件時，技能（技藝）可能以一定機率發動；原文提及三種觸發類型。"
+          ],
+          [
+            "內容取得狀態",
+            "目前僅搜尋索引可讀，直接開啟文章回傳 403；各技藝的逐項條件和效果尚未核實，不能當作已確認攻略。"
+          ]
+        ],
+        "source": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=140"
       }
     ],
-    "count": 31
+    "count": 33
   },
   {
     "id": "random",
@@ -10722,8 +10737,35 @@
           ]
         ],
         "source": "https://forum.gamer.com.tw/listG.php?bsn=6035"
+      },
+      {
+        "title": "巴哈姆特最新來源邊界／2026-10-09",
+        "type": "facts",
+        "rows": [
+          [
+            "已完成追查",
+            "2026-10-09：再查巴哈姆特精華區與《3代球員的技藝》；金手指（2006 XT/PAR 與 2025 PCSX2）已有部分內容在金手指章；技能文章搜尋索引可讀，全文直接開啟 403。不能宣稱巴哈已挖完。2003 版初期經營內容須與 2005 PS2 三代分開標註，不得混用。"
+          ],
+          [
+            "精華區／歷史索引",
+            "https://forum.gamer.com.tw/listG.php?bsn=6035"
+          ],
+          [
+            "三代技能文章",
+            "https://forum.gamer.com.tw/C.php?bsn=6035&snA=140"
+          ],
+          [
+            "2006 三代 XT／PAR 碼",
+            "https://forum.gamer.com.tw/G2.php?bsn=6035&sn=12"
+          ],
+          [
+            "2025 PCSX2 回覆",
+            "https://forum.gamer.com.tw/Co.php?bsn=6035&sn=853"
+          ]
+        ],
+        "source": "https://forum.gamer.com.tw/listG.php?bsn=6035"
       }
     ],
-    "count": 34
+    "count": 39
   }
 ]
