@@ -64,6 +64,36 @@
  }
  window.yt3ReconcileRowCrops=reconcileRowCrops;
 
+ // Separator-free search runs on unresolved rows only; both independent crops
+ // must agree before upgrading a candidate to a confirmed name.
+ function compareFlatCrops(base,aligned,raw,players){
+   const a=aligned?.m,b=raw?.m;
+   const first=a?.candidates?.[0],second=b?.candidates?.[0];
+   if(!first?.p?._uid||first.p._uid!==second?.p?._uid)return base;
+   const uid=first.p._uid;
+   const uniqueName=s=>String(s||'').normalize('NFKC').replace(/\s/g,'');
+   const unique=players.filter(x=>uniqueName(x['名前'])===uniqueName(first.p['名前'])).length===1;
+   if(!unique)return base;
+   const independent=!!aligned?.canvas&&!!raw?.canvas&&aligned.canvas!==raw.canvas;
+   const bothConfirm=independent&&a.match?.p?._uid===uid&&b.match?.p?._uid===uid&&
+     Math.abs((first.score||0)-(second.score||0))<=.12;
+   if(bothConfirm&&!base?.m?.match){
+     const stronger=aligned.score>=raw.score?aligned:raw;
+     return{...stronger,m:{...stronger.m,method:'two independent separator-free crops'}};
+   }
+   // Rank a stable, previously excluded name as a candidate without making
+   // unsupported accuracy claims.
+   if(!base?.m?.match&&first.score>=.66&&second.score>=.66&&
+     (base?.score??-9)<Math.min(first.score,second.score)-.06){
+     const candidate={...first,score:Math.min(first.score,second.score)};
+     const tail=(base?.m?.candidates||[]).filter(x=>x.p?._uid!==uid).slice(0,4);
+     return{...aligned,score:candidate.score,m:{...aligned.m,match:null,
+       candidates:[candidate,...tail],method:'unresolved separator-free candidate'}};
+   }
+   return base;
+ }
+ window.yt3CompareFlatCrops=compareFlatCrops;
+
  function matchAligned(aligned,number,players,category){let best=null,confirmed=null,attempts=[];
   for(const dy of [-2,-1,0,1]){
    const c=rowCanvas(aligned,number,dy),m=yt3ClaudeGlyph.match(c,players,category),sc=m.candidates?.[0]?.score;
@@ -139,6 +169,14 @@
             (attempt.m.match&&!item.m.match&&same&&attempt.score>=item.score-.055))item=attempt;
         }
       }
+    }
+    if(!item.m?.match&&item.m?.candidates?.length){
+      const flatAligned=yt3ClaudeGlyph.match(item.canvas,state.players,'',{forceFlat:true});
+      const flatOriginal=yt3ClaudeGlyph.match(copy.canvas,state.players,'',{forceFlat:true});
+      item=compareFlatCrops(item,
+       {canvas:item.canvas,m:flatAligned,score:flatAligned.candidates?.[0]?.score??-9},
+       {canvas:copy.canvas,m:flatOriginal,score:flatOriginal.candidates?.[0]?.score??-9},
+       state.players);
     }
     const m=item.m;
     results.push(output({canvas:item.canvas,file:copy.file,row:number,category:s.category,

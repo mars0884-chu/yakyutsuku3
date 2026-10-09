@@ -286,5 +286,21 @@
     "status": "search_indexed_partial",
     "priority": 3,
     "note": "索引可取得兩個完整歷史 URL，直接閱讀正文 403，不假稱已讀取全文。"
+  },
+  {
+    "name": "2007 やきゅつく3 45年目：玩家 FAQ 與練習道具差異",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1192516413",
+    "role": "2007 年 PS2 三代公開可讀歷史討論與外站目錄",
+    "status": "verified_fulltext_player_observation",
+    "priority": 3,
+    "note": "練習道具同樣顯示◎仍可能有不同數值成長；頁內另見 ya3.tsukuclear.com 舊站連結。只整理已確認的新資訊，重複 FAQ 不再匯入。"
+  },
+  {
+    "name": "ya3.tsukuclear.com やきゅつく3 舊攻略站",
+    "url": "http://ya3.tsukuclear.com/",
+    "role": "2007 年 45年目與 2021 年 55年目玩家串仍引用的舊三代攻略站",
+    "status": "historical_reference_unavailable",
+    "priority": 4,
+    "note": "歷史串能確認網址與用途，但現站正文無法可靠讀取；不使用未知站內容建構攻略。"
   }
 ]

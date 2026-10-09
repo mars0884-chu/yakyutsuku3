@@ -19,7 +19,7 @@ function rowData(src){let found=cache.get(src);if(found)return found;
  if(median>145)for(let i=0;i<gray.length;i++)gray[i]=Math.min(255,Math.max(0,Math.round(75+(median-gray[i])*2)));
  let block=null,st=-1;for(let x=40;x<=Math.min(125,width);x++){let count=0;if(x<width)for(let y=2;y<14;y++)if(gray[y*width+x]>180)count++;const yes=count/12>.58;if(yes&&st<0)st=x;if((!yes||x===125)&&st>=0){if(x-st>=7&&(!block||x-st>block[1]-block[0]))block=[st,x];st=-1}}
  const origin=(l,r)=>{let sum=0;for(let y=0;y<16;y++)for(let x=l;x<r;x++)sum+=gray[y*width+x];const th=sum/Math.max(1,16*(r-l))+30;for(let x=l;x<r;x++)for(let y=0;y<16;y++)if(gray[y*width+x]>th)return x;return -1};
- found={gray,width,block,left:origin(39,Math.min(width,block?block[0]-2:160)),right:block?origin(block[1]+2,Math.min(width,160)):-1,features:new Map(),scores:new Map()};cache.set(src,found);return found;}
+ found={gray,width,block,left:origin(39,Math.min(width,block?block[0]-2:160)),flatLeft:origin(39,Math.min(width,160)),right:block?origin(block[1]+2,Math.min(width,160)):-1,features:new Map(),scores:new Map()};cache.set(src,found);return found;}
 function feature(row,side,k,off,dy){const key=`${side}/${k}/${off}/${dy}`;let v=row.features.get(key);if(v)return v;
  v=new Float32Array(256);const x0=(side==='R'?row.right:row.left)+off+16*k-1;let sum=0;for(let y=0;y<16;y++)for(let x=0;x<16;x++){const ax=Math.max(0,Math.min(row.width-1,x0+x)),ay=Math.max(0,Math.min(17,y+dy));const vv=row.gray[ay*row.width+ax];v[y*16+x]=vv;sum+=vv}const mean=sum/256;let energy=0;for(let j=0;j<256;j++){v[j]-=mean;energy+=v[j]*v[j]}const inv=1/Math.sqrt(energy+1e-8);for(let j=0;j<256;j++)v[j]*=inv;row.features.set(key,v);return v;}
 function cs(row,side,k,off,dy,ch){const idx=chars.get(ch);if(idx===undefined)return -.35;const key=`${side}/${k}/${off}/${dy}`;let scores=row.scores.get(key);if(!scores){scores=new Float32Array(glyphs.length);row.scores.set(key,scores)}const found=scores[idx];if(found)return found-2;const a=feature(row,side,k,off,dy),g=glyphs[idx];let s=0;for(let i=0;i<256;i++)s+=a[i]*g[i];scores[idx]=s+2;return s;}
@@ -60,10 +60,10 @@ function handFeature(row,x0,dy){const v=new Float32Array(256);let sum=0;for(let 
 function readHand(row,threshold){if(row.width<270)return null;let o=-1;for(let x=205;x<267;x++){let n=0;for(let y=2;y<14;y++)if(row.gray[y*row.width+x]>threshold)n++;if(n>=2){o=x;break}}if(o<0)return null;
  const labels=['右','左','両'];const classify=x=>{let best=[];for(const ch of labels){const t=glyphs[chars.get(ch)];if(!t)continue;let sc=-9;for(const dx of [-2,-1,0,1,2]){const a=handFeature(row,x+dx-1,0);let v=0;for(let k=0;k<256;k++)v+=a[k]*t[k];sc=Math.max(sc,v)}best.push({ch,sc})}best.sort((a,b)=>b.sc-a.sc);return{v:best[0]?.ch||'',s:best[0]?.sc||0,margin:(best[0]?.sc||0)-(best[1]?.sc||0)}};
  const a=classify(o),b=classify(o+24);return{guess:a.v+'/'+b.v,first:a,second:b,origin:o,reliable:a.s>=.55&&b.s>=.55&&a.margin>=.07&&b.margin>=.07};}
-function match(canvas,players,category,options={}){if(!glyphs)throw Error('離線 16x16 字形尚未載入');const row=rowData(canvas);const eligible=listFor(players,category);
+function match(canvas,players,category,options={}){if(!glyphs)throw Error('離線 16x16 字形尚未載入');const rawRow=rowData(canvas);const row=options.forceFlat?{...rawRow,block:null,left:rawRow.flatLeft,features:new Map(),scores:new Map()}:rawRow;const eligible=listFor(players,category);
  let n=0,brightness=0;for(let y=2;y<14;y++)for(let x=39;x<160;x+=2){brightness+=row.gray[y*row.width+x];n++}const threshold=brightness/n+38;
- const hand=readHand(row,threshold);const scored=[];const canSplit=!!row.block&&row.left>=0&&row.right>=0;
- for(const t of eligible){const {S,G}=t;if(!S.length)continue;if(canSplit){if(!G.length||Math.abs(row.block[0]-(row.left+16*S.length+3.5))>(options.recovery?24:10))continue}else if(S.length+G.length>(options.recovery?12:9)||row.left<0)continue;
+ const hand=readHand(row,threshold);const scored=[];const canSplit=!options.forceFlat&&!!row.block&&row.left>=0&&row.right>=0;
+ for(const t of eligible){const {S,G}=t;if(!S.length)continue;if(canSplit){if(!G.length||Math.abs(row.block[0]-(row.left+16*S.length+3.5))>(options.recovery?24:10))continue}else if(S.length+G.length>((options.recovery||options.forceFlat)?12:9)||row.left<0)continue;
   let score=-4;for(const dy of [-1,0,1]){let s;if(canSplit){const l=seq(row,'L',S,dy,threshold),r=seq(row,'R',G,dy,threshold);s=(l*S.length+r*G.length)/(S.length+G.length)}else s=seq(row,'L',S.concat(G),dy,threshold);score=Math.max(score,s)}
   if(Number.isFinite(score)&&score>-.7){const handed=String(t.p['投/打']||'').replace('／','/');const handAdjustment=hand?.reliable&&(handed==='右/右'||handed==='左/右'||handed==='右/左'||handed==='左/左'||handed==='右/両'||handed==='左/両')?(handed===hand.guess?.06:-.06):0;scored.push({p:t.p,name:t.name,score:score+handAdjustment,visualScore:score,handScore:handAdjustment});}
  }
@@ -85,8 +85,8 @@ function match(canvas,players,category,options={}){if(!glyphs)throw Error('離�
  }
  const top=scored.slice(0,5),best=top[0],second=top[1],margin=(best?.score??-9)-(second?.score??-9);
  const duplicates=best?eligible.filter(x=>canon(x.name)===canon(best.name)).length:0;
- const confident=!!best&&duplicates===1&&(options.recovery?best.score>=.73&&margin>=.18&&best.visualScore>=.69:alreadyStrong?best.score>=.60&&margin>=.14:best.score>=.65&&margin>=.15&&best.visualScore>=.55);
+ const confident=!!best&&duplicates===1&&(options.forceFlat?best.score>=.78&&margin>=.22&&best.visualScore>=.75:options.recovery?best.score>=.73&&margin>=.18&&best.visualScore>=.69:alreadyStrong?best.score>=.60&&margin>=.14:best.score>=.65&&margin>=.15&&best.visualScore>=.55);
  row.features.clear();row.scores.clear();cache.delete(canvas); // release large per-row CV caches before next photo
- return{candidates:top,match:confident?best:null,margin,hand,method:'16x16 pixel glyph + uncertain-row fine spacing'};
+ return{candidates:top,match:confident?best:null,margin,hand,method:options.forceFlat?'16x16 separator-free': '16x16 pixel glyph + uncertain-row fine spacing'};
 }
 window.yt3ClaudeGlyph={init,match};})();
