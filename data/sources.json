@@ -142,5 +142,13 @@
     "status": "active",
     "priority": 4,
     "note": "以實況球隊歷史為主，對核心公式價值較低，列為旁證。"
+  },
+  {
+    "name": "巴哈姆特：3代球員的技藝（PS2 3）",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=140",
+    "role": "球員技藝索引（僅摘要，尚未取得全文）",
+    "status": "indexed_partial",
+    "priority": 4,
+    "note": "2026-10-09 搜尋索引能看到三種觸發類型的開頭，但直接存取 403；尚無法逐項核對完整條件、效果。不能列為已完整擷取。"
   }
 ]
