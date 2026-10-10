@@ -55,6 +55,8 @@ jobs:
         run: node scripts/smoke-r29.mjs
       - name: Verify r30 blank row suppression and ZIP import
         run: node scripts/smoke-r30.mjs
+      - name: Verify r31 ZIP-group overlap and player comparison
+        run: node scripts/smoke-r31.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail

@@ -119,7 +119,8 @@
  }
  window.yt3TentativeCandidate=tentativeCandidate;
 
- const output=(r,i)=>({canvas:r.canvas,file:r.file,row:r.row,firstIndex:i,
+ const batchGroupOf=name=>String(name||'').match(/^(.+?)__/)?.[1]||'單張截圖';
+ const output=(r,i)=>({canvas:r.canvas,file:r.file,row:r.row,batchGroup:batchGroupOf(r.file),firstIndex:i,
     parsed:{pos:({投手:'投',捕手:'捕',內野手:'一',外野手:'外'})[r.category]||''},sources:r.sources||[],
     match:r.match||null,resolved:r.match?null:tentativeCandidate(r.candidates,state.players),candidates:r.candidates||[],score:r.candidates?.[0]?.score||0,
     raw:r.mode,status:r.match?'確認':'候選'});
@@ -202,17 +203,50 @@
     if(i%2===1)await frame();
    }
    // Two unrelated row groups cannot both be confirmed as the exact same player.
-   const byName=new Map();for(const row of results)if(row.match){const n=row.match.p['名前'];const a=byName.get(n)||[];a.push(row);byName.set(n,a)}
-   for(const rows of byName.values())if(rows.length>1)for(const r of rows){r.match=null;r.status='候選'}
-   const confirmedIds=new Set(results.filter(r=>r.match).map(r=>r.match.p?._uid));
-   for(const r of results)if(r.resolved&&confirmedIds.has(r.resolved.p?._uid))r.resolved=null;
+   // A player can legitimately appear in different ZIP/season rosters. Only
+   // duplicated names inside the SAME capture sequence require collision review.
+   const byName=new Map();
+   for(const row of results)if(row.match){
+     const key=row.batchGroup+'|'+String(row.match.p['名前']).normalize('NFKC').replace(/\s/g,'');
+     const group=byName.get(key)||[];group.push(row);byName.set(key,group);
+   }
+   for(const group of byName.values())if(group.length>1){
+     for(const row of group){row.match=null;row.status='候選'}
+   }
+   const confirmedIds=new Set(results.filter(r=>r.match).map(r=>r.batchGroup+'|'+r.match.p?._uid));
+   for(const row of results)if(row.resolved&&confirmedIds.has(row.batchGroup+'|'+row.resolved.p?._uid))row.resolved=null;
    state.batchRawRows=results;state.batchRows=results;state.expectedTotal=0;renderBatchResults();
    const confirmed=results.filter(r=>r.match).length;
    const actualRows=results.length;
    const inferred=results.filter(r=>!r.match&&r.resolved).length;
+   // Compact, collapsed provenance breakdown helps compare Safari and desktop
+   // WITHOUT treating four independent saves as one continuous team roster.
+   const perArchive=new Map();
+   const slot=group=>{
+     if(!perArchive.has(group))perArchive.set(group,{raw:0,unique:0,confirmed:0,tentative:0,pending:0});
+     return perArchive.get(group);
+   };
+   for(const group of grouped.groups||[]){
+     const key=batchGroupOf(group.copies?.[0]?.file);
+     const n=slot(key);n.raw+=group.copies.length;n.unique++;
+   }
+   for(const row of results){
+     const n=slot(row.batchGroup);
+     if(row.match)n.confirmed++;else if(row.resolved)n.tentative++;else n.pending++;
+   }
+   const oldBreakdown=document.getElementById('batchArchiveDetails');if(oldBreakdown)oldBreakdown.remove();
+   if(perArchive.size>1){
+     const detail=document.createElement('details');detail.id='batchArchiveDetails';detail.className='batch-archive-breakdown';
+     const htmlEscape=text=>String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+     detail.innerHTML='<summary>展開各 ZIP／資料夾的辨識統計</summary>'+
+       '<div class="compare-scroll"><table class="guide-table"><thead><tr><th>來源</th><th>姓名列</th><th>不同列</th><th>確認</th><th>推定</th><th>候選</th></tr></thead><tbody>'+
+       [...perArchive].map(([name,n])=>'<tr><td>'+htmlEscape(name)+'</td><td>'+n.raw+'</td><td>'+n.unique+'</td><td>'+n.confirmed+'</td><td>'+n.tentative+'</td><td>'+n.pending+'</td></tr>').join('')+'</tbody></table></div>';
+     byId('batchSummary').after(detail);
+   }
+
    const failed=aligned.filter(x=>!x.valid||x.loc.score<.65).length;
    const overlapCount=grouped.overlaps.reduce((n,e)=>n+e.k,0);
-   update(100,`完成：${grouped.rawRows} 有姓名原始列 → ${results.length} 個不同列位（跨頁去重 ${overlapCount}）；確認 ${confirmed}、推定 ${inferred}、候選 ${results.length-confirmed-inferred}${failed?'；'+failed+' 張表頭改用備援':''}｜全程本機、無 AI`);
+   update(100,`完成：${grouped.rawRows} 有姓名原始列 → ${results.length} 個不同列位（跨頁去重 ${overlapCount}）；確認 ${confirmed}、推定 ${inferred}、候選 ${results.length-confirmed-inferred}；來源群組 ${grouped.sequenceGroups?.length||1}${failed?'；'+failed+' 張表頭改用備援':''}｜各來源獨立去重・全程本機、無 AI`);
   }catch(error){console.error(error);byId('batchStatus').textContent='辨識未完成：'+String(error?.message||error)}
   finally{runButton.disabled=false}
  };

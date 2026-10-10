@@ -58,6 +58,13 @@ function choosePixel(a,b,debug=false){
  if(debug)return all.sort((a,b)=>b.avg-a.avg).slice(0,6);
  return opts.sort((a,b)=>(b.avg+Math.min(.025,b.k*.004))-(a.avg+Math.min(.025,a.k*.004))||b.k-a.k)[0]||null;
 }
+// Each ZIP/folder is an independent capture sequence. Never infer that the
+// bottom of one archive continues at the top of another archive.
+function batchSource(name){
+ const text=String(name||'');
+ const m=/^(.+?)__/.exec(text);
+ return m?m[1]:'單張截圖';
+}
 function naturalCompare(a,b){return String(a||'').localeCompare(String(b||''),'en',{numeric:true,sensitivity:'base'})}
 function analyze(inputs,aligned=[]){
  // Name/number sorting is not an answer source. It only reconstructs screenshot traversal.
@@ -79,11 +86,19 @@ function analyze(inputs,aligned=[]){
  const parent=Array.from({length:n},(_,i)=>i),find=i=>parent[i]===i?i:(parent[i]=find(parent[i])),join=(i,j)=>{i=find(i);j=find(j);if(i!==j)parent[j]=i};
  const edges=[];
  for(let i=0;i<pages.length-1;i++){
-  const a=pages[i],b=pages[i+1],sameTab=!categories[i]||!categories[i+1]||categories[i]===categories[i+1];
-  if(!sameTab)continue;
-  const px=choosePixel(a,b),fallback=oldPair(a,b);
-  let chosen=px;
-  if(!chosen&&fallback?.k){
+  const a=pages[i],b=pages[i+1],sameBatch=batchSource(ordered[i].name)===batchSource(ordered[i+1].name),sameTab=!categories[i]||!categories[i+1]||categories[i]===categories[i+1];
+  if(!sameBatch||!sameTab)continue;
+  // Scores near the threshold vary across JPEG/canvas decoders on Safari/Edge.
+  // Ambiguous boundaries are safer left unmerged than silently deleting players.
+  const px=choosePixel(a,b),alternatives=choosePixel(a,b,true);
+  const runner=px?alternatives.find(q=>q.k!==px.k&&q.avg>=.65):null;
+  const decisive=px&&
+    (px.k===1?px.avg>=.925:px.avg>=.805&&px.min>=.75)&&
+    (!runner||px.avg-runner.avg>=.055||px.avg>=.94);
+  const safePixel=decisive?px:null;
+  const fallback=oldPair(a,b);
+  let chosen=safePixel;
+  if(!chosen&&fallback?.k&&(!px||!runner||px.avg-runner.avg>=.055)){
     const k=fallback.k;let trusted=fallback.avg>=.81&&fallback.min>=.76;
     // Weak row masks alone are insufficient; require two independent matching pairs.
     if(!trusted&&k===1&&fallback.avg>=.76){
@@ -102,10 +117,13 @@ function analyze(inputs,aligned=[]){
     for(let j=0;j<chosen.k;j++)join(offsets[i]+a.length-chosen.k+j,offsets[i+1]+j)}
  }
  const groups=new Map();for(let p=0;p<pages.length;p++)for(let j=0;j<pages[p].length;j++){
-  const key=find(offsets[p]+j),entry={...pages[p][j],imageIndex:ordered[p].original,originalRow:pages[p][j].row||j+1,file:ordered[p].name,screenCategory:categories[p]};
+  const key=find(offsets[p]+j),entry={...pages[p][j],imageIndex:ordered[p].original,originalRow:pages[p][j].row||j+1,file:ordered[p].name,screenCategory:categories[p],screenBatch:batchSource(ordered[p].name)};
   if(!groups.has(key))groups.set(key,{copies:[],firstImage:ordered[p].original,firstRow:pages[p][j].row||j+1});groups.get(key).copies.push(entry);
  }
- return {rawRows:n,uniqueRows:groups.size,groups:[...groups.values()],overlaps:edges};
+ return {rawRows:n,uniqueRows:groups.size,groups:[...groups.values()],
+  overlaps:edges,sequenceGroups:[...new Set(ordered.map(x=>batchSource(x.name)))],
+  // All cross-ZIP boundaries are explicit non-merge boundaries.
+  boundaryPolicy:'archive-isolated; marginal edges unmerged'};
 }
 window.yt3OfflineOverlapsV14=analyze;
 window.yt3PixelOverlap=choosePixel;

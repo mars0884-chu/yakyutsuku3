@@ -358,5 +358,37 @@
     "status": "index_accessible_subpages_unavailable",
     "priority": 3,
     "note": "首頁章節索引可讀，已試點的一年模式和優秀選手子頁 404；未把頁名冒充已取得正文。"
+  },
+  {
+    "name": "巴哈姆特：模擬職棒3 新的金手指（PS2，2006）",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=121",
+    "role": "歷史 XT／PAR 主碼、資金、Scouting 和 Memo 改造碼；有玩家同時使用出差＋設施碼當機回報",
+    "status": "verified_fulltext_crosschecked_existing_cheats",
+    "priority": 2,
+    "note": "已和既有金手指章 Hiscode 對照；新增來源交叉引用即可，避免把完全相同碼表再匯入一份。"
+  },
+  {
+    "name": "えびたま：やきゅつく3 ベイスターズ編 2 年目",
+    "url": "https://note.com/ebitama52/n/nbff2432e1683",
+    "role": "2023 PS2 實戰：年資較短選手交易受阻案例、球員接班",
+    "status": "verified_fulltext_player_save_case",
+    "priority": 3,
+    "note": "與作者 GBA／2003 版本分開；本頁明確 PS2《やきゅつく3》，只引用案例不推導普遍公式。"
+  },
+  {
+    "name": "えびたま：やきゅつく3 ベイスターズ編 7 年目",
+    "url": "https://note.com/ebitama52/n/naf16e95a05a3",
+    "role": "2023 PS2 實戰：教練投球變化球指導與長期經營",
+    "status": "verified_fulltext_player_save_case",
+    "priority": 3,
+    "note": "投手教練優先能指導滑球、指叉、噴射三方向，玩家單一存檔經驗；非官方加成規則。"
+  },
+  {
+    "name": "えびたま：やきゅつく3 ベイスターズ編 12 年目",
+    "url": "https://note.com/ebitama52/n/n6768cdc83ed5",
+    "role": "2024 PS2 長期玩家日記：游擊接班／世代交替",
+    "status": "verified_fulltext_player_save_case",
+    "priority": 3,
+    "note": "11~12 年玩家實戰，游擊位置補強困難，不能直接推成全部球團的固定規則。"
   }
 ]

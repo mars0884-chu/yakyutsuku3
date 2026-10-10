@@ -165,5 +165,10 @@
     "claude_plan_review": "2026-10-09 r18 Claude Code spec examined: Python-based per-row empty-name gate, glyph/hand constraints and split/selected rows are useful. The golden answer files are not bundled into PWA or used as recognition hints.",
     "research_new": "2006 40年目 and 2011 52年目 historical PS2 threads identify old PukiWiki, 神様２人のサイト, Vector data tool, Jenova idea memo tables, and notitle/yaku3 index. Jenova and notitle index are fetchable but some characters/subpages are unavailable; Geocities/Livedoor/Vector old endpoints unavailable. Marked as indexes or historical references, NOT fully imported gameplay rules.",
     "dedup": "Added one external-links chapter/table in sources. Removed one repeated newcomer salary summary already present in cheap/contract guide. Exact table-row duplicates remain zero."
+  },
+  "r31_progress": {
+    "checked_at": "2026-10-10",
+    "result": "Mixed ZIP stress coverage ~50%, not true name accuracy. Fixed cross-ZIP overlap boundary and duplicate-name conflict scoped to each archive. Restored compare 4 players. PS2 verified Bahamut code post snA=121 already exists in cheats; no repeat import. PS2 Yokohama diary adds three unique observations with original Japanese + Traditional Chinese.",
+    "unverified": "Real Safari/Chrome retest is still required. Old mixed screenshot counts do not represent verified accuracy."
   }
 }
