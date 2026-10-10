@@ -625,10 +625,6 @@
             "可先二軍、年底 5 年；或第一年當替補、第二年二軍／留學後再鎖長約。"
           ],
           [
-            "新人",
-            "初期能力很高：第一年二軍／留學後直接 5 年約，例示約現狀～＋500 萬；需較久育成者可先一年約，第二年留學再 5 年。"
-          ],
-          [
             "Trade 球員",
             "取得後二軍／留學再年底 5 年，可壓薪；另一種實戰是取得後先用，11 月再 Trade 放出，視作短期低成本租用。"
           ],
@@ -644,7 +640,7 @@
         "source": "https://www.sheepplus.com/yakyutsuku3/color/salary.html"
       }
     ],
-    "count": 22
+    "count": 21
   },
   {
     "id": "models_20261005",
@@ -9976,9 +9972,46 @@
           ]
         ],
         "source": "https://kako.5ch.io/test/read.cgi/gamespo/1192516413"
+      },
+      {
+        "type": "table",
+        "title": "外部歷史攻略站續查（2006 舊串→現存／失效頁）",
+        "headers": [
+          "原始日文站名",
+          "繁體中文查核結果",
+          "連結"
+        ],
+        "rows": [
+          [
+            "やきゅつく３Wiki／Livedoor PukiWiki",
+            "2006 年三代 40年目串與後續模板有引用；原站失效，無法驗證全文。",
+            "http://f56.aaa.livedoor.jp/~lotte/pukiwiki14/pukiwiki.php?FrontPage"
+          ],
+          [
+            "神様２人のサイト",
+            "GeoCities Japan 舊個人攻略站；歷史引用成立，正文目前不可取得。",
+            "http://www.geocities.jp/yakyutuku4/"
+          ],
+          [
+            "選手データツール／Vector",
+            "2006 年玩家所指的選手資料工具作者頁，目前未確認可下載版本。",
+            "http://hp.vector.co.jp/authors/VA043416/"
+          ],
+          [
+            "アイデアメモ一覧・組み合わせ／Jenova",
+            "兩頁仍可開啟，但舊編碼與既有經營企劃逆引內容重疊；未逐條核實前不重複放入配方。",
+            "https://hccweb5.bai.ne.jp/jenova/game/yakyu/memo.html"
+          ],
+          [
+            "やきゅつく3メモ／notitle",
+            "章節索引仍可閱讀，一年模式等已測試子頁回傳 404；保留索引，不冒稱完整攻略。",
+            "https://notitle.moo.jp/ch/yaku3/"
+          ]
+        ],
+        "source": "https://kako.5ch.io/test/read.cgi/gamespo/1157525747"
       }
     ],
-    "count": 48
+    "count": 53
   },
   {
     "id": "bugs",

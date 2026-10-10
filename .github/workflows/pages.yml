@@ -53,6 +53,8 @@ jobs:
         run: node scripts/smoke-r28.mjs
       - name: Verify r29 selected navy rows and tentative display
         run: node scripts/smoke-r29.mjs
+      - name: Verify r30 blank row suppression and ZIP import
+        run: node scripts/smoke-r30.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
@@ -63,6 +65,8 @@ jobs:
           mkdir -p _site
           cp index.html styles.css app.js manifest.webmanifest sw.js VERSION _site/
           cp -R assets data engine _site/
+          mkdir -p _site/vendor
+          cp node_modules/jszip/dist/jszip.min.js _site/vendor/jszip.min.js
           touch _site/.nojekyll
       - name: Publish complete site to gh-pages branch
         env:

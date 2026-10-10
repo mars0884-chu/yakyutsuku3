@@ -43,6 +43,8 @@
 <section id="view-batch" class="view">
   <div class="batch-actions">
     <label class="filebtn">選擇截圖<input id="batchFiles" type="file" accept="image/*" multiple></label>
+    <label class="filebtn">加入 ZIP<input id="batchZip" type="file" accept=".zip,application/zip" multiple></label>
+    <label class="filebtn">加入資料夾<input id="batchFolder" type="file" accept="image/*" multiple webkitdirectory directory></label>
     <button id="runBatch" class="primary">開始找人</button>
     <button id="clearBatch">清除</button>
   </div>
@@ -71,6 +73,7 @@
 
 <div id="drawer" class="drawer" aria-hidden="true"><div class="shade"></div><article class="sheet"><button id="closeDrawer" class="close">關閉</button><div id="drawerBody"></div></article></div>
 
+<script src="./vendor/jszip.min.js" defer></script>
 <script src="./app.js" defer></script>
 <script src="./engine/cv_dice.js" defer></script>
 <script src="./engine/geometry-fixed.js" defer></script>
@@ -79,6 +82,7 @@
 <script src="./engine/r14-overlap-r18.js" defer></script>
 <script src="./engine/claude-cv-coarse.js" defer></script>
 <script src="./engine/claude-align-r17.js" defer></script>
+<script src="./engine/r30-row-ink.js" defer></script>
 <script src="./engine/claude-cv-r18.js" defer></script>
 <script src="./engine/r18-batch.js" defer></script>
 </body>

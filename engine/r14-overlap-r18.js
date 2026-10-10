@@ -59,12 +59,22 @@ function choosePixel(a,b,debug=false){
  return opts.sort((a,b)=>(b.avg+Math.min(.025,b.k*.004))-(a.avg+Math.min(.025,a.k*.004))||b.k-a.k)[0]||null;
 }
 function naturalCompare(a,b){return String(a||'').localeCompare(String(b||''),'en',{numeric:true,sensitivity:'base'})}
-function analyze(inputs){
+function analyze(inputs,aligned=[]){
  // Name/number sorting is not an answer source. It only reconstructs screenshot traversal.
  const mapped=inputs.map((x,i)=>({im:x.image||x,name:x.name||x.yt3Filename||String(i),original:i}));
  const ordered=mapped.every(x=>x.name)?[...mapped].sort((a,b)=>naturalCompare(a.name,b.name)):mapped;
  const categories=ordered.map(({im})=>yt3CaptureCategory(im));
- const pages=ordered.map(({im},i)=>batchTestRows(im,String(i)));
+ const pages=ordered.map(({im,original},i)=>{
+  const rows=batchTestRows(im,String(i));
+  const normal=aligned[original];
+  if(!normal?.valid||!window.yt3RowInkGate)return rows;
+  // A badge/icon, gridline or empty player slot must not enter roster comparison.
+  // Preserve originalRow: only the physical rows with printed NAME ink can overlap.
+  return rows.filter(r=>{
+   const decision=window.yt3RowInkGate(normal.canvas,r.row);
+   return decision.hasName||decision.uncertain;
+  });
+ });
  const offsets=[];let n=0;for(const pg of pages){offsets.push(n);n+=pg.length}
  const parent=Array.from({length:n},(_,i)=>i),find=i=>parent[i]===i?i:(parent[i]=find(parent[i])),join=(i,j)=>{i=find(i);j=find(j);if(i!==j)parent[j]=i};
  const edges=[];

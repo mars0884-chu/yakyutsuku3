@@ -310,5 +310,53 @@
     "status": "verified_fulltext_player_challenge",
     "priority": 3,
     "note": "2023-10-08 作者公開可讀正文；4 種自訂挑戰條件已整合到進階章，僅標示玩家縛り，不冒充遊戲內建規則。"
+  },
+  {
+    "name": "2006 三代舊 Wiki（Livedoor）",
+    "url": "http://f56.aaa.livedoor.jp/~lotte/pukiwiki14/pukiwiki.php?FrontPage",
+    "role": "40年目討論串和後續模板反覆引用的 PS2 三代 Wiki",
+    "status": "historical_reference_unavailable",
+    "priority": 4,
+    "note": "2006~2011 討論串確認 URL；現頁無法存取，正文未取得，不做推測性匯入。"
+  },
+  {
+    "name": "2006 神様２人のサイト（舊個人站）",
+    "url": "http://www.geocities.jp/yakyutuku4/",
+    "role": "2006 歷史模板的三代個人攻略連結",
+    "status": "historical_reference_unavailable",
+    "priority": 4,
+    "note": "2006 40年目與 2011 52年目模板反覆引用；GeoCities JP 舊站目前失效。"
+  },
+  {
+    "name": "やきゅつく3 選手データツール（Vector 作者）",
+    "url": "http://hp.vector.co.jp/authors/VA043416/",
+    "role": "PS2 三代舊玩家用選手資料工具發行頁",
+    "status": "historical_link_unreadable",
+    "priority": 4,
+    "note": "2006 年舊串提供確切 Vector 作者 URL；無法確認目前程式下載或內容，不能當作完整可用工具。"
+  },
+  {
+    "name": "Jenova 舊站：アイデアメモ一覧",
+    "url": "https://hccweb5.bai.ne.jp/jenova/game/yakyu/idea.html",
+    "role": "日本三代舊攻略站：地區別 Idea Memo 條目",
+    "status": "readable_index_encoding_limited",
+    "priority": 3,
+    "note": "站內頁面目前可開啟，但舊編碼造成部分文字無法可靠轉出；僅加入來源索引，不重複匯入未校對的配方。"
+  },
+  {
+    "name": "Jenova 舊站：アイデアメモ組み合わせ",
+    "url": "https://hccweb5.bai.ne.jp/jenova/game/yakyu/memo.html",
+    "role": "日本三代舊攻略站：Memo 條件組合表",
+    "status": "readable_index_encoding_limited",
+    "priority": 3,
+    "note": "頁面可讀表格結構，文字編碼暫未完整校對，與既有經營企劃逆引大量重疊，未重複匯入。"
+  },
+  {
+    "name": "やきゅつく3メモ（notitle 舊站子目錄）",
+    "url": "https://notitle.moo.jp/ch/yaku3/",
+    "role": "玩家三代攻略章節索引：一季模式、強力技能、守位推薦",
+    "status": "index_accessible_subpages_unavailable",
+    "priority": 3,
+    "note": "首頁章節索引可讀，已試點的一年模式和優秀選手子頁 404；未把頁名冒充已取得正文。"
   }
 ]

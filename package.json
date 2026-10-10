@@ -12,6 +12,7 @@
     "cheerio": "1.0.0",
     "sharp": "0.33.5",
     "@paddleocr/paddleocr-js": "0.4.2",
-    "esbuild": "0.25.10"
+    "esbuild": "0.25.10",
+    "jszip": "3.10.1"
   }
 }

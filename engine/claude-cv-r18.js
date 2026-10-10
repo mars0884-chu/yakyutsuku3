@@ -61,6 +61,12 @@ function readHand(row,threshold){if(row.width<270)return null;let o=-1;for(let x
  const labels=['右','左','両'];const classify=x=>{let best=[];for(const ch of labels){const t=glyphs[chars.get(ch)];if(!t)continue;let sc=-9;for(const dx of [-2,-1,0,1,2]){const a=handFeature(row,x+dx-1,0);let v=0;for(let k=0;k<256;k++)v+=a[k]*t[k];sc=Math.max(sc,v)}best.push({ch,sc})}best.sort((a,b)=>b.sc-a.sc);return{v:best[0]?.ch||'',s:best[0]?.sc||0,margin:(best[0]?.sc||0)-(best[1]?.sc||0)}};
  const a=classify(o),b=classify(o+24);return{guess:a.v+'/'+b.v,first:a,second:b,origin:o,reliable:a.s>=.55&&b.s>=.55&&a.margin>=.07&&b.margin>=.07};}
 function match(canvas,players,category,options={}){if(!glyphs)throw Error('離線 16x16 字形尚未載入');const rawRow=rowData(canvas);const row=options.forceFlat?{...rawRow,block:null,left:rawRow.flatLeft,features:new Map(),scores:new Map()}:rawRow;const eligible=listFor(players,category);
+ // An empty name box is not a very short player name. Never compare a grid
+ // background or the position icon against the full 3,767-player roster.
+ let visibleInk=0;
+ for(let y=2;y<14;y++)for(let x=39;x<Math.min(160,row.width);x++)
+   if(row.gray[y*row.width+x]>140)visibleInk++;
+ if(visibleInk<42)return{candidates:[],match:null,margin:0,hand:null,method:'empty-name-suppressed'};
  let n=0,brightness=0;for(let y=2;y<14;y++)for(let x=39;x<160;x+=2){brightness+=row.gray[y*row.width+x];n++}const threshold=brightness/n+38;
  const hand=readHand(row,threshold);const scored=[];const canSplit=!options.forceFlat&&!!row.block&&row.left>=0&&row.right>=0;
  for(const t of eligible){const {S,G}=t;if(!S.length)continue;if(canSplit){if(!G.length||Math.abs(row.block[0]-(row.left+16*S.length+3.5))>(options.recovery?24:10))continue}else if(S.length+G.length>((options.recovery||options.forceFlat)?12:9)||row.left<0)continue;

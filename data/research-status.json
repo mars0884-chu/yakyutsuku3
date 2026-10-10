@@ -156,5 +156,14 @@
     "web_audit": "Rechecked Bahamut board 6035 historical external guide index and Co sn=470, still blocked/403 for direct content; existing Ikasumi, Geocities kiyopf1005, datapot, ya3.tsukuclear links remain separately categorized by readability. No new Bahamut fulltext claimed.",
     "new_readable_external": "2023 Japanese PS2 long-form diary re-owls.com/entry/100123 has a readable first-person challenge rule set; unique four self-imposed rules added to advanced guide, never treated as game mechanics.",
     "dedup": "Rechecked complete guide table for exact row duplicates (zero) and ensured new challenge article is stored only once, with original Japanese alongside Traditional Chinese."
+  },
+  "r30_batch_and_research": {
+    "real_sample": "666.zip verified: 11 JPGs. Raw screenshot name-zone pixel check after fixed-header alignment: 99 occupied slots across 11 screenshots, 22 empty slots (7 in 3583, 8 in 3584, 7 in 3596). Previous app showed 114 raw slots; 15 were blank false positives. No player-name truth labels used in this occupancy test.",
+    "repeating_wrong_candidate": "Name matching was attempted on empty grid/background due icon-side hasName fallback; unrelated short names such as 神崎孝司 could surface across positions. r30 checks aligned NAME ink before overlap and again before matching, plus CV-level empty-name suppression.",
+    "tested_limitation": "The occupancy check was run locally with reference Python layout on user supplied 666.zip. The browser/Safari result and post-correction cross-page overlap count remain to be verified. The archive contains screens with footer rosters of 32 and 77 players; these represent different roster contexts, so their displayed footer totals must not be summed as a single roster.",
+    "folder_archive_import": "Multiple image selections, ZIPs, nested folders; the file picker appends instead of replacing. Local JSZip 3.10.1 bundled into offline PWA; skips macOS resource forks and has per-file archive size safeguards. Folder chooser browser support varies; ZIP available in Safari.",
+    "claude_plan_review": "2026-10-09 r18 Claude Code spec examined: Python-based per-row empty-name gate, glyph/hand constraints and split/selected rows are useful. The golden answer files are not bundled into PWA or used as recognition hints.",
+    "research_new": "2006 40年目 and 2011 52年目 historical PS2 threads identify old PukiWiki, 神様２人のサイト, Vector data tool, Jenova idea memo tables, and notitle/yaku3 index. Jenova and notitle index are fetchable but some characters/subpages are unavailable; Geocities/Livedoor/Vector old endpoints unavailable. Marked as indexes or historical references, NOT fully imported gameplay rules.",
+    "dedup": "Added one external-links chapter/table in sources. Removed one repeated newcomer salary summary already present in cheap/contract guide. Exact table-row duplicates remain zero."
   }
 }

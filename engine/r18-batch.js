@@ -138,7 +138,7 @@
     update(3+10*(i+1)/state.batchFiles.length,'分析遊戲表頭 '+(i+1)+' / '+state.batchFiles.length);
     await frame();
    }
-   update(14,'以實際影像比對跨頁重複');const grouped=yt3OfflineOverlapsV14(images);
+   update(14,'以實際影像比對跨頁重複');const grouped=yt3OfflineOverlapsV14(images,aligned);
    const selected=grouped.groups.map(g=>{
      const chosen=g.copies.reduce((a,b)=>{const sa=(aligned[a.imageIndex]?.valid&&aligned[a.imageIndex]?.loc?.score>=.65?1000000000:0)+a.canvas.width*a.canvas.height;const sb=(aligned[b.imageIndex]?.valid&&aligned[b.imageIndex]?.loc?.score>=.65?1000000000:0)+b.canvas.width*b.canvas.height;return sb>sa?b:a});
      return {chosen,copies:g.copies,category:chosen.screenCategory||''};
@@ -147,6 +147,12 @@
    for(let i=0;i<selected.length;i++){
     const s=selected[i],copy=s.chosen,info=aligned[copy.imageIndex],number=copy.originalRow;
     let item=null;
+    // Do not attempt to identify empty printed slots, even if geometry fallback
+    // included them. Blank rows can otherwise hallucinate the same short name.
+    if(info?.valid&&window.yt3RowInkGate){
+      const ink=window.yt3RowInkGate(info.canvas,number);
+      if(!ink.hasName&&!ink.uncertain)continue;
+    }
     if(info?.valid&&info.loc.score>=.65&&number>=1&&number<=11)
      item=matchAligned(info.canvas,number,state.players,s.category);
     // Missing/weak first pass: retry only the same row from its source image,
@@ -202,10 +208,11 @@
    for(const r of results)if(r.resolved&&confirmedIds.has(r.resolved.p?._uid))r.resolved=null;
    state.batchRawRows=results;state.batchRows=results;state.expectedTotal=0;renderBatchResults();
    const confirmed=results.filter(r=>r.match).length;
+   const actualRows=results.length;
    const inferred=results.filter(r=>!r.match&&r.resolved).length;
    const failed=aligned.filter(x=>!x.valid||x.loc.score<.65).length;
    const overlapCount=grouped.overlaps.reduce((n,e)=>n+e.k,0);
-   update(100,`完成：${grouped.rawRows} 原始列 → ${grouped.uniqueRows} 個不同列位（跨頁去重 ${overlapCount}）；確認 ${confirmed}、推定 ${inferred}、候選 ${results.length-confirmed-inferred}${failed?'；'+failed+' 張表頭改用備援':''}｜全程本機、無 AI`);
+   update(100,`完成：${grouped.rawRows} 有姓名原始列 → ${results.length} 個不同列位（跨頁去重 ${overlapCount}）；確認 ${confirmed}、推定 ${inferred}、候選 ${results.length-confirmed-inferred}${failed?'；'+failed+' 張表頭改用備援':''}｜全程本機、無 AI`);
   }catch(error){console.error(error);byId('batchStatus').textContent='辨識未完成：'+String(error?.message||error)}
   finally{runButton.disabled=false}
  };
