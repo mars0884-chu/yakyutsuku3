@@ -22,7 +22,7 @@ if(have!==4)throw Error('blank row leak '+have);
 if(!overlap.includes('yt3RowInkGate(normal.canvas,r.row)'))throw Error('overlap must filter before grouping');
 if(!batch.includes('yt3OfflineOverlapsV14(images,aligned)'))throw Error('aligned images not passed to de-duplicator');
 if(!cv.includes('empty-name-suppressed'))throw Error('CV must not hallucinate blank rows');
-if(!app.includes("JSZip.loadAsync(await archive.arrayBuffer())"))throw Error('ZIP import missing');
+if(!app.includes("window.JSZip.loadAsync(await archive.arrayBuffer())"))throw Error('ZIP import missing');
 if(!app.includes("id in ['batchFiles'")){/* check DOM instead */}
 if(!index.includes('id="batchZip"')||!index.includes('webkitdirectory'))throw Error('ZIP/folder picker missing');
 if(!index.includes('./vendor/jszip.min.js')||!sw.includes('./vendor/jszip.min.js'))throw Error('offline JSZip vendor missing');
