@@ -1,0 +1,410 @@
+[
+  {
+    "name": "がめづくし / Gamezukushi",
+    "url": "https://gamezukushi.com/yakyutsuku3/",
+    "role": "選手名冊主資料＋攻略",
+    "status": "active",
+    "priority": 1,
+    "note": "15 個國內新人／外國人名冊頁；完整名冊目標 3,767 筆。"
+  },
+  {
+    "name": "GAME攻略書庫 やきゅつく3 Wiki",
+    "url": "https://wiki.yakyutsuku.game-syo.com/",
+    "role": "攻略資料庫",
+    "status": "top_page_accessible_subpages_redirect_to_home",
+    "priority": 1,
+    "note": "設施、經營、技能、留學、事件、爆發經驗值等。；2026-10-11 實際點擊規則會議、爆發經驗值與 Camp 效果，僅回頂層索引，未能讀取該章正文，不重複灌進攻略。"
+  },
+  {
+    "name": "Sheep+ やきゅつく3攻略",
+    "url": "https://www.sheepplus.com/yakyutsuku3/",
+    "role": "攻略資料庫",
+    "status": "active",
+    "priority": 1,
+    "note": "Home Town、設施、經營企劃、Idea Memo、Team Color 等。"
+  },
+  {
+    "name": "Ikasumi やきゅつく3 プレイデータ",
+    "url": "https://www.ikasumi.org/yakyu3/",
+    "role": "OB／架空選手＋攻略筆記",
+    "status": "active",
+    "priority": 1,
+    "note": "OB、實用架空選手、隊伍顏色、經營企劃、留學等。"
+  },
+  {
+    "name": "ゲーム好き",
+    "url": "https://gamezukinahito.blog.fc2.com/blog-category-2.html",
+    "role": "近年逆向／ISO 改造／最新版資料",
+    "status": "active",
+    "priority": 1,
+    "note": "2023–2026 仍有更新；含 ISO 資料結構與最新版改造研究。"
+  },
+  {
+    "name": "抜け出せ三等兵",
+    "url": "https://hiscode.blog56.fc2.com/blog-entry-54.html",
+    "role": "PS2 XT/PAR 改造碼",
+    "status": "active",
+    "priority": 1,
+    "note": "歷史改造碼的主要原始來源之一。"
+  },
+  {
+    "name": "Wazap!",
+    "url": "https://wazap.com/game/13936/cheats/",
+    "role": "攻略／裏技／PAR 回報",
+    "status": "active",
+    "priority": 2,
+    "note": "29 筆攻略／裏技，另有 PAR 問答與實機回報。"
+  },
+  {
+    "name": "5ch / 2ch 過去ログ",
+    "url": "https://kako.5ch.io/test/read.cgi/gameurawaza/1156139067/l50",
+    "role": "歷史攻略／改造碼討論",
+    "status": "archive",
+    "priority": 2,
+    "note": "可追溯多代改造碼討論與後續實機回報。"
+  },
+  {
+    "name": "Crazyboys00 WordPress",
+    "url": "https://crazyboys00.wordpress.com/category/%E3%82%84%E3%81%8D%E3%82%85%E3%81%A4%E3%81%8F%EF%BC%93%E6%94%BB%E7%95%A5%EF%BC%88%EF%BC%9F%EF%BC%89/",
+    "role": "長篇攻略／實戰紀錄",
+    "status": "active",
+    "priority": 2,
+    "note": "2006 年大量攻略文章仍可讀。"
+  },
+  {
+    "name": "re-owls やきゅつく3プレイ日記",
+    "url": "https://re-owls.com/",
+    "role": "近年實戰紀錄",
+    "status": "active",
+    "priority": 3,
+    "note": "現代重玩紀錄，可補充實戰觀察。"
+  },
+  {
+    "name": "Codevis 舊站",
+    "url": "https://codevis.nobody.jp/old/game/yk3/",
+    "role": "歷史 Play Diary／名單例",
+    "status": "active",
+    "priority": 3,
+    "note": "舊站仍可索引。"
+  },
+  {
+    "name": "KADOKAWA 官方 Complete Guide",
+    "url": "https://www.kadokawa.co.jp/product/200700002980/",
+    "role": "官方攻略本書目",
+    "status": "catalog_only",
+    "priority": 3,
+    "note": "官方 447 頁攻略本書目可查；未發現公開完整數位正文。"
+  },
+  {
+    "name": "Vector やきゅつく3用選手データビューアー",
+    "url": "https://www.vector.co.jp/",
+    "role": "舊工具線索",
+    "status": "partial",
+    "priority": 3,
+    "note": "歷史工具線索，現行可取得性有限。"
+  },
+  {
+    "name": "notitle / 舊個人站",
+    "url": "https://notitle.moo.jp/",
+    "role": "舊攻略線索",
+    "status": "partial",
+    "priority": 4,
+    "note": "部分舊內容／索引可追，完整性不穩定。"
+  },
+  {
+    "name": "巴哈姆特「模擬職棒」哈啦板",
+    "url": "https://forum.gamer.com.tw/listG.php?bsn=6035",
+    "role": "台灣舊社群：PS2 三代攻略／OB／金手指／實機回報",
+    "status": "active_fulltext_pages",
+    "priority": 2,
+    "note": "板內混有多代；已取得 PS2 三代 2005 OB 名單、2006 金手指 1／2／新金手指、初期經營、2018 PCSX2 心得與改名原型、2025 PCSX2 1.7 pnach 回覆全文。NDS 混合串只採明確指向 PS2 的回覆；DC 二代與 NDS 專屬內容排除。"
+  },
+  {
+    "name": "skillove Ameba：やきゅつく3 検証攻略",
+    "url": "https://ameblo.jp/skillove/",
+    "role": "長期實測／技能傳承／球員成績",
+    "status": "active",
+    "priority": 2,
+    "note": "多年實測型資料，適合補技能傳承與長期表現；不當作官方公式。"
+  },
+  {
+    "name": "mixi やきゅつく3 歷史討論",
+    "url": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=1578351",
+    "role": "2005 舊社群技能／留學討論",
+    "status": "search_indexed_partial",
+    "priority": 4,
+    "note": "搜尋索引仍可看到部分歷史片段，完整閱讀可能受登入限制。"
+  },
+  {
+    "name": "うんこちゃんのやきゅつく3 @ wiki",
+    "url": "https://w.atwiki.jp/untsuku3/",
+    "role": "長期遊玩／年度記錄",
+    "status": "active",
+    "priority": 4,
+    "note": "以實況球隊歷史為主，對核心公式價值較低，列為旁證。"
+  },
+  {
+    "name": "巴哈姆特：3代球員的技藝（PS2 3）",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=140",
+    "role": "球員技藝索引（僅摘要，尚未取得全文）",
+    "status": "indexed_partial",
+    "priority": 4,
+    "note": "2026-10-09 搜尋索引能看到三種觸發類型的開頭，但直接存取 403；尚無法逐項核對完整條件、效果。不能列為已完整擷取。"
+  },
+  {
+    "name": "巴哈姆特：模擬職棒3 金手指3",
+    "url": "https://forum.gamer.com.tw/G2.php?bsn=6035&sn=29",
+    "role": "PS2 三代金手指精華索引",
+    "status": "indexed_partial",
+    "priority": 3,
+    "note": "索引可確認 2006-12-28 標題，正文目前 403；碼值未核實，不列入有效金手指。"
+  },
+  {
+    "name": "巴哈姆特：要命的薪水勒索",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=130",
+    "role": "PS2 三代年薪／複數年約個案",
+    "status": "indexed_partial",
+    "priority": 3,
+    "note": "索引可見第 3–4 年高額索薪，正文目前 403；不可推導固定公式。"
+  },
+  {
+    "name": "巴哈姆特：相關網站／企劃案資料",
+    "url": "https://forum.gamer.com.tw/G1.php?bsn=6035&parent=7",
+    "role": "歷史企劃案／攻略站索引",
+    "status": "indexed_partial",
+    "priority": 3,
+    "note": "索引可見企劃案資料與攻略網站 1～3，正文目前 403，外部目標網站尚未查核。"
+  },
+  {
+    "name": "巴哈姆特：SEGA太郎怎們養才會強阿?",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=65",
+    "role": "PS2 SEGA 太郎養成舊串／待取正文",
+    "status": "indexed_partial",
+    "priority": 3,
+    "note": "搜尋摘要可確認 PS2 版討論存在；回文細節目前 403，不能當成已整理出訓練配方。"
+  },
+  {
+    "name": "巴哈姆特：2018 PS2 模擬職棒3 實戰與球員清單",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=214&tnum=1",
+    "role": "PCSX2、改名原型及投手能力/無數值候選",
+    "status": "verified_fulltext",
+    "priority": 2,
+    "note": "已取得 PS2 標記全文；拆分改名原型、14 位投手能力樣本與未附數值的推薦候選。數值屬玩家當時紀錄，不能視為一律固定初始能力。"
+  },
+  {
+    "name": "巴哈：遊戲初期節省薪資的辦法",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=53",
+    "role": "2005 年 PS2 初期年薪控制舊文；全文待核",
+    "status": "indexed_partial",
+    "priority": 3,
+    "note": "搜尋索引可確認 PS2 標籤及 2005-08-04 發文資訊；正文目前 403，細節不可視為已取得。"
+  },
+  {
+    "name": "巴哈：發現鈴木一郎和 B．邦茲！！",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=57",
+    "role": "PS2 改名／外國球員歷史玩家討論；全文待核",
+    "status": "indexed_partial",
+    "priority": 3,
+    "note": "搜尋可找到 PS2 標籤和主題，但無法完整取回原文；不增加未核實姓名對應。"
+  },
+  {
+    "name": "巴哈：發現一個可靠消息!",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=145",
+    "role": "2007 年 PS2 玩家攻略線索；全文待核",
+    "status": "indexed_partial",
+    "priority": 4,
+    "note": "標題及 2007-05-05 日期可檢索，正文 403；具體消息未經核實。"
+  },
+  {
+    "name": "巴哈：我終於在第六年拿到冠軍了",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=82",
+    "role": "PS2 六年奪冠隊伍配置實戰串；全文待核",
+    "status": "indexed_partial",
+    "priority": 4,
+    "note": "搜尋摘要能確認玩家提及第六年冠軍與部分球員位置，但正文 403，無法驗證完整組隊策略；不混入已確認攻略。"
+  },
+  {
+    "name": "巴哈：2003 交換球員成功率（排除跨代）",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=11",
+    "role": "2003 年 PS2 系列舊文：非 2005 三代可證實",
+    "status": "cross_version_excluded",
+    "priority": 5,
+    "note": "發表於 2003-12-09，早於 PS2 やきゅつく3 上市；不可把原帖交易公式自動套入三代。"
+  },
+  {
+    "name": "Wazap：名も無きOB選手／無名 OB 原型",
+    "url": "https://wazap.com/cheat/%E5%90%8D%E3%82%82%E7%84%A1%E3%81%8D%EF%BC%AF%EF%BC%A2%E9%81%B8%E6%89%8B/126773/",
+    "role": "2005 年改名原型 19 筆；已與巴哈 2018 整合",
+    "status": "source_crosscheck",
+    "priority": 2,
+    "note": "和巴哈 2018 PS2 長文交叉去重，統一至架空／OB 原型對照表，仍保留來源。"
+  },
+  {
+    "name": "巴哈精華：初期經營法（版本待核）",
+    "url": "https://forum.gamer.com.tw/G2.php?bsn=6035&lorder=1&parent=54&sn=55",
+    "role": "2006 編輯的舊版經營攻略；涉及「2003年版」",
+    "status": "version_ambiguous",
+    "priority": 4,
+    "note": "已從 PS2 三代已確認開局章移至資料研究章，等取得版本上下文與對照後再恢復適用性。"
+  },
+  {
+    "name": "2005 PS2《やきゅつく3》20年目討論串",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1123809103",
+    "role": "引越し屋＋各地 Memo 商店進出的歷史討論；未確認配方",
+    "status": "historical_fulltext_unverified_claim",
+    "priority": 3,
+    "note": "原文可讀，但貼文中有試不成功的回報；網站標示為未確認歷史配方候選。"
+  },
+  {
+    "name": "巴哈外部連結／kiyopf1005 経営企画",
+    "url": "http://www.geocities.jp/kiyopf1005/keiei.html",
+    "role": "已失效的三代經營企劃外站",
+    "status": "historical_reference_unavailable",
+    "priority": 4,
+    "note": "巴哈 sn=470 索引保留 URL；Geocities 日本舊頁目前不可閱讀，不能當作已取回正文。"
+  },
+  {
+    "name": "PS2 やきゅつく3 攻略テンプレ／kiyopf1005",
+    "url": "http://www.geocities.jp/kiyopf1005/yakyutuku.html",
+    "role": "2005 年引用的攻略模板",
+    "status": "historical_reference_unavailable",
+    "priority": 4,
+    "note": "2005 年 2ch 第20年串提及，2006 年第40年串明言已死鏈。"
+  },
+  {
+    "name": "巴哈外部參考／datapot 球員資料",
+    "url": "https://datapot.com/pw/vs/index.php",
+    "role": "PS2 OB／架空選手歷史推薦連結",
+    "status": "external_link_unverified",
+    "priority": 4,
+    "note": "巴哈 sn=850 同時推薦 Ikasumi 和此站，目前無法檢索確認內容，暫不匯入球員資料。"
+  },
+  {
+    "name": "巴哈：三代兩個經營企劃外站原帖",
+    "url": "https://forum.gamer.com.tw/Co.php?bsn=6035&sn=470",
+    "role": "舊外部站來源：Ikasumi＋Geocities",
+    "status": "search_indexed_partial",
+    "priority": 3,
+    "note": "索引可取得兩個完整歷史 URL，直接閱讀正文 403，不假稱已讀取全文。"
+  },
+  {
+    "name": "2007 やきゅつく3 45年目：玩家 FAQ 與練習道具差異",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1192516413",
+    "role": "2007 年 PS2 三代公開可讀歷史討論與外站目錄",
+    "status": "verified_fulltext_player_observation",
+    "priority": 3,
+    "note": "練習道具同樣顯示◎仍可能有不同數值成長；頁內另見 ya3.tsukuclear.com 舊站連結。只整理已確認的新資訊，重複 FAQ 不再匯入。"
+  },
+  {
+    "name": "ya3.tsukuclear.com やきゅつく3 舊攻略站",
+    "url": "http://ya3.tsukuclear.com/",
+    "role": "2007 年 45年目與 2021 年 55年目玩家串仍引用的舊三代攻略站",
+    "status": "historical_reference_unavailable",
+    "priority": 4,
+    "note": "歷史串能確認網址與用途，但現站正文無法可靠讀取；不使用未知站內容建構攻略。"
+  },
+  {
+    "name": "やきゅつく3プレイ日記 ～スーパーリアルへの道～（2023～）",
+    "url": "https://re-owls.com/entry/100123",
+    "role": "PS2 三代長期玩家實戰：自訂 S/A Rank 員額、新人取得限制、生涯生え抜き、禁重讀挑戰",
+    "status": "verified_fulltext_player_challenge",
+    "priority": 3,
+    "note": "2023-10-08 作者公開可讀正文；4 種自訂挑戰條件已整合到進階章，僅標示玩家縛り，不冒充遊戲內建規則。"
+  },
+  {
+    "name": "2006 三代舊 Wiki（Livedoor）",
+    "url": "http://f56.aaa.livedoor.jp/~lotte/pukiwiki14/pukiwiki.php?FrontPage",
+    "role": "40年目討論串和後續模板反覆引用的 PS2 三代 Wiki",
+    "status": "historical_reference_unavailable",
+    "priority": 4,
+    "note": "2006~2011 討論串確認 URL；現頁無法存取，正文未取得，不做推測性匯入。"
+  },
+  {
+    "name": "2006 神様２人のサイト（舊個人站）",
+    "url": "http://www.geocities.jp/yakyutuku4/",
+    "role": "2006 歷史模板的三代個人攻略連結",
+    "status": "historical_reference_unavailable",
+    "priority": 4,
+    "note": "2006 40年目與 2011 52年目模板反覆引用；GeoCities JP 舊站目前失效。"
+  },
+  {
+    "name": "やきゅつく3 選手データツール（Vector 作者）",
+    "url": "http://hp.vector.co.jp/authors/VA043416/",
+    "role": "PS2 三代舊玩家用選手資料工具發行頁",
+    "status": "historical_link_unreadable",
+    "priority": 4,
+    "note": "2006 年舊串提供確切 Vector 作者 URL；無法確認目前程式下載或內容，不能當作完整可用工具。"
+  },
+  {
+    "name": "Jenova 舊站：アイデアメモ一覧",
+    "url": "https://hccweb5.bai.ne.jp/jenova/game/yakyu/idea.html",
+    "role": "日本三代舊攻略站：地區別 Idea Memo 條目",
+    "status": "readable_index_encoding_limited",
+    "priority": 3,
+    "note": "站內頁面目前可開啟，但舊編碼造成部分文字無法可靠轉出；僅加入來源索引，不重複匯入未校對的配方。"
+  },
+  {
+    "name": "Jenova 舊站：アイデアメモ組み合わせ",
+    "url": "https://hccweb5.bai.ne.jp/jenova/game/yakyu/memo.html",
+    "role": "日本三代舊攻略站：Memo 條件組合表",
+    "status": "readable_index_encoding_limited",
+    "priority": 3,
+    "note": "頁面可讀表格結構，文字編碼暫未完整校對，與既有經營企劃逆引大量重疊，未重複匯入。"
+  },
+  {
+    "name": "やきゅつく3メモ（notitle 舊站子目錄）",
+    "url": "https://notitle.moo.jp/ch/yaku3/",
+    "role": "玩家三代攻略章節索引：一季模式、強力技能、守位推薦",
+    "status": "index_accessible_subpages_unavailable",
+    "priority": 3,
+    "note": "首頁章節索引可讀，已試點的一年模式和優秀選手子頁 404；未把頁名冒充已取得正文。"
+  },
+  {
+    "name": "巴哈姆特：模擬職棒3 新的金手指（PS2，2006）",
+    "url": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=121",
+    "role": "歷史 XT／PAR 主碼、資金、Scouting 和 Memo 改造碼；有玩家同時使用出差＋設施碼當機回報",
+    "status": "verified_fulltext_crosschecked_existing_cheats",
+    "priority": 2,
+    "note": "已和既有金手指章 Hiscode 對照；新增來源交叉引用即可，避免把完全相同碼表再匯入一份。"
+  },
+  {
+    "name": "えびたま：やきゅつく3 ベイスターズ編 2 年目",
+    "url": "https://note.com/ebitama52/n/nbff2432e1683",
+    "role": "2023 PS2 實戰：年資較短選手交易受阻案例、球員接班",
+    "status": "verified_fulltext_player_save_case",
+    "priority": 3,
+    "note": "與作者 GBA／2003 版本分開；本頁明確 PS2《やきゅつく3》，只引用案例不推導普遍公式。"
+  },
+  {
+    "name": "えびたま：やきゅつく3 ベイスターズ編 7 年目",
+    "url": "https://note.com/ebitama52/n/naf16e95a05a3",
+    "role": "2023 PS2 實戰：教練投球變化球指導與長期經營",
+    "status": "verified_fulltext_player_save_case",
+    "priority": 3,
+    "note": "投手教練優先能指導滑球、指叉、噴射三方向，玩家單一存檔經驗；非官方加成規則。"
+  },
+  {
+    "name": "えびたま：やきゅつく3 ベイスターズ編 12 年目",
+    "url": "https://note.com/ebitama52/n/n6768cdc83ed5",
+    "role": "2024 PS2 長期玩家日記：游擊接班／世代交替",
+    "status": "verified_fulltext_player_save_case",
+    "priority": 3,
+    "note": "11~12 年玩家實戰，游擊位置補強困難，不能直接推成全部球團的固定規則。"
+  },
+  {
+    "name": "巴哈精華：模擬職棒3 金手指2（背號技能替換）",
+    "url": "https://forum.gamer.com.tw/G2.php?bsn=6035&lorder=2&parent=11&sn=21",
+    "role": "2006 PS2 XT/PAR 進階技能替換與技能代碼舊帖",
+    "status": "search_index_code_fragment_direct_403",
+    "priority": 2,
+    "note": "搜尋索引確實顯示「背番号指定によるスキル変更(XT)＊要必須」與部分欄位、技能代碼；G2 文章直讀403，原作者對背號是否減1仍存疑。未把不完整碼誤標已實測。"
+  },
+  {
+    "name": "球団規約／新版自訂縛り條件（re-owls）",
+    "url": "https://re-owls.com/rearule",
+    "role": "PS2 三代可讀的 13 條玩家自訂挑戰規則，新版與原前言差異",
+    "status": "verified_fulltext_player_optional_rules",
+    "priority": 3,
+    "note": "已和既有 2023 前言章去重，僅補 5 個不重複主題至同一章：開局名單、外籍人／續約限制、先發輪替與休息、蝴蝶球禁用和失敗條件。不視為遊戲內建公式。"
+  }
+]

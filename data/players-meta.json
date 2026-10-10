@@ -1,0 +1,81 @@
+{
+  "count": 3767,
+  "updatedAt": "2026-10-10T16:25:06.518Z",
+  "sources": [
+    {
+      "slug": "rookie-pitcher1",
+      "count": 479,
+      "expected": 479
+    },
+    {
+      "slug": "rookie-pitcher2",
+      "count": 425,
+      "expected": 425
+    },
+    {
+      "slug": "rookie-catcher",
+      "count": 198,
+      "expected": 198
+    },
+    {
+      "slug": "rookie-first",
+      "count": 200,
+      "expected": 200
+    },
+    {
+      "slug": "rookie-second",
+      "count": 205,
+      "expected": 205
+    },
+    {
+      "slug": "rookie-third",
+      "count": 196,
+      "expected": 196
+    },
+    {
+      "slug": "rookie-shortstop",
+      "count": 200,
+      "expected": 200
+    },
+    {
+      "slug": "rookie-outfielder",
+      "count": 498,
+      "expected": 498
+    },
+    {
+      "slug": "foreign-pitcher",
+      "count": 416,
+      "expected": 416
+    },
+    {
+      "slug": "foreign-catcher",
+      "count": 142,
+      "expected": 142
+    },
+    {
+      "slug": "foreign-first",
+      "count": 137,
+      "expected": 137
+    },
+    {
+      "slug": "foreign-second",
+      "count": 143,
+      "expected": 143
+    },
+    {
+      "slug": "foreign-third",
+      "count": 147,
+      "expected": 147
+    },
+    {
+      "slug": "foreign-shortstop",
+      "count": 138,
+      "expected": 138
+    },
+    {
+      "slug": "foreign-outfielder",
+      "count": 243,
+      "expected": 243
+    }
+  ]
+}
