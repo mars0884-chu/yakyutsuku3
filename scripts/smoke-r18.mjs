@@ -5,7 +5,7 @@ function check(b,m){if(!b)throw Error(m)}
 for(const src of [app,batch,match,sw])new Function(src);
 check(batch.includes('runButton.onclick=async()=>'),'r18 handler missing');
 check(html.indexOf('engine/claude-cv-r18.js')<html.indexOf('engine/r18-batch.js'),'glyph script order');
-check(batch.includes('yt3OfflineOverlapsV14(images)')&&batch.includes('yt3ClaudeGlyph.match('),'pixel engine not wired');
+check((batch.includes('yt3OfflineOverlapsV14(images)')||batch.includes('yt3OfflineOverlapsV14(images,aligned)'))&&batch.includes('yt3ClaudeGlyph.match('),'pixel engine not wired');
 check(!batch.includes('fetch(')&&!batch.includes('https://'),'r18 matching cannot call remote APIs');
 check(match.includes('for(const t of eligible)')&&!match.includes('await base.init()'),'full roster / unused 8x8 glyph pack');
 check(sw.includes('YT3_CACHE_PROGRESS')&&app.includes('YT3_CACHE_PROGRESS'),'real cache progress missing');
