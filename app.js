@@ -160,9 +160,82 @@ function renderSources(){$('#sourceList').innerHTML=state.sources.map(s=>`<artic
 $('#refreshData').onclick=async()=>{const b=$('#refreshData');b.disabled=true;$('#dataStatus').textContent='更新完整名冊…';try{await loadData(true)}catch(e){$('#dataStatus').textContent='名冊更新失敗：'+e.message}finally{b.disabled=false}};
 
 // --- 批次截圖找人：固定版面分列 → 本機 OCR 獨立讀字 → 再與完整球員資料庫比對；不使用特定截圖／特定姓名校準表。---
-$('#batchFiles').onchange=e=>{state.batchFiles=[...e.target.files];state.batchRows=[];state.batchRawRows=[];state.expectedTotal=0;renderBatchPreview();renderBatchResults();$('#batchStatus').textContent=`已選 ${state.batchFiles.length} 張。`};
-$('#clearBatch').onclick=()=>{state.batchFiles=[];state.batchRows=[];state.batchRawRows=[];state.expectedTotal=0;$('#batchFiles').value='';renderBatchPreview();renderBatchResults();$('#batchStatus').textContent='可一次選多張 OFFICE MENU 名單截圖。'};
-function renderBatchPreview(){$('#batchPreview').innerHTML='';for(const f of state.batchFiles){const u=URL.createObjectURL(f),d=document.createElement('div');d.className='thumb';d.innerHTML=`<img src="${u}"><small>${esc(f.name)}</small>`;d.querySelector('img').onload=()=>setTimeout(()=>URL.revokeObjectURL(u),1000);$('#batchPreview').appendChild(d)}}
+// Add files from multiple pickers without clearing earlier selections.
+const importedImageKeys=new Set();
+const validScreenName=name=>/\.(?:png|jpe?g|webp|bmp)$/i.test(name||'');
+function appendBatchFiles(files){
+ let added=0;
+ for(const f of files){
+  if(!validScreenName(f.name))continue;
+  const key=[f.name,f.size,f.lastModified].join('|');
+  if(importedImageKeys.has(key))continue;
+  importedImageKeys.add(key);state.batchFiles.push(f);added++;
+ }
+ if(added){state.batchRows=[];state.batchRawRows=[];state.expectedTotal=0;renderBatchPreview();renderBatchResults()}
+ $('#batchStatus').textContent=`已載入 ${state.batchFiles.length} 張截圖（本次新增 ${added} 張）。`;
+ return added;
+}
+$('#batchFiles').onchange=e=>{appendBatchFiles([...e.target.files]);e.target.value=''};
+$('#batchFolder').onchange=e=>{
+ const files=[...e.target.files].filter(f=>validScreenName(f.name)).map(f=>{
+  const relative=f.webkitRelativePath||f.name;
+  return new File([f],relative.replaceAll('/','__'),{type:f.type||'image/jpeg',lastModified:f.lastModified});
+ });
+ appendBatchFiles(files);e.target.value='';
+};
+$('#batchZip').onchange=async e=>{
+ const input=e.target,archives=[...input.files];input.value='';
+ if(!window.JSZip){$('#batchStatus').textContent='離線 ZIP 引擎尚未載入，請先檢查更新';return}
+ $('#batchZip').disabled=true;
+ try{
+  let count=0;
+  for(let i=0;i<archives.length;i++){
+   const archive=archives[i];
+   if(archive.size>90*1024*1024)throw Error('壓縮檔超過 90 MB，請分批選取');
+   $('#batchStatus').textContent=`讀取 ZIP ${i+1}/${archives.length}：${archive.name}`;
+   const zip=await window.JSZip.loadAsync(await archive.arrayBuffer());
+   const entries=Object.values(zip.files).filter(x=>!x.dir&&validScreenName(x.name)&&
+     !x.name.startsWith('__MACOSX/')&&!x.name.split('/').some(part=>part.startsWith('._')||part==='.DS_Store')).sort((a,b)=>a.name.localeCompare(b.name,'en',{numeric:true}));
+   let totalBytes=0;
+   const files=[];
+   for(let j=0;j<entries.length;j++){
+    const entry=entries[j];
+    const expected=entry._data?.uncompressedSize;
+    if(expected>18*1024*1024)throw Error('ZIP 內圖片超過 18 MB：'+entry.name);
+    totalBytes+=expected||0;
+    if(totalBytes>190*1024*1024)throw Error('ZIP 展開總量超過 190 MB，請拆成幾批');
+    const content=await entry.async('uint8array');
+    if(content.byteLength>18*1024*1024)throw Error('ZIP 圖片過大：'+entry.name);
+    const ext=entry.name.split('.').pop().toLowerCase();
+    const kind=ext==='png'?'image/png':ext==='webp'?'image/webp':'image/jpeg';
+    // Preserve archive and folder identity. No guesses about any player names.
+    const display=archive.name.replace(/\.zip$/i,'')+'__'+entry.name.replaceAll('/','__');
+    files.push(new File([content],display,{type:kind,lastModified:archive.lastModified}));
+    if(j%8===0){$('#batchStatus').textContent=`ZIP ${i+1}/${archives.length}｜解壓 ${j+1}/${entries.length}`;await new Promise(resolve=>setTimeout(resolve,0))}
+   }
+   count+=appendBatchFiles(files);
+  }
+  $('#batchStatus').textContent=`ZIP 完成：本次新增 ${count} 張，共 ${state.batchFiles.length} 張。可繼續加入其他 ZIP／資料夾。`;
+ }catch(err){$('#batchStatus').textContent='ZIP 匯入失敗：'+String(err?.message||err)}
+ finally{$('#batchZip').disabled=false}
+};
+$('#clearBatch').onclick=()=>{
+ state.batchFiles=[];state.batchRows=[];state.batchRawRows=[];state.expectedTotal=0;importedImageKeys.clear();
+ for(const id of ['batchFiles','batchFolder','batchZip'])$('#'+id).value='';
+ renderBatchPreview();renderBatchResults();$('#batchStatus').textContent='選擇圖片、資料夾或 ZIP。';
+};
+function renderBatchPreview(){
+ const root=$('#batchPreview');root.innerHTML='';
+ // Keep Safari memory bounded even if five archives contain hundreds of screenshots.
+ const limit=24;
+ for(const f of state.batchFiles.slice(0,limit)){
+  const u=URL.createObjectURL(f),d=document.createElement('div');d.className='thumb';
+  d.innerHTML=`<img src="${u}"><small>${esc(f.name)}</small>`;
+  const img=d.querySelector('img');img.onload=img.onerror=()=>URL.revokeObjectURL(u);
+  root.appendChild(d);
+ }
+ if(state.batchFiles.length>limit){const d=document.createElement('div');d.className='thumb';d.textContent=`另有 ${state.batchFiles.length-limit} 張`;root.appendChild(d)}
+}
 function loadImage(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);res(im)};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('圖片解碼失敗'))};im.src=u})}
 function withTimeout(promise,ms,label='處理逾時'){let t;return Promise.race([promise,new Promise((_,rej)=>t=setTimeout(()=>rej(new Error(label)),ms))]).finally(()=>clearTimeout(t))}
 
