@@ -34,5 +34,5 @@ const re=await JSZip.loadAsync(bytes);
 if(Object.keys(re.files).filter(k=>/\.jpg$/i.test(k)&&!k.startsWith('__MACOSX')).length!==1)throw Error('zip excludes resource forks');
 const data=JSON.parse(manifest);
 if(data.dependencies.jszip!=='3.10.1')throw Error('JSZip dependency missing');
-if(!version.trim().startsWith('2026.10.10-r')||!app.includes("const APP_VERSION='"+version.trim()+"'"))throw Error('version mismatch');
+if(!/^2026[.]10[.][0-9]{2}-r[0-9]+$/.test(version.trim())||!app.includes("const APP_VERSION='"+version.trim()+"'"))throw Error('version mismatch');
 console.log('r30 PASS: blank rows ignored, name-only geometry, 11-slot sample test, ZIP/Folder plus offline deps');

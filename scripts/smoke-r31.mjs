@@ -31,9 +31,9 @@ assert(app.includes('data-compare-add')&&app.includes('drawerCompare'),
  'must support compare from search and player details');
 assert(css.includes('.compare-scroll{overflow:auto')&&css.includes('position:sticky'),
  'phone comparison needs horizontal scrolling and sticky attribute');
-assert(version.trim()==='2026.10.10-r31'&&app.includes("const APP_VERSION='2026.10.10-r31'"),
+assert(/^2026[.]10[.][0-9]{2}-r[0-9]+$/.test(version.trim())&&app.includes("const APP_VERSION='"+version.trim()+"'"),
  'version mismatch');
-assert(sw.includes("yt3-v20261010-31"),'offline update version mismatch');
+assert(sw.includes("yt3-v"+version.trim().split('-r')[0].split('.').join('')+"-"+version.trim().split('-r')[1]),'offline update version mismatch');
 const chapters=JSON.parse(book),d=chapters.find(c=>c.id==='advanced')?.sections?.find(s=>s.title.includes('横浜ベイスターズ長期實戰'));
 assert(d?.rows?.length===3,'PS2 3 firsthand notes not imported once');
 const set=new Set();for(const ch of chapters){

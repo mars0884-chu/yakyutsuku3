@@ -24,6 +24,40 @@ if(top.length<18||sc>top[top.length-1].score){top.push({x,y,s,score:sc});top.sor
 let best={score:-1};for(const b of top){for(let ds=-.10;ds<=.10;ds+=.025){const s=b.s+ds;if(s<=0||s*262>src.w)continue;
 for(let dy=-6;dy<=6;dy+=2)for(let dx=-9;dx<=9;dx+=3){const x=b.x+dx,y=b.y+dy;if(x<0||y<0)continue;const score=correlation(src,fine,x,y,s);if(score>best.score)best={score,s,x,y};}}
 }
+// Large captures from a phone's crop editor can contain the game window
+// well inside a surrounding UI. The ordinary fast search only covers the
+// top-left 320x126: recheck a wider region ONLY for large images.
+if(src.w>=1900&&src.h>=850){
+ const centerCandidates=[];
+ const put=c=>{
+  if(centerCandidates.length<16||c.score>centerCandidates[centerCandidates.length-1].score){
+   centerCandidates.push(c);centerCandidates.sort((a,b)=>b.score-a.score);
+   if(centerCandidates.length>16)centerCandidates.pop();
+  }
+ };
+ for(let s=1.4;s<=5.01;s+=.18){
+  if(s*262>=src.w||s*233>=src.h)continue;
+  const xmin=Math.max(0,Math.floor(src.w*.10)),xmax=Math.min(Math.floor(src.w*.55),src.w-s*262-2);
+  const ymin=Math.max(0,Math.floor(src.h*.06)),ymax=Math.min(Math.floor(src.h*.43),src.h-s*233-2);
+  for(let y=ymin;y<=ymax;y+=9)for(let x=xmin;x<=xmax;x+=12){
+   const score=correlation(src,coarse,x,y,s);
+   if(score>=.24)put({x,y,s,score});
+  }
+ }
+ // Strong local confirmation uses all 594 original fine-mask samples.
+ for(const candidate of centerCandidates){
+  for(let ds=-.14;ds<=.14;ds+=.028){
+   const s=candidate.s+ds;
+   if(s<=0||s*262>src.w)continue;
+   for(let dy=-12;dy<=12;dy+=3)for(let dx=-16;dx<=16;dx+=4){
+    const x=candidate.x+dx,y=candidate.y+dy;
+    if(x<0||y<0)continue;
+    const score=correlation(src,fine,x,y,s);
+    if(score>best.score)best={score,x,y,s,search:'inset-editor'};
+   }
+  }
+ }
+}
 return best;
 }
 function normalize(image){const loc=locate(image);if(loc.score<.35)return{canvas:null,loc,valid:false};const {s,x,y}=loc;

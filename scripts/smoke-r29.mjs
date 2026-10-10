@@ -41,5 +41,5 @@ for(const ch of chapters){let n=0;for(const sec of ch.sections||[]){
   ok(!seen.has(key),'duplicate table row '+ch.id+':'+sec.title);seen.add(key)}
 }ok(ch.count===n,'guide count mismatch '+ch.id)}
 ok(version.trim()===app.match(/APP_VERSION='([^']+)'/)[1],'UI version mismatch');
-ok(sw.includes('yt3-v20261010-'+version.trim().split('-r')[1]),'service worker cache does not match VERSION');
+ok(sw.includes('yt3-v'+version.trim().split('-r')[0].split('.').join('')+'-'+version.trim().split('-r')[1]),'service worker cache does not match VERSION');
 console.log('r29 tests pass: real selected-row RGB pixels, unaffected normal rows, tentative safety, unique '+seen.size+' guide facts');

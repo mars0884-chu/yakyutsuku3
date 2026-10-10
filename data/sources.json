@@ -11,9 +11,9 @@
     "name": "GAME攻略書庫 やきゅつく3 Wiki",
     "url": "https://wiki.yakyutsuku.game-syo.com/",
     "role": "攻略資料庫",
-    "status": "active",
+    "status": "top_page_accessible_subpages_redirect_to_home",
     "priority": 1,
-    "note": "設施、經營、技能、留學、事件、爆發經驗值等。"
+    "note": "設施、經營、技能、留學、事件、爆發經驗值等。；2026-10-11 實際點擊規則會議、爆發經驗值與 Camp 效果，僅回頂層索引，未能讀取該章正文，不重複灌進攻略。"
   },
   {
     "name": "Sheep+ やきゅつく3攻略",
@@ -390,5 +390,21 @@
     "status": "verified_fulltext_player_save_case",
     "priority": 3,
     "note": "11~12 年玩家實戰，游擊位置補強困難，不能直接推成全部球團的固定規則。"
+  },
+  {
+    "name": "巴哈精華：模擬職棒3 金手指2（背號技能替換）",
+    "url": "https://forum.gamer.com.tw/G2.php?bsn=6035&lorder=2&parent=11&sn=21",
+    "role": "2006 PS2 XT/PAR 進階技能替換與技能代碼舊帖",
+    "status": "search_index_code_fragment_direct_403",
+    "priority": 2,
+    "note": "搜尋索引確實顯示「背番号指定によるスキル変更(XT)＊要必須」與部分欄位、技能代碼；G2 文章直讀403，原作者對背號是否減1仍存疑。未把不完整碼誤標已實測。"
+  },
+  {
+    "name": "球団規約／新版自訂縛り條件（re-owls）",
+    "url": "https://re-owls.com/rearule",
+    "role": "PS2 三代可讀的 13 條玩家自訂挑戰規則，新版與原前言差異",
+    "status": "verified_fulltext_player_optional_rules",
+    "priority": 3,
+    "note": "已和既有 2023 前言章去重，僅補 5 個不重複主題至同一章：開局名單、外籍人／續約限制、先發輪替與休息、蝴蝶球禁用和失敗條件。不視為遊戲內建公式。"
   }
 ]

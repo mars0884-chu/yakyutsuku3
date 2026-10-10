@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-10",
+  "checked_at": "2026-10-11",
   "scope": "公開、可檢索、目前可讀取的 Web 資料",
   "result": "本輪以 Gamezukushi 的「プロ野球チームをつくろう！3」分類為主來源做逐篇盤點。分類核心共整理為24篇：15篇完整名冊頁與9篇系統攻略頁。9篇系統攻略已逐頁交叉檢查，新增的精確條件已回填到既有攻略章，而非另做散亂索引；15篇名冊頁維持選手資料來源角色。站內相關連結再追後未出現此分類之外、但會改變核心攻略架構的新系統頁；另行的「やきゅつく3 プレイ日記」屬不同分類，仍作長期實玩旁證，不混作本分類核心攻略頁。",
   "core_sources": [
@@ -170,5 +170,14 @@
     "checked_at": "2026-10-10",
     "result": "Mixed ZIP stress coverage ~50%, not true name accuracy. Fixed cross-ZIP overlap boundary and duplicate-name conflict scoped to each archive. Restored compare 4 players. PS2 verified Bahamut code post snA=121 already exists in cheats; no repeat import. PS2 Yokohama diary adds three unique observations with original Japanese + Traditional Chinese.",
     "unverified": "Real Safari/Chrome retest is still required. Old mixed screenshot counts do not represent verified accuracy."
+  },
+  "r32_20261011": {
+    "sample_archive": "777.zip inspected locally: 12 valid files, one editor-overlay PNG at IMG_3609.PNG 2796×1290 (central embedded game), 11 direct JPGs roughly 1212–1268 wide. ZIP CRC valid. One image had header fallback in user test but exact file identity not provided.",
+    "user_observed_r31": "4 ZIPs: both 454 named rows →387 distinct / 67 overlaps / 5 remaining candidates; desktop confirmed351, tentative31; Safari confirmed347, tentative35. 777 alone: both 118 named rows→103 distinct, 91 confirmed, 10 tentative, 2 candidates. Counts are result statuses, not measured person-name accuracy.",
+    "root_cause_hypothesis": "One editor-overlay image cannot be found by the old top-left x≤320,y≤126 header scan and exceeds standard photo scale. r32 searches large-image central inset only when width ≥1900 and height≥850, independently of player names.",
+    "release_validation": "New synthetic inset-header correlation test in CI plus complete existing source/guide tests; offline browser real 777 batch on Safari/desktop still needs final independent device run.",
+    "bahamut_index_only": "2006 G2 精華〈模擬職棒3 金手指2〉 returns HTTP 403 direct, but search index includes partial 背番号指定によるスキル変更(XT) template. Archived author uncertain if uniform number subtract 1; not copied as a confirmed functioning cheat.",
+    "confirmed_new_external": "re-owls.com/rearule is readable and adds five distinct challenge themes, integrated into the existing advanced challenge section, Japanese original + Traditional Chinese. These are optional self-imposed restrictions, not game mechanics.",
+    "wiki_limit": "game-syo Wiki main index loads, but tested meeting/explosion/camp subpage URLs redirect to the homepage; no alleged details imported. Existing guide body checked for exact duplicate rows; no repeated rows added."
   }
 }
