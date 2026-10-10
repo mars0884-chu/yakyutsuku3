@@ -179,5 +179,15 @@
     "bahamut_index_only": "2006 G2 精華〈模擬職棒3 金手指2〉 returns HTTP 403 direct, but search index includes partial 背番号指定によるスキル変更(XT) template. Archived author uncertain if uniform number subtract 1; not copied as a confirmed functioning cheat.",
     "confirmed_new_external": "re-owls.com/rearule is readable and adds five distinct challenge themes, integrated into the existing advanced challenge section, Japanese original + Traditional Chinese. These are optional self-imposed restrictions, not game mechanics.",
     "wiki_limit": "game-syo Wiki main index loads, but tested meeting/explosion/camp subpage URLs redirect to the homepage; no alleged details imported. Existing guide body checked for exact duplicate rows; no repeated rows added."
+  },
+  "bahamut_external_20261011_r33": {
+    "result": "再次逆追巴哈 PS2 G2 精華：金手指2 原先僅標索引片段，本輪公開搜尋能檢索 XT/PAR 8 格技能替換模板與技能代碼，共 107 組，收進同一金手指章；既有狀態碼不重複。直接 G2 原頁仍 HTTP 403，不能標為直接取得完整全文。另重查巴哈「相關網站」歷史索引，未得到新可讀外站正文。",
+    "search_index_readable": "https://forum.gamer.com.tw/G2.php?bsn=6035&lorder=2&parent=11&sn=21",
+    "new_code_rows": 7,
+    "new_skill_mapping_rows": 107,
+    "existing_state_code_rows_duplicated": 0,
+    "duplicate_guide_table_rows": 0,
+    "status": "長期歷史外連 Geocities/Datapot/ya3.tsukuclear/部分 G2 正文未能恢復；不等於不存在，也不能宣稱全部挖完。",
+    "recognition": "沿用使用者 R31 實測結果：混合四 ZIP 387 去重列（351/347 確認）；777 單獨 103 去重列，桌機與手機均 91 確認。這是候選分級而非人工真值正確率。本版不更動影像辨識程式。"
   }
 }

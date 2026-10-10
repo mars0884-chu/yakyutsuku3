@@ -394,10 +394,10 @@
   {
     "name": "巴哈精華：模擬職棒3 金手指2（背號技能替換）",
     "url": "https://forum.gamer.com.tw/G2.php?bsn=6035&lorder=2&parent=11&sn=21",
-    "role": "2006 PS2 XT/PAR 進階技能替換與技能代碼舊帖",
-    "status": "search_index_code_fragment_direct_403",
+    "role": "巴哈 2006 PS2 三代金手指2：背號指定 8 格技能替換與技能代碼（公開搜尋可取正文片段）",
+    "status": "search_index_extended_direct_403_not_device_tested",
     "priority": 2,
-    "note": "搜尋索引確實顯示「背番号指定によるスキル変更(XT)＊要必須」與部分欄位、技能代碼；G2 文章直讀403，原作者對背號是否減1仍存疑。未把不完整碼誤標已實測。"
+    "note": "公開搜尋索引能讀到 XT／PAR 共通部、背號欄位、8 格技能槽與 107 組技能代碼；直接開 G2 頁面仍 403。原作者對背號是否減1不確定，部分 PAR 的「要必須」可能失敗。已整合進既有金手指章，不重複匯入狀態調整碼；未作遊戲實測。"
   },
   {
     "name": "球団規約／新版自訂縛り條件（re-owls）",
