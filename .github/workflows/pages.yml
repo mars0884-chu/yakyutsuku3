@@ -51,6 +51,8 @@ jobs:
         run: node scripts/smoke-r27.mjs
       - name: Test r28 separator-free CV and guide dedup
         run: node scripts/smoke-r28.mjs
+      - name: Verify r29 selected navy rows and tentative display
+        run: node scripts/smoke-r29.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail

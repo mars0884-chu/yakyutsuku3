@@ -302,5 +302,13 @@
     "status": "historical_reference_unavailable",
     "priority": 4,
     "note": "歷史串能確認網址與用途，但現站正文無法可靠讀取；不使用未知站內容建構攻略。"
+  },
+  {
+    "name": "やきゅつく3プレイ日記 ～スーパーリアルへの道～（2023～）",
+    "url": "https://re-owls.com/entry/100123",
+    "role": "PS2 三代長期玩家實戰：自訂 S/A Rank 員額、新人取得限制、生涯生え抜き、禁重讀挑戰",
+    "status": "verified_fulltext_player_challenge",
+    "priority": 3,
+    "note": "2023-10-08 作者公開可讀正文；4 種自訂挑戰條件已整合到進階章，僅標示玩家縛り，不冒充遊戲內建規則。"
   }
 ]

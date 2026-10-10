@@ -14,7 +14,7 @@ function listFor(players,category){let cached=rosterCache.get(players);if(!cache
 function rowData(src){let found=cache.get(src);if(found)return found;
  const width=Math.max(190,Math.min(370,Math.round(src.width*16/src.height)));
  const can=document.createElement('canvas');can.width=width;can.height=18;const ctx=can.getContext('2d',{willReadFrequently:true});ctx.imageSmoothingEnabled=true;ctx.drawImage(src,0,0,src.width,src.height,0,0,width,16);
- const d=ctx.getImageData(0,0,width,18).data,gray=new Uint8Array(width*18);for(let i=0;i<gray.length;i++){const k=i*4;gray[i]=Math.round(d[k]*.299+d[k+1]*.587+d[k+2]*.114)}
+ const d=ctx.getImageData(0,0,width,18).data,gray=new Uint8Array(width*18);for(let i=0;i<gray.length;i++){const k=i*4;gray[i]=window.yt3ClaudeAlign?.selectedInkLuma?window.yt3ClaudeAlign.selectedInkLuma(d[k],d[k+1],d[k+2]):Math.round(d[k]*.299+d[k+1]*.587+d[k+2]*.114)}
  const reg=[];for(let y=2;y<14;y++)for(let x=39;x<Math.min(160,width);x+=2)reg.push(gray[y*width+x]);reg.sort((a,b)=>a-b);const median=reg[reg.length>>1]||65;
  if(median>145)for(let i=0;i<gray.length;i++)gray[i]=Math.min(255,Math.max(0,Math.round(75+(median-gray[i])*2)));
  let block=null,st=-1;for(let x=40;x<=Math.min(125,width);x++){let count=0;if(x<width)for(let y=2;y<14;y++)if(gray[y*width+x]>180)count++;const yes=count/12>.58;if(yes&&st<0)st=x;if((!yes||x===125)&&st>=0){if(x-st>=7&&(!block||x-st>block[1]-block[0]))block=[st,x];st=-1}}

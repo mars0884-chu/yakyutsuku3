@@ -109,9 +109,19 @@
      best.m.candidates?.[0]?.p?._uid===confirmed.m.match?.p?._uid)return confirmed;
   return voteAligned(attempts,players)||best;
  }
+ // High-scoring first guesses are useful as tentative lookups, not confirmed IDs.
+ function tentativeCandidate(candidates,players){
+  const first=candidates?.[0],second=candidates?.[1];
+  if(!first?.p||!second)return null;
+  if(first.score<.57||first.score-second.score<.075||(first.visualScore??first.score)<.52)return null;
+  const norm=s=>String(s||'').normalize('NFKC').replace(/\s/g,'');
+  return players.filter(p=>norm(p['名前'])===norm(first.p['名前'])).length===1?first:null;
+ }
+ window.yt3TentativeCandidate=tentativeCandidate;
+
  const output=(r,i)=>({canvas:r.canvas,file:r.file,row:r.row,firstIndex:i,
     parsed:{pos:({投手:'投',捕手:'捕',內野手:'一',外野手:'外'})[r.category]||''},sources:r.sources||[],
-    match:r.match||null,resolved:null,candidates:r.candidates||[],score:r.candidates?.[0]?.score||0,
+    match:r.match||null,resolved:r.match?null:tentativeCandidate(r.candidates,state.players),candidates:r.candidates||[],score:r.candidates?.[0]?.score||0,
     raw:r.mode,status:r.match?'確認':'候選'});
  runButton.onclick=async()=>{
   if(!state.batchFiles.length){alert('請先選擇截圖');return}
@@ -180,7 +190,7 @@
     }
     const m=item.m;
     results.push(output({canvas:item.canvas,file:copy.file,row:number,category:s.category,
-      candidates:m.candidates,match:m.match,mode:info?.valid?'Claude r18 全名冊 16×16・對齊 CV':'Claude r18 全名冊 16×16・備援 CV',
+      candidates:m.candidates,match:m.match,mode:info?.valid?'本機全名冊 16×16 字形比對':'本機全名冊 16×16 原始列備援',
       sources:s.copies.map(c=>({file:c.file,screen:c.imageIndex,row:c.originalRow}))},i));
     update(15+80*(i+1)/Math.max(1,selected.length),'非 AI 姓名比對 '+(i+1)+' / '+selected.length);
     if(i%2===1)await frame();
@@ -188,11 +198,14 @@
    // Two unrelated row groups cannot both be confirmed as the exact same player.
    const byName=new Map();for(const row of results)if(row.match){const n=row.match.p['名前'];const a=byName.get(n)||[];a.push(row);byName.set(n,a)}
    for(const rows of byName.values())if(rows.length>1)for(const r of rows){r.match=null;r.status='候選'}
+   const confirmedIds=new Set(results.filter(r=>r.match).map(r=>r.match.p?._uid));
+   for(const r of results)if(r.resolved&&confirmedIds.has(r.resolved.p?._uid))r.resolved=null;
    state.batchRawRows=results;state.batchRows=results;state.expectedTotal=0;renderBatchResults();
    const confirmed=results.filter(r=>r.match).length;
+   const inferred=results.filter(r=>!r.match&&r.resolved).length;
    const failed=aligned.filter(x=>!x.valid||x.loc.score<.65).length;
    const overlapCount=grouped.overlaps.reduce((n,e)=>n+e.k,0);
-   update(100,`完成：${grouped.rawRows} 原始列 → ${grouped.uniqueRows} 個不同列位（跨頁去重 ${overlapCount}）；確認 ${confirmed}、候選 ${results.length-confirmed}${failed?'；'+failed+' 張表頭改用備援':''}｜全程本機、無 AI`);
+   update(100,`完成：${grouped.rawRows} 原始列 → ${grouped.uniqueRows} 個不同列位（跨頁去重 ${overlapCount}）；確認 ${confirmed}、推定 ${inferred}、候選 ${results.length-confirmed-inferred}${failed?'；'+failed+' 張表頭改用備援':''}｜全程本機、無 AI`);
   }catch(error){console.error(error);byId('batchStatus').textContent='辨識未完成：'+String(error?.message||error)}
   finally{runButton.disabled=false}
  };

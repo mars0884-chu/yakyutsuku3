@@ -148,5 +148,13 @@
     "dedup": "技能傳承的重複 20 年樣本細節已移除一個補充章，數字仍完整保留在《20年技能傳承觀察樣本》；唯一的原創技能限制與多技能球員樣本記錄合入《技能傳承：公開資料交叉整理》。",
     "remaining": "巴哈歷史精華外部網站的部分舊頁無法完整查閱。無法證明已經全部挖乾淨。未讀取不等於不存在。",
     "recognition": "增加不依賴姓／名分隔區的純本機 16×16 全名冊比對，只處理仍未確認的列。來自兩個不同裁切的結果相符才可提升信心；沒有加入已知答案。仍缺這批 92 列的逐人姓名真值評測。"
+  },
+  "r29_selected_row_and_sources": {
+    "selected_row_problem": "PS2 roster selection draws near-black/navy glyphs on neutral gray. Grayscale-only OCR-free matcher cannot detect ink. New deterministic dark-blue chroma correction before normalization + raw-crop fallback, without player names in production code.",
+    "selected_row_reference_test": "2026-10-10 user sample EEE.png, row 5: bundled historical pure-program reference matcher returned no candidate before color conversion; afterward top candidate 江口 友澄 score .7349, runner-up .6106. This is a one-row offline test, not a general 92-row accuracy claim.",
+    "mobile_desktop": "Same per-pixel arithmetic used by Safari, Chrome and Edge. Real browser/iPhone accuracy not yet verified on this release.",
+    "web_audit": "Rechecked Bahamut board 6035 historical external guide index and Co sn=470, still blocked/403 for direct content; existing Ikasumi, Geocities kiyopf1005, datapot, ya3.tsukuclear links remain separately categorized by readability. No new Bahamut fulltext claimed.",
+    "new_readable_external": "2023 Japanese PS2 long-form diary re-owls.com/entry/100123 has a readable first-person challenge rule set; unique four self-imposed rules added to advanced guide, never treated as game mechanics.",
+    "dedup": "Rechecked complete guide table for exact row duplicates (zero) and ensured new challenge article is stored only once, with original Japanese alongside Traditional Chinese."
   }
 }
