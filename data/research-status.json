@@ -151,7 +151,7 @@
   },
   "r29_selected_row_and_sources": {
     "selected_row_problem": "PS2 roster selection draws near-black/navy glyphs on neutral gray. Grayscale-only OCR-free matcher cannot detect ink. New deterministic dark-blue chroma correction before normalization + raw-crop fallback, without player names in production code.",
-    "selected_row_reference_test": "2026-10-10 user sample EEE.png, row 5: bundled historical pure-program reference matcher returned no candidate before color conversion; afterward top candidate 江口 友澄 score .7349, runner-up .6106. This is a one-row offline test, not a general 92-row accuracy claim.",
+    "selected_row_reference_test": "2026-10-10 user-provided selected-row image: bundled deterministic reference matcher produced no name before chroma restoration; afterward the top candidate agreed with the user's manually labeled screenshot (score .7349, runner-up .6106). The manually labeled name and the image itself are kept out of production app/data.",
     "mobile_desktop": "Same per-pixel arithmetic used by Safari, Chrome and Edge. Real browser/iPhone accuracy not yet verified on this release.",
     "web_audit": "Rechecked Bahamut board 6035 historical external guide index and Co sn=470, still blocked/403 for direct content; existing Ikasumi, Geocities kiyopf1005, datapot, ya3.tsukuclear links remain separately categorized by readability. No new Bahamut fulltext claimed.",
     "new_readable_external": "2023 Japanese PS2 long-form diary re-owls.com/entry/100123 has a readable first-person challenge rule set; unique four self-imposed rules added to advanced guide, never treated as game mechanics.",
