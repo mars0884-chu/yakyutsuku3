@@ -9,7 +9,7 @@ for(const ch of book){
   const count=ch.sections.reduce((n,s)=>n+(s.rows?.length||0)+(s.items?.length||0),0);
   ok(ch.count===count,'Wrong count: '+ch.id);
   for(const s of ch.sections)for(const row of (s.rows||[])){
-    const key=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\\s+/g,' ').trim()));
+    const key=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));
     ok(!seen.has(key),'Duplicate guide row in '+ch.id+' : '+key.slice(0,90));
     seen.add(key);rows++;
   }
