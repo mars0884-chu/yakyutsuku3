@@ -33,7 +33,7 @@ ok(candidate([item(a,.61,.60),item(b,.59,.58)],[a,b])===null,'close candidates m
 ok(candidate([item(a,.52,.51),item(b,.43,.41)],[a,b])===null,'weak candidates must not be inferred');
 ok(candidate([item(a,.67,.61),item(b,.57,.58)],[a,b,{...a,_uid:'c'}])===null,'duplicate roster names must remain ambiguous');
 const chapters=JSON.parse(book),newSection=chapters.find(c=>c.id==='advanced')?.sections?.find(s=>s.title.startsWith('PS2 三代進階挑戰玩法'));
-ok(newSection?.rows?.length===4,'new PS2 fulltext source not integrated into proper chapter');
+ok(newSection?.rows?.length>=4&&newSection.rows.some(r=>r[0]==='Sランク2名、Aランク13人まで'),'original PS2 player challenge content missing');
 const seen=new Set();
 for(const ch of chapters){let n=0;for(const sec of ch.sections||[]){
  n+=(sec.rows?.length||0)+(sec.items?.length||0);
