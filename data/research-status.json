@@ -235,5 +235,23 @@
     "source_status": "Wazap與歷史改造碼原帖可讀；Jenova現存但編碼破字；五個特殊 2ch 討論串仍只有歷史引用；巴哈多個 G1/G2 網址 403，未取得全文部分不偽稱已挖到。",
     "open_questions": "所有無法取得全文與紙本攻略的潛在資料無法確認完整度；改造碼未做實機驗收；批次找人R31姓名真值與手機實機尚未通過。",
     "convergence": "本輪特定查詢的末段結果多次回到 Gamezukushi/Sheep/Ikasumi/Wazap/40年目原串。只能描述已查公開可檢索範圍逐漸收斂，不能保證不存在新公開鏡像。"
+  },
+  "bahamut_external_20261011_r36": {
+    "scope": "繼續查巴哈 6035 C/G2/外站；重新檢視2018 PS2 模擬器玩家全文搜尋索引、2005 原始改造碼串、GAME攻略書庫PukiWiki真實子頁、Jenova亂碼站、skillove 20年實測及其他日文部落格。",
+    "new_hardware_reference_rows": 7,
+    "complete_transcribed_lines_or_blocks": 6,
+    "incomplete_transcribed_blocks": 1,
+    "original_source": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=214&tnum=1",
+    "crosscheck_source": "https://kako.5ch.io/test/read.cgi/gamespo/1122038561",
+    "duplicate_code_crosschecks": [
+      "201728DC 24020001",
+      "20523554 24020064"
+    ],
+    "warnings": "PCSX2 1.4 個人實測不可當跨平台保證；2018 Skills 列首行20245784 4060001僅7位，未補碼值；18歳只是顯示，仍衰退。金手指仍需實機驗證。",
+    "source_count": 71,
+    "source_status_rechecked": "2018巴哈 C頁直接403但搜尋索引有長正文。GAME 攻略書庫子頁（海外選手権、アイデアメモ、選手スキル、ミッションポイント）實際點擊均導回TopPage，非完整攻略。Jenova舊 Shift_JIS 顯示破字，無可確認新表。",
+    "duplicate_semantics": "對照既有技能、Team Color、資金與年齡碼；目前以前版已收的完全相同碼條目為 0。2005 與 2018 同碼只新增一列並標跨來源。",
+    "excluded": "DS／2003 的搜尋結果不得當成 PS2 三代；skillove 20年技能實驗先前已收錄8項完整樣本，這輪沒有再次匯入。",
+    "discovery_boundary": "搜尋回流目前的主站/史料；仍有舊站與巴哈403未取得正文，不能宣告網路上不存在公開備份。"
   }
 }

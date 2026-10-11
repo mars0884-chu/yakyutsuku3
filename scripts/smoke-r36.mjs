@@ -1,0 +1,24 @@
+import fs from 'node:fs/promises';
+const read=async p=>JSON.parse(await fs.readFile(new URL('../data/'+p,import.meta.url),'utf8'));
+const [book,cheats,sources,status]=await Promise.all(['guide-book.json','cheats.json','sources.json','research-status.json'].map(read));
+const ok=(a,m)=>{if(!a)throw Error(m)};
+ok(book.length===31&&sources.length===71,'Wrong base data');
+const ch=book.find(x=>x.id==='cheats_20261005');
+ok(JSON.stringify(ch)===JSON.stringify(cheats[0]),'Unmatched cheats mirrors');
+const a=ch.sections.find(x=>x.title.startsWith('巴哈 2018：PCSX2 1.4 原始碼'));
+ok(a?.rows.length===7,'Wrong original code count');
+const contents=JSON.stringify(ch);
+for(const k of ['F0101B08 004A0B4B','201728DC 24020001','20523554 24020064','202455D0 24030001','203F8B80 24050012','203F8EDC 24050012','20245784 4060001'])ok(contents.includes(k),'Missing code '+k);
+ok(a.rows.filter(x=>x[1].includes('20245784')).length===1,'Duplicated incomplete code');
+ok(a.rows.find(x=>x[1].includes('20245784'))[2].includes('7 個十六進位'),'Incomplete original code caution missing');
+ok(a.rows.find(x=>x[1].includes('20523554'))[2].includes('未實測'),'Unsupported signing bonus code');
+ok(a.rows.find(x=>x[1].includes('203F8B80'))[2].includes('衰退'),'Age display hazard missing');
+const src=sources.find(x=>x.url==='https://forum.gamer.com.tw/C.php?bsn=6035&snA=214&tnum=1');
+ok(src?.status==='search_index_longtext_direct_403_with_emulator_player_report','Incorrect Bahamut source status');
+const wiki=sources.find(x=>x.url==='https://wiki.yakyutsuku.game-syo.com/');
+ok(wiki?.status==='top_page_accessible_subpages_redirect_to_home','Incorrect Wiki source status');
+const seen=new Set();
+for(const c of book){let total=c.sections.reduce((n,s)=>n+(s.rows?.length||0)+(s.items?.length||0),0);ok(total===c.count,'Incorrect chapter count '+c.id);for(const s of c.sections)for(const row of s.rows||[]){let k=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Duplicate guide data '+k.slice(0,80));seen.add(k)}}
+ok(status.bahamut_external_20261011_r36?.incomplete_transcribed_blocks===1,'Untracked incomplete code');
+ok((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim()==='2026.10.11-r36','Wrong VERSION');
+console.log('R36 OK: 7 PCSX2 1.4 source records (1 incomplete), 71 sources, '+seen.size+' unique table rows.');

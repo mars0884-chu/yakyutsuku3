@@ -65,6 +65,8 @@ jobs:
         run: node scripts/smoke-r34.mjs
       - name: Verify r35 external research, Japanese/Traditional Chinese and historic codes
         run: node scripts/smoke-r35.mjs
+      - name: Verify r36 Bahamut PCSX2 codes, access status and exact dedup
+        run: node scripts/smoke-r36.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
