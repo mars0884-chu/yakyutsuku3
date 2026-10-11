@@ -77,6 +77,8 @@ jobs:
         run: node scripts/smoke-r40.mjs
       - name: Verify r41 original 68 Memo values, HDD code templates and source contradictions
         run: node scripts/smoke-r41.mjs
+      - name: Verify r42 original source pitch counts and corrected 2012 values
+        run: node scripts/smoke-r42.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
