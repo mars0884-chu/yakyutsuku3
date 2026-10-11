@@ -654,5 +654,21 @@
     "status": "verified_readable_code_mirror_not_device_tested",
     "priority": 2,
     "note": "頁面直接可讀，條目與Hiscode共源，不算兩份獨立實機驗證；XT秘書切換xx可用候選只記作者列表，顯示年齡代碼不會停止實際衰退。"
+  },
+  {
+    "name": "2018 PS2 やきゅつく3 第54年目原串（1,002 則）",
+    "url": "https://medaka.5ch.io/test/read.cgi/gamespo/1538897478",
+    "role": "PS2 三代FAQ；#16 同一阪神存檔3輪投手成績（有修改能力碼）、Camp第3週變化球評價操作及Bug歷史彙總",
+    "status": "verified_fulltext_mixed_ps2_versions_explicit_3_experiment",
+    "priority": 1,
+    "note": "原文全篇可讀。#16說明有使用『能力仮限界までアップ』碼，數值不可當原版控制實驗；前幾樓亦允許 PS2 2/2003 串談，逐項核實三代。2007 無付費入團Bug在此FAQ已有彙整，不再重複新增規則。"
+  },
+  {
+    "name": "2007 DC 混版串 PS2 三代免費外國人入團 Bug #959–960",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1157542684",
+    "role": "混版本 #959 玩家記 7月以後簽兩外援、11月資金不足但第二位仍於隔年入團；#960 親自補正此筆為PS2三代",
+    "status": "verified_fulltext_explicit_ps2_yakyutsuku3_exception_in_dc_thread",
+    "priority": 2,
+    "note": "整串主題為 DC，只有 #959/#960 清楚標 PS2 三代，不能把其他樓的 DC 成長/交易當三代規則。此問題在現有 bugs 章已整理，只補獨立原帖而不複製條目。"
   }
 ]
