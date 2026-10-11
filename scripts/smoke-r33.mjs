@@ -32,5 +32,5 @@ const u='https://forum.gamer.com.tw/G2.php?bsn=6035&lorder=2&parent=11&sn=21';
 ok(sources.filter(x=>x.url===u).length===1,'Source URL missing or repeated');
 ok(status.bahamut_external_20261011_r33?.new_skill_mapping_rows===107,'Incorrect status record');
 const ver=(await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim();
-ok(ver==='2026.10.11-r33','Incorrect version '+ver);
+ok(/^2026\.10\.11-r\d+$/.test(ver)&&Number(ver.split('-r').at(-1))>=33,'Expected r33 or newer version '+ver);
 console.log('r33 guide/cheats: '+rows+' globally unique table rows, 107 mapped skills, 7 setup rows, 31 chapters');
