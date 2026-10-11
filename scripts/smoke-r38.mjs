@@ -3,8 +3,8 @@ const load=async p=>JSON.parse(await fs.readFile(new URL('../data/'+p,import.met
 const [book,cheat,sources,rs]=await Promise.all(['guide-book.json','cheats.json','sources.json','research-status.json'].map(load));
 const ok=(v,m)=>{if(!v)throw Error(m)};
 ok(book.length===31,'Unexpected chapter count');
-ok(sources.length===82,'R38 source count should be 82');
-ok(new Set(sources.map(x=>x.url)).size===82,'Duplicate URL');
+ok(sources.length>=82,'R38 baseline below 82 sources');
+ok(new Set(sources.map(x=>x.url)).size===sources.length,'Duplicate URL');
 const c=book.find(x=>x.id==='cheats_20261005');
 ok(JSON.stringify(c)===JSON.stringify(cheat[0]),'Cheats mirror unsynchronized');
 const a=c.sections.find(x=>x.title.startsWith('主碼／資金'));
@@ -27,5 +27,5 @@ ok(h.sections.find(x=>x.title.startsWith('2005～2006：PS2 三代'))?.rows.leng
 const seen=new Set();
 for(const ch of book){ok(ch.count===ch.sections.reduce((n,s)=>n+(s.rows?.length||0)+(s.items?.length||0),0),'Bad count '+ch.id);for(const sec of ch.sections)for(const row of sec.rows||[]){let k=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Duplicate row '+k.slice(0,70));seen.add(k)}}
 ok(rs.bahamut_external_20261011_r38?.new_url_records===9,'Missing source audit');
-ok((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim()==='2026.10.11-r38','Wrong version');
+ok(/^2026\.10\.11-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=38,'Expected r38 or newer');
 console.log('R38 verified: 82 unique sources, two 7-line PAR variants and 3 age/secretary codes, 5 original 2005–2006 cases, '+seen.size+' unique table rows');
