@@ -566,5 +566,21 @@
     "status": "verified_fulltext_uninterpretable_code_not_usable",
     "priority": 3,
     "note": "原文未提供功能敘述，僅外部網址；不能列入可直接使用的改造碼。"
+  },
+  {
+    "name": "Crazyboys 2007 第90回：設施投資與四個歷史攻略站",
+    "url": "https://crazyboys00.wordpress.com/2007/01/24/%E7%AC%AC%EF%BC%99%EF%BC%90%E5%9B%9E%E3%83%BB%E8%B6%85%E5%88%9D%E5%BF%83%E8%80%85%E7%94%A8%E3%81%AE%E3%83%A4%E3%82%AD%E3%83%A5%E3%83%84%E3%82%AF%E6%8C%87%E5%8D%97%EF%BC%96%EF%BC%88%E6%96%BD%E8%A8%AD/",
+    "role": "PS2 三代外站原名歷史引用／非站內正文",
+    "status": "verified_fulltext_historical_site_names_only",
+    "priority": 2,
+    "note": "公開可讀 2006／2007 原文確實提及 やきゅつく攻略メモ、やきゅつく３徹底攻略、プロ野球チームをつくろう・攻略式、たなぼたとやきゅぼた３；尚無可靠的原站網址，不憑名稱編造。"
+  },
+  {
+    "name": "Crazyboys 2006 第17回：投手球種與舊站引文",
+    "url": "https://crazyboys00.wordpress.com/2006/07/07/%E7%AC%AC%EF%BC%91%EF%BC%97%E5%9B%9E%E3%83%BB%E6%8A%95%E6%89%8B%E3%81%AE%E5%A4%89%E5%8C%96%E7%90%83%E3%81%AE%E3%81%99%E3%81%B9%E3%81%A6/",
+    "role": "PS2 三代外站原名歷史引用／非站內正文",
+    "status": "verified_fulltext_historical_site_names_only",
+    "priority": 2,
+    "note": "公開可讀 2006／2007 原文確實提及 やきゅつく攻略メモ、やきゅつく３徹底攻略、プロ野球チームをつくろう・攻略式、たなぼたとやきゅぼた３；尚無可靠的原站網址，不憑名稱編造。"
   }
 ]
