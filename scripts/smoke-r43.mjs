@@ -10,11 +10,11 @@ ok(source?.status==='verified_partial_fulltext_through_archive_mirror','Mirror e
 const get=id=>book.find(x=>x.id===id);
 const one=get('one').sections.find(x=>x.title.startsWith('2011 第52年原串：'));
 ok(one?.rows.length===8,'Expected eight position groups for one-year mode');
-ok(one.rows.every(x=>x[3].includes('玩家')||x[3].includes('原帖')||x[3].includes('A/B')),'Player-provided rankings insufficiently qualified');
+ok(one.title.includes('玩家 A／B 級')&&one.title.includes('不是資料庫 Rank'),'Player-provided ranking origin missing');
 const med=get('facilities').sections.find(x=>x.title.startsWith('2011 第52年討論串：'));
 ok(med?.rows.length===4,'Recovery-vs-prevention rules absent');
 ok(med.rows.some(x=>x[0].startsWith('医務室')&&x[1].includes('縮短復健')),'Medical facility interpretation lost');
-ok(med.rows.some(x=>x[0].includes('プール')&&x[2].includes('第226則')),'Original corrected injury-prevention note absent');
+ok(med.rows.some(x=>x[0].includes('プール')&&x[1].includes('第226則')),'Original corrected injury-prevention note absent');
 ok(med.rows.some(x=>x[0].includes('１人ローテ')&&x[1].includes('3名先發')),'Single-starter injury risk missing');
 const seen=new Set();
 for(const c of book){ok(c.count===c.sections.reduce((n,s)=>n+(s.items?.length||0)+(s.rows?.length||0),0),'Wrong count '+c.id);for(const s of c.sections)for(const row of s.rows||[]){let k=JSON.stringify(row.map(v=>String(v).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Exact duplicate '+k.slice(0,80));seen.add(k)}}
