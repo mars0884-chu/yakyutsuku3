@@ -79,6 +79,8 @@ jobs:
         run: node scripts/smoke-r41.mjs
       - name: Verify r42 original source pitch counts and corrected 2012 values
         run: node scripts/smoke-r42.mjs
+      - name: Verify r43 2011 PS2 year-mode archive and injury-facility corrections
+        run: node scripts/smoke-r43.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
