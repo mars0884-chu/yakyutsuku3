@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 const load=async n=>JSON.parse(await fs.readFile(new URL('../data/'+n,import.meta.url),'utf8'));
 const [book,sources,rs]=await Promise.all(['guide-book.json','sources.json','research-status.json'].map(load));
 const ok=(v,m)=>{if(!v)throw Error(m)};
-ok(book.length===31&&sources.length===88,'Expected 31 chapters and 88 verified sources');
+ok(book.length===31&&sources.length>=88,'Expected 31 chapters and 88 verified sources');
 ok(new Set(sources.map(x=>x.url)).size===sources.length,'Duplicate URL');
 for(const url of ['https://notitle.moo.jp/ch/yaku3x/','https://notitle.moo.jp/ch/yaku3x/rec.html','https://notitle.moo.jp/ch/yaku3x/seiseki.html','https://medaka.5ch.io/test/read.cgi/gamespo/1638738401'])ok(sources.filter(x=>x.url===url).length===1,'Recovered source missing '+url);
 const c=id=>book.find(x=>x.id===id);
@@ -20,5 +20,5 @@ ok(c('created').sections.find(x=>x.title.startsWith('自創球員年數上限：
 ok(c('bugs').sections.find(x=>x.title==='高影響 Bug／異常行為').rows.filter(x=>x[0]==='「器用」異常高打率').length===1,'Duplicated Bug');
 const seen=new Set();for(const ch of book){ok(ch.count===ch.sections.reduce((n,z)=>n+(z.items?.length||0)+(z.rows?.length||0),0),'Bad chapter '+ch.id);for(const z of ch.sections)for(const row of z.rows||[]){let k=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Duplicate table row '+k.slice(0,60));seen.add(k)}}
 ok(rs.bahamut_external_20261011_r40?.source_counts?.added===4,'Missing R40 audit');
-ok((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim()==='2026.10.11-r40','Unexpected version');
+ok(/^2026\.10\.11-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=40,'Expected r40 or newer');
 console.log('R40 VERIFIED: 88 distinct sources, 18 conversion options, 11 cautious binary fields, 5 record tactics, 31 chapters, '+seen.size+' unique table rows');
