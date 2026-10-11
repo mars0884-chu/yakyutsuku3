@@ -374,5 +374,36 @@
     "archive_link_status": "原始 https://kako.5ch.io/test/read.cgi/gamespo/1317196650 與medaka直接失敗，但部分n2ch分頁成功；同串51年目 mirror目前也失敗。",
     "excludes": "其他代別如DC/2003的文字不直接當三代；單季排名、玩家的A/B評分、傷病統計不是官方能力值。",
     "still_unresolved": "巴哈G1/G2 403、歷史站GeoCities/tsukuclear/mimizun、舊Wiki子頁、Jenova舊編碼及n2ch未開段落；這輪找回又一份可讀原始串，因此不能宣告全部公開資料已收斂到終點。"
+  },
+  "bahamut_external_20261011_r44": {
+    "scope": "第52年原串n2ch經前後頁連結全10段共991則均可開啟；沿51年（2009–2011，共1001樓）及50年（2009，共981樓）前串連結追查其鏡像。新增主題以技能8格、重複技能、HomeTown建物合併、投野轉換及原帖自我更正的留學Pipe門檻為主。",
+    "available_year52_pages": [
+      "1-",
+      "101-",
+      "201-",
+      "301-",
+      "401-",
+      "501-",
+      "601-",
+      "701-",
+      "801-",
+      "901-"
+    ],
+    "full_year52": "https://n2ch.net/r/FbB------F/gamespo/1317196650/1-?guid=ON",
+    "year51": "https://n2ch.net/r/FbB------F/gamespo/1259337191/1-?guid=ON",
+    "year50": "https://n2ch.net/r/FbB------F/gamespo/1233052146/1-?guid=ON",
+    "source_total": 95,
+    "source_new_urls": 2,
+    "guide_additions": {
+      "skill_caveats": 4,
+      "building_merge_routes": 4,
+      "corrected_pipeline_cases": 4,
+      "conversion_player_cases": 3,
+      "CPU_trade_reset_anecdote": 1
+    },
+    "access_scope": "52年鏡像各100樓分頁確實已成功開啟至901-991。51年鏡像首頁與末段可讀但未審完所有1001樓；50年鏡像末段可讀、未審完981樓。僅可開啟不等於已逐樓人工精讀，剩餘有用段落須繼續。",
+    "correction": "#622先猜ソックラム2500，#625質疑，#626原作者自認16進位計算錯誤並改4000；#305回答技能8格（含教練技能）；#913 vs #918教練技能來源有矛盾，不當官方硬規則。",
+    "pitfalls": "不可把玩家自訂A/B年度推薦誤作遊戲Rank；對CPU交易重載玩家討論尚未受控驗證；本機非AI截圖辨識核心與3767名名冊未修改。",
+    "exhaustion": "新發現兩條現存可讀長篇原串，仍無法宣告公共有效來源都已追至無新正文。巴哈G2部分403、GeoCities/tsukuclear失效與破字頁持續標記不可取得。"
   }
 }
