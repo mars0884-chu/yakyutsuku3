@@ -284,5 +284,19 @@
     "exhaustion_status": "這一輪仍找到新可讀來源 Chaos-File 的完整歷史代碼與其原始來源鏡像，故不能宣告公開資料挖盡。繼續區分 403/失效外站與可讀原文。",
     "additional_2006_code_rows": 3,
     "code_crosscheck": "巴哈 G2 sn12 的 PAR 資金最大第一組7行與 Hiscode/Chaos-File 相符；另一組只有第5行 9CFF80FC B0D54435 不同，採獨立完整組，兩組切勿同時開。2006原文亦有年齢18歳.ver2 XT/PAR 及秘書変更 XT 模板，均未實機驗證。"
+  },
+  "bahamut_external_20261011_r39": {
+    "scope": "繼續篩查2005 PS2 攻略專串索引；2018年 PS2 三代第54年目可讀原文（1,002則），交叉對2007年DC混版串第959、960樓明確自認為三代的稀有外國人簽約Bug。",
+    "added_sources": 2,
+    "source_count": 84,
+    "new_experiment_rows": 6,
+    "new_camp_method_rows": 3,
+    "existing_bug_updated": 1,
+    "original_2018": "https://medaka.5ch.io/test/read.cgi/gamespo/1538897478",
+    "original_2007": "https://kako.5ch.io/test/read.cgi/gamespo/1157542684",
+    "method_warning": "三輪投手ERA採用了『能力仮限界まで成長』修改碼，因此不是純原版受控測試；時間、球隊及存檔固定也不代表樣本足以建置球員排名。",
+    "bug_warning": "2007年該原串標題是DC，僅樓959/960明言PS2三代；2018年PS2三代第54年目FAQ亦重述此Bug，因此補到原已存在的Bug條目，不新增第二筆。",
+    "original_2005_guide_thread": "https://itest.5ch.net/medaka/test/read.cgi/gameover/1122437345/259-n 原本2005攻略串當前可於搜尋索引見留言摘要，但直接開啟會導回5ch板首頁；僅索引，不虛構全文。",
+    "unresolved": "歷史論壇大量混版；G2部分403及Jenova破字、失效GeoCities、2005專串全文仍無法直接取回。已檢索到的新有效資料仍持續出現，不能宣告所有公開來源挖盡。"
   }
 }
