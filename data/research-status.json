@@ -325,5 +325,30 @@
     "hex_uncertainty": "55年串的ISO球員位址2022曾由0x707B4FA0更正為0x707B5000，2023第509樓列+0x15、+0x35、+0x37等；+0x39、+0x47、+0x49、+0x4D、+0xA3作者仍標可能/問號。這是私人修改原版映像試驗，不證明所有區域版通用。",
     "exhaustive_status": "此輪成功新挖復原靜態攻略全文，所以尚不能誠稱所有公開可讀來源已挖完。剩餘巴哈 G1/G2 403、GeoCities 失效、舊wiki索引、notitle動態wiki404、2005特定串及資料 viewer 的原文待查。",
     "note": "批次截圖辨識與球員名冊無變動。"
+  },
+  "bahamut_external_20261011_r41": {
+    "scope": "繼續追2012 PS2 三代第53年原串1002則，沿 2014#454 效果別経営企画舊站網址及2017#782 pinkpantu 舊金手指原站，並查2006 mimizun 過去FAQ鏡像。",
+    "source_new_url_total": 4,
+    "source_count": 92,
+    "confirmed_fulltext": [
+      "https://medaka.5ch.io/test/read.cgi/gamespo/1352107542",
+      "https://pinkpantu.gozaru.jp/yakyutuku3.htm"
+    ],
+    "historical_only_unavailable": [
+      "http://www.tsukuclear.com/keiei/",
+      "http://mimizun.com/log/2ch/gamespo/1151312142/"
+    ],
+    "new_structured": {
+      "idea_memo_hex_labels": 68,
+      "hdd_and_nonhdd_raw_memory_blocks": 9,
+      "pipe_conflicts": 3,
+      "hometown_upper_bound_observations": 1,
+      "salary_negotiation_observations": 2
+    },
+    "source_notes": "pinkpantu官方原碼頁62行皆可讀；含HDD使用時？、HDDなしの場合？及xx/xxxx模板。該網站非軟體發行商，未見完整版本對應表及硬體相容報告，不能以此保證可用性。",
+    "contradiction": "2012#9說早乙女北美初期3500、平瀬也許2500、ゴッデス9000，但Gamezukushi整理平瀬3500、ゴッデス8000；Grand6500、米加加入160、球探上限6000互證。數值分歧不可暗改原有固定攻略。",
+    "dedup": "經濟10 DVD製作可收入5億、成長型評語、34/39/44壽命公式已在現有章節，這輪未重複灌錄；只補新編碼／來源分歧／操作特例。",
+    "no_verified_exhaustion": "本輪新找到62行可讀金手指站與2012-2018完整原始論壇、而且原串還有大量樓層，因此仍不能證明所有公開可讀內容已追到沒有新增。",
+    "excluded": "跨代PS2 2003／DC／NDS之代碼排除；聲稱手機/PAR通用的文字都不當驗證，AI-free本機截圖辨識與3767原版名冊完全不變。"
   }
 }
