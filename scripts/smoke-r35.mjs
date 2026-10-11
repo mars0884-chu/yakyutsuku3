@@ -19,7 +19,7 @@ const raw=cc.sections.find(x=>x.title.startsWith('2005～2009 公開原串補完
 ok(raw?.rows.length===16,'Wrong raw-code items');
 ok(raw.rows.every(x=>x[1].trim()&&/未實測|尚未驗證|未驗證|可用碼/.test(x[2])),'Raw-code hardware uncertainty missing');
 const originalSet=new Set();for(const ch of b){let n=ch.sections.reduce((z,x)=>z+(x.rows?.length||0)+(x.items?.length||0),0);ok(n===ch.count,'Incorrect chapter '+ch.id);for(let sec of ch.sections)for(let row of sec.rows||[]){let key=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!originalSet.has(key),'Duplicate guide row '+key.slice(0,70));originalSet.add(key)}}
-ok(s.length===71,'Source count not 71');
+ok(s.length>=71,'Source count below r35 baseline');
 ok(new Set(s.map(x=>x.url)).size===s.length,'Duplicate source URL');
 ok(st.bahamut_external_20261011_r35?.new_source_index_records===15,'Research status missing');
 ok(/^2026\.10\.11-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=35,'Expected r35 or newer version');
