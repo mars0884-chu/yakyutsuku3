@@ -1,0 +1,24 @@
+import fs from 'node:fs/promises';
+const load=async p=>JSON.parse(await fs.readFile(new URL('../data/'+p,import.meta.url),'utf8'));
+const [book,cheat,sources,rs]=await Promise.all(['guide-book.json','cheats.json','sources.json','research-status.json'].map(load));
+const ok=(v,m)=>{if(!v)throw Error(m)};
+ok(book.length===31,'Unexpected chapter count');
+ok(sources.length===81,'R38 source count should be 81');
+ok(new Set(sources.map(x=>x.url)).size===81,'Duplicate URL');
+const c=book.find(x=>x.id==='cheats_20261005');
+ok(JSON.stringify(c)===JSON.stringify(cheat[0]),'Cheats mirror unsynchronized');
+const a=c.sections.find(x=>x.title.startsWith('主碼／資金'));
+const par=a.rows.filter(x=>x[0].includes('資金最大（PAR／原版七行組）'));
+ok(par.length===1&&par[0][1]==='PAR','Missing original seven-line code');
+const code=par[0][2].trim().split('\n');
+ok(code.length===7,'PAR code not seven lines');
+ok(code.every(x=>/^[0-9A-F]{8} [0-9A-F]{8}$/.test(x)),'Invalid PAR code line');
+ok(code[0]==='9C87CE90 0C3CF017'&&code[6]==='9CFF8004 1456E7A5','Incorrect code endpoints');
+ok(par[0][3].includes('未經實機驗證'),'PAR compatibility caveat missing');
+const h=book.find(x=>x.id==='history_20261005');
+ok(h.sections.find(x=>x.title.startsWith('2005～2006：PS2 三代'))?.rows.length===5,'Player cases missing');
+const seen=new Set();
+for(const ch of book){ok(ch.count===ch.sections.reduce((n,s)=>n+(s.rows?.length||0)+(s.items?.length||0),0),'Bad count '+ch.id);for(const sec of ch.sections)for(const row of sec.rows||[]){let k=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Duplicate row '+k.slice(0,70));seen.add(k)}}
+ok(rs.bahamut_external_20261011_r38?.new_url_records===8,'Missing source audit');
+ok((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim()==='2026.10.11-r38','Wrong version');
+console.log('R38 verified: 81 unique sources, 7 valid-length PAR code lines, 5 original 2005–2006 cases, '+seen.size+' unique table rows');
