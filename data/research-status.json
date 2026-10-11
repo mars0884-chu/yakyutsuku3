@@ -298,5 +298,32 @@
     "bug_warning": "2007年該原串標題是DC，僅樓959/960明言PS2三代；2018年PS2三代第54年目FAQ亦重述此Bug，因此補到原已存在的Bug條目，不新增第二筆。",
     "original_2005_guide_thread": "https://itest.5ch.net/medaka/test/read.cgi/gameover/1122437345/259-n 原本2005攻略串當前可於搜尋索引見留言摘要，但直接開啟會導回5ch板首頁；僅索引，不虛構全文。",
     "unresolved": "歷史論壇大量混版；G2部分403及Jenova破字、失效GeoCities、2005專串全文仍無法直接取回。已檢索到的新有效資料仍持續出現，不能宣告所有公開來源挖盡。"
+  },
+  "bahamut_external_20261011_r40": {
+    "scope": "在原有84筆來源之外，沿第55年討論串及巴哈/日本舊站追回2009 notitle 完整靜態路徑，核對其主頁450行、record跟器用Bug兩篇詳細頁；2021～2026 第55年全文含2023 #509資料欄位實測；重讀2005三代第20年原串。",
+    "restored_fulltext_pages": [
+      "https://notitle.moo.jp/ch/yaku3x/",
+      "https://notitle.moo.jp/ch/yaku3x/rec.html",
+      "https://notitle.moo.jp/ch/yaku3x/seiseki.html"
+    ],
+    "living_original_thread": "https://medaka.5ch.io/test/read.cgi/gamespo/1638738401",
+    "source_counts": {
+      "before": 84,
+      "after": 88,
+      "added": 4
+    },
+    "new_content": {
+      "pitcher_hitter_conversions": 18,
+      "player_iso_field_hypotheses": 11,
+      "record_strategies": 5,
+      "camp_skill_transfer_observations": 2,
+      "growth_claim_disagreements": 2,
+      "updated_existing_bug_entries": 1
+    },
+    "access_correction": "notitle.moo.jp/ch/yaku3/ 的 index.php? 動態子頁的確404，但 notitle.moo.jp/ch/yaku3x/ 及 rec/seiseki.html 靜態頁直接可讀。不能將動態頁失效等同原作者全部資料失效。",
+    "age_conflict": "notitle說自創球員第31年後起始能力不再提升，Gamezukushi表述遊戲第20年起進入第三能力段；兩者不能冒充相同結論，併列玩家說法待驗。",
+    "hex_uncertainty": "55年串的ISO球員位址2022曾由0x707B4FA0更正為0x707B5000，2023第509樓列+0x15、+0x35、+0x37等；+0x39、+0x47、+0x49、+0x4D、+0xA3作者仍標可能/問號。這是私人修改原版映像試驗，不證明所有區域版通用。",
+    "exhaustive_status": "此輪成功新挖復原靜態攻略全文，所以尚不能誠稱所有公開可讀來源已挖完。剩餘巴哈 G1/G2 403、GeoCities 失效、舊wiki索引、notitle動態wiki404、2005特定串及資料 viewer 的原文待查。",
+    "note": "批次截圖辨識與球員名冊無變動。"
   }
 }
