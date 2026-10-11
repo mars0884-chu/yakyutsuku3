@@ -1,0 +1,23 @@
+import fs from 'node:fs/promises';
+const read=async n=>JSON.parse(await fs.readFile(new URL('../data/'+n,import.meta.url),'utf8'));
+const [book,sources,status]=await Promise.all(['guide-book.json','sources.json','research-status.json'].map(read));
+const ok=(a,m)=>{if(!a)throw Error(m)};
+ok(book.length===31&&sources.length===93,'Wrong R43 base counts');
+ok(new Set(sources.map(x=>x.url)).size===sources.length,'Repeated source URL');
+const mirror='https://n2ch.net/r/FbB------F/gamespo/1317196650/101-?guid=ON';
+const source=sources.find(x=>x.url===mirror);
+ok(source?.status==='verified_partial_fulltext_through_archive_mirror','Mirror extent not qualified');
+const get=id=>book.find(x=>x.id===id);
+const one=get('one').sections.find(x=>x.title.startsWith('2011 第52年原串：'));
+ok(one?.rows.length===8,'Expected eight position groups for one-year mode');
+ok(one.rows.every(x=>x[3].includes('玩家')||x[3].includes('原帖')||x[3].includes('A/B')),'Player-provided rankings insufficiently qualified');
+const med=get('facilities').sections.find(x=>x.title.startsWith('2011 第52年討論串：'));
+ok(med?.rows.length===4,'Recovery-vs-prevention rules absent');
+ok(med.rows.some(x=>x[0].startsWith('医務室')&&x[1].includes('縮短復健')),'Medical facility interpretation lost');
+ok(med.rows.some(x=>x[0].includes('プール')&&x[2].includes('第226則')),'Original corrected injury-prevention note absent');
+ok(med.rows.some(x=>x[0].includes('１人ローテ')&&x[1].includes('3名先發')),'Single-starter injury risk missing');
+const seen=new Set();
+for(const c of book){ok(c.count===c.sections.reduce((n,s)=>n+(s.items?.length||0)+(s.rows?.length||0),0),'Wrong count '+c.id);for(const s of c.sections)for(const row of s.rows||[]){let k=JSON.stringify(row.map(v=>String(v).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Exact duplicate '+k.slice(0,80));seen.add(k)}}
+ok(status.bahamut_external_20261011_r43?.total_sources===93,'R43 provenance missing');
+ok((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim()==='2026.10.11-r43','Wrong VERSION');
+console.log('R43: 93 source URLs, 8 sourced one-year rankings, 4 historical facility warnings, '+seen.size+' unique table rows');
