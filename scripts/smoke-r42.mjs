@@ -1,0 +1,22 @@
+import fs from 'node:fs/promises';
+const read=async p=>JSON.parse(await fs.readFile(new URL('../data/'+p,import.meta.url),'utf8'));
+const [book,sources,rs]=await Promise.all(['guide-book.json','sources.json','research-status.json'].map(read));
+const ok=(b,m)=>{if(!b)throw Error(m)};
+ok(book.length===31&&sources.length===92,'Expected 31 chapters and 92 primary sources');
+ok(new Set(sources.map(x=>x.url)).size===sources.length,'Duplicate source URL');
+const chapter=id=>book.find(x=>x.id===id);
+const pitch=chapter('pitch');
+const s=pitch.sections.find(x=>x.title.startsWith('2012 第53年原串：三位投手'));
+ok(s?.rows.length===3,'Missing one-game original pitching records');
+ok(s.rows.find(x=>x[0]==='桑田')?.[1]?.includes('不明45'),'Kuwata missing unrecognized balls');
+ok(s.rows.find(x=>x[0]==='権藤')?.[1]?.includes('ドロップS+18'),'Gondo count lost');
+const k=s.rows.find(x=>x[0]==='川本修司');
+ok(k?.[1]?.includes('ストレート17')&&k?.[1]?.includes('シュートB+16')&&k?.[1]?.includes('フォークA18'),'Kawamoto original corrected count missing');
+ok(!k[1].includes('ストレート27')&&!k[1].includes('フォークA28'),'Kawamoto incorrect first posting survived');
+ok(k[2].includes('第26則更正後'),'Original source correction not cited');
+ok(pitch.sections.find(x=>x.title.startsWith('2012 逐球樣本告訴'))?.rows.length===2,'Missing one-game inference warning');
+const seen=new Set();
+for(const c of book){ok(c.count===c.sections.reduce((n,x)=>n+(x.items?.length||0)+(x.rows?.length||0),0),'Bad count '+c.id);for(const s of c.sections)for(const row of s.rows||[]){let k=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Duplicate table row '+k.slice(0,70));seen.add(k)}}
+ok(rs.bahamut_external_20261011_r42?.new_original_pitch_case_rows===3,'Source audit missing');
+ok((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim()==='2026.10.11-r42','Wrong VERSION');
+console.log('R42 pass: 92 sources, 3 original PS2 play-by-play pitch samples with source correction; '+seen.size+' unique table rows');
