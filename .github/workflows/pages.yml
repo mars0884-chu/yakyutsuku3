@@ -73,6 +73,8 @@ jobs:
         run: node scripts/smoke-r38.mjs
       - name: Verify r39 three-run pitchers, Camp menu and PS2-only source separation
         run: node scripts/smoke-r39.mjs
+      - name: Verify r40 recovered Japanese PS2 guides, bilingual data and uncertain ROM analysis
+        run: node scripts/smoke-r40.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
