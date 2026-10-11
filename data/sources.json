@@ -702,5 +702,37 @@
     "status": "verified_fulltext_binary_field_player_experiment",
     "priority": 1,
     "note": "明確標PS2三代；2022#123/126修正球員表地址錯誤，2023#509提出0x707B5000基底加相對位移，含rank/年齡/出身/賽區/成長/爆發；只是私人修改環境推定，絕不硬寫成原版官方規格或讓一般使用者改ISO。"
+  },
+  {
+    "name": "2012～2018 PS2 三代第53年目原始全文（1,002則）",
+    "url": "https://medaka.5ch.io/test/read.cgi/gamespo/1352107542",
+    "role": "2012-2018完整FAQ：HomeTown指標上限、成長型評語、北美パイプ個別經驗、年度心得與新外站引用",
+    "status": "verified_fulltext_ps2_third_game_long_thread",
+    "priority": 1,
+    "note": "直讀全文10,145行、1,002則。主題明確三代，但PS2/2003散見混談，數值先和Gamezukushi交叉；#9早乙女初始3500/平瀬可能2500、ゴッデス9000與Gamezukushi平瀬3500及ゴッデス8000相衝突，不能無條件覆寫。"
+  },
+  {
+    "name": "pinkpantu 原始やきゅつく3 HDD／非HDD 靜態改造碼表",
+    "url": "https://pinkpantu.gozaru.jp/yakyutuku3.htm",
+    "role": "直接可讀62行：HDD/非HDD 記憶體地址、資金、城市五指標、經營企劃五個slot、完整Idea Memo編碼對照",
+    "status": "verified_fulltext_legacy_cheat_templates_not_device_tested",
+    "priority": 1,
+    "note": "2017第53年串#782原帖提供網址；2026-10-11實際HTTPS全文可讀。有 xx/xxxx/e005xxxx 模板、HDD?註記、遊戲版別不明；只能展示帶未驗證警告的原文位址，不可當原版PS2/PCSX2通用即用碼。"
+  },
+  {
+    "name": "tsukuclear 效果別・経営企画 2014 年引用的歷史站",
+    "url": "http://www.tsukuclear.com/keiei/",
+    "role": "2014 年三代第53年串 #454 明確引「効果別・経営企画」外站；該站現無法直接取回正文",
+    "status": "historical_reference_unavailable",
+    "priority": 2,
+    "note": "與 ya3.tsukuclear.com 不同歷史網址；本輪試 HTTP/HTTPS及公共網頁搜尋，無可靠可讀原站全文。可用Sheep與Ikasumi既有公開經營企劃互證，但不可冒充已復原。"
+  },
+  {
+    "name": "mimizun 2006 歷史討論串過去日誌鏡像（第53年串 #2 引用）",
+    "url": "http://mimizun.com/log/2ch/gamespo/1151312142/",
+    "role": "2012年PS2三代第53年原帖 #2 引用的2006長篇歷史FAQ鏡像",
+    "status": "historical_reference_unavailable",
+    "priority": 3,
+    "note": "2012年有明確引用；2026-10-11 HTTP/HTTPS無法可靠開啟原站，可能與其他可讀2006期串重合。未取得正文，不重複計算攻略。"
   }
 ]
