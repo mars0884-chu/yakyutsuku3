@@ -734,5 +734,13 @@
     "status": "historical_reference_unavailable",
     "priority": 3,
     "note": "2012年有明確引用；2026-10-11 HTTP/HTTPS無法可靠開啟原站，可能與其他可讀2006期串重合。未取得正文，不重複計算攻略。"
+  },
+  {
+    "name": "2011～2012 PS2 三代第52年目：n2ch 可讀歷史分頁",
+    "url": "https://n2ch.net/r/FbB------F/gamespo/1317196650/101-?guid=ON",
+    "role": "原本5ch/kako封存無法直取的2011三代52年目，n2ch鏡像可讀第101~300樓；一年模式各守位A/B補強名單與受傷/醫務室/草皮原始討論",
+    "status": "verified_partial_fulltext_through_archive_mirror",
+    "priority": 1,
+    "note": "原串標991回覆。2026-10-11已實際開啟101-及201-分頁正文，其中#105一年模式自訂A/B等級（非遊戲Rank）、#196單一先發輪值受傷、#225-228醫務室僅加速治療與休養/草皮，#226自我更正浴場為泳池；首頁1-和301以後在此工具有Unicode/轉碼失敗，不能宣稱全991樓已取得。"
   }
 ]
