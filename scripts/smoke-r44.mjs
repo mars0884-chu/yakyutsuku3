@@ -1,0 +1,26 @@
+import fs from 'node:fs/promises';
+const get=async p=>JSON.parse(await fs.readFile(new URL('../data/'+p,import.meta.url),'utf8'));
+const [book,sources,status,cheats]=await Promise.all(['guide-book.json','sources.json','research-status.json','cheats.json'].map(get));
+const ok=(c,m)=>{if(!c)throw Error(m)};
+ok(book.length===31&&sources.length===95,'R44 unexpected 31 chapters or 95 sources');
+ok(new Set(sources.map(x=>x.url)).size===sources.length,'Duplicate source URL');
+const url='https://n2ch.net/r/FbB------F/gamespo/1317196650/1-?guid=ON';
+ok(sources.filter(x=>x.url===url&&x.status==='verified_fulltext_archive_all_991_pages').length===1,'Full 52nd-year recovery not recorded');
+const c=id=>book.find(x=>x.id===id);
+const t=c('skills').sections.find(x=>x.title.startsWith('2012 第52年原串：技能'));
+ok(t?.rows.length===4,'4 original skill observations missing');
+ok(t.rows[0][1].includes('8格')&&t.rows[1][1].includes('兩個安打製造機'),'8 slot/repeated skill detail lost');
+ok(t.rows[2][2].includes('互相矛盾'),'Conflicting coach skill observation not qualified');
+const hom=c('home').sections.find(x=>x.title.startsWith('2009–2012 兩串互證：'));
+ok(hom?.rows.length===4,'Four HomeTown merge recipes missing');
+ok(hom.rows[0][0].includes('銀行')&&hom.rows[1][0].includes('ゲームセンター'),'Bank/shop/arcade recipe lost');
+const sd=c('study').sections.find(x=>x.title.startsWith('2012 第52年 Pipe 原始數值勘誤'));
+ok(sd?.rows.length===4,'Four correction records missing');
+ok(sd.rows[0][0].includes('2500 → 4000')&&sd.rows[0][1].includes('#626'),'2012 source correction not enforced');
+ok(c('acquire').sections.find(x=>x.title.startsWith('2011 第52年原帖補充：'))?.rows.length===3,'New historical conversion candidates missing');
+ok(c('bugs').sections.find(x=>x.title.startsWith('2009 第51年串：'))?.rows.length===1,'CPU acquired attribute reset caution missing');
+ok(JSON.stringify(c('cheats_20261005'))===JSON.stringify(cheats[0]),'Cheat mirror unexpectedly drifted');
+const seen=new Set();for(const ch of book){ok(ch.count===ch.sections.reduce((n,s)=>n+(s.items?.length||0)+(s.rows?.length||0),0),'Bad count '+ch.id);for(const s of ch.sections)for(const row of s.rows||[]){let k=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Duplicate exact row '+k.slice(0,70));seen.add(k)}}
+ok(status.bahamut_external_20261011_r44?.source_total===95,'Research audit missing');
+ok((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim()==='2026.10.11-r44','Wrong VERSION');
+console.log('R44 verified: 95 URLs; year52 full 991 posts reachable; year50/51 source status qualified; '+seen.size+' table rows unique');
