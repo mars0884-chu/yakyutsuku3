@@ -646,5 +646,13 @@
     "status": "verified_fulltext_mixed_ps2_versions_no_new_hard_rules",
     "priority": 3,
     "note": "原帖 #1~3 說明 PS2 2、2003、3 會一起討論；例如赤星肩力 A/B 說法相互矛盾，不可寫成三代固定上限或排行。確認可讀完整原串，但不匯入不確定數值。"
+  },
+  {
+    "name": "Chaos-File：PS2 やきゅつく3 2006 XT／PAR 歷史改造碼可讀備份",
+    "url": "https://chaos-file.jp/?tid=567&z=t2",
+    "role": "與抜け出せ三等兵 2006 資料交叉，發現PAR資金第二種七行、年齡顯示ver2、秘書更換模板",
+    "status": "verified_readable_code_mirror_not_device_tested",
+    "priority": 2,
+    "note": "頁面直接可讀，條目與Hiscode共源，不算兩份獨立實機驗證；XT秘書切換xx可用候選只記作者列表，顯示年齡代碼不會停止實際衰退。"
   }
 ]
