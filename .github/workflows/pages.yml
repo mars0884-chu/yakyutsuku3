@@ -71,6 +71,8 @@ jobs:
         run: node scripts/smoke-r37.mjs
       - name: Verify r38 2006 Bahamut original PAR code and documented PS2 cases
         run: node scripts/smoke-r38.mjs
+      - name: Verify r39 three-run pitchers, Camp menu and PS2-only source separation
+        run: node scripts/smoke-r39.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
