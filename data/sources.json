@@ -251,9 +251,9 @@
     "name": "2005 PS2《やきゅつく3》20年目討論串",
     "url": "https://kako.5ch.io/test/read.cgi/gamespo/1123809103",
     "role": "引越し屋＋各地 Memo 商店進出的歷史討論；未確認配方",
-    "status": "historical_fulltext_unverified_claim",
+    "status": "verified_fulltext_original_ps2_2005_thread",
     "priority": 3,
-    "note": "原文可讀，但貼文中有試不成功的回報；網站標示為未確認歷史配方候選。"
+    "note": "原文可讀，但貼文中有試不成功的回報；網站標示為未確認歷史配方候選。；R40 重查成功開啟1001則全文：2005/08/12～13自創球員◎/○道具組合及教練技能傳授等案例可讀，但非官方數值公式。"
   },
   {
     "name": "巴哈外部連結／kiyopf1005 経営企画",
@@ -357,7 +357,7 @@
     "role": "玩家三代攻略章節索引：一季模式、強力技能、守位推薦",
     "status": "index_accessible_subpages_unavailable",
     "priority": 3,
-    "note": "首頁章節索引可讀，已試點的一年模式和優秀選手子頁 404；未把頁名冒充已取得正文。"
+    "note": "首頁章節索引可讀，已試點的一年模式和優秀選手子頁 404；未把頁名冒充已取得正文。；R40 找到同作者完整靜態版 https://notitle.moo.jp/ch/yaku3x/，可直接讀全文；原 PukiWiki index.php? 內頁仍404，不能把動態頁回404等同整站不可讀。"
   },
   {
     "name": "巴哈姆特：模擬職棒3 新的金手指（PS2，2006）",
@@ -670,5 +670,37 @@
     "status": "verified_fulltext_explicit_ps2_yakyutsuku3_exception_in_dc_thread",
     "priority": 2,
     "note": "整串主題為 DC，只有 #959/#960 清楚標 PS2 三代，不能把其他樓的 DC 成長/交易當三代規則。此問題在現有 bugs 章已整理，只補獨立原帖而不複製條目。"
+  },
+  {
+    "name": "notitle 旧靜態版《やきゅつく3メモ》完整攻略",
+    "url": "https://notitle.moo.jp/ch/yaku3x/",
+    "role": "2009版完整長篇PS2三代攻略，含Camp、投野互轉名單、育成、紀錄、技能傳授與源站連結",
+    "status": "verified_fulltext_static_mirror",
+    "priority": 1,
+    "note": "與 notitle.moo.jp/ch/yaku3/ 現有目錄不同：舊index.php?各子頁回404，但 /yaku3x/ 靜態頁450行原文可讀，不得說notitle全部無法取得。作者自述31年後自創選手封頂，與Gamezukushi 20年3階段不同，保留分歧。"
+  },
+  {
+    "name": "notitle 2009 レコード記録の更新の裏技（PS2 三代）",
+    "url": "https://notitle.moo.jp/ch/yaku3x/rec.html",
+    "role": "完整靜態玩家攻略：以交易削弱同聯盟對手先發或捕手，拚打擊及盜壘紀錄",
+    "status": "verified_fulltext_strategic_guide",
+    "priority": 1,
+    "note": "玩家做紀錄的非一般建隊玩法，非固定成功公式。原文案例工藤及虛弱捕手交換。"
+  },
+  {
+    "name": "notitle 2009 器用バグのようなもの 原作者紀錄",
+    "url": "https://notitle.moo.jp/ch/yaku3x/seiseki.html",
+    "role": "原作者赤沼等連打、直球に強い、勝負を決める獲得時間線；ERA/打率異常不是通用固定公式",
+    "status": "verified_fulltext_bug_observation_not_reproducible",
+    "priority": 1,
+    "note": "作者觀察個案第1年打率.320、次年近.580，五年約.575/66HR；只是技能傳授相關Bug疑似條件，尚不能保證重現。軟體型號/HDD可能影響。"
+  },
+  {
+    "name": "2021～2026 PS2 三代第55年目長串：球員欄位實測與FAQ",
+    "url": "https://medaka.5ch.io/test/read.cgi/gamespo/1638738401",
+    "role": "2022/2023 原版PS2 ISO 玩家二進位欄位研究、原始選秀年齡/出場旗標、資質/爆發型；多年FAQ及自創玩家存檔，版本須區分",
+    "status": "verified_fulltext_binary_field_player_experiment",
+    "priority": 1,
+    "note": "明確標PS2三代；2022#123/126修正球員表地址錯誤，2023#509提出0x707B5000基底加相對位移，含rank/年齡/出身/賽區/成長/爆發；只是私人修改環境推定，絕不硬寫成原版官方規格或讓一般使用者改ISO。"
   }
 ]
