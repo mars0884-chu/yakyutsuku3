@@ -582,5 +582,61 @@
     "status": "verified_fulltext_historical_site_names_only",
     "priority": 2,
     "note": "公開可讀 2006／2007 原文確實提及 やきゅつく攻略メモ、やきゅつく３徹底攻略、プロ野球チームをつくろう・攻略式、たなぼたとやきゅぼた３；尚無可靠的原站網址，不憑名稱編造。"
+  },
+  {
+    "name": "巴哈精華：模擬職棒3 金手指 1／PAR 資金最大七行",
+    "url": "https://forum.gamer.com.tw/G2.php?bsn=6035&sn=12",
+    "role": "2006 年 PS2 三代 XT/PAR 共通主碼與完整 PAR 資金最大七行",
+    "status": "search_index_full_code_direct_403_not_device_tested",
+    "priority": 1,
+    "note": "2006-12 精華全文可於搜尋索引讀到，直接開頁為403；原帖警告 PAR 相容性差異。本輪新增7行 PAR 資金碼，既有XT及其他碼沒有重貼；硬體未實測。"
+  },
+  {
+    "name": "half_half311 PS2 三代阪神編首年實戰（2005）",
+    "url": "https://halfhalf.exblog.jp/176363/",
+    "role": "2005 初始 12 億阪神編首年、轉隊、嶋重宣三冠王等單次球季紀錄",
+    "status": "verified_fulltext_player_save_case",
+    "priority": 2,
+    "note": "公開全文可讀，明確 PS2 三代。年薪、打擊成績與交易都屬特定遊戲存檔，非固定能力/公式。"
+  },
+  {
+    "name": "half_half311 PS2 三代第二年（2006）",
+    "url": "https://halfhalf.exblog.jp/301783/",
+    "role": "2006 年實戰記錄合約暴漲、FA 未獲得、選秀/傷病對戰績影響",
+    "status": "verified_fulltext_player_save_case",
+    "priority": 2,
+    "note": "公開全文可讀。嶋重宜首年三冠後合約例子為2.5億加達標獎金3千萬，福原1.7億；不當作所有存檔的固定公式。"
+  },
+  {
+    "name": "half_half311 PS2 三代四年目日本一（2006）",
+    "url": "https://halfhalf.exblog.jp/540026/",
+    "role": "四年目日本シリーズ4比3勝利以及選秀與多年度契約的單一案例",
+    "status": "verified_fulltext_player_save_case",
+    "priority": 2,
+    "note": "可讀 2006 1月日本一七場逐場結果、野村克也/槙原寛己/酒井忠晴選秀與約期；不可視為固定賽程或固定人選。"
+  },
+  {
+    "name": "half_half311 PS2 三代五年目贊助與冠軍（2006）",
+    "url": "https://halfhalf.exblog.jp/808913/",
+    "role": "五年目第二座日本一；原作者記錄來自スポンサー的15億收益",
+    "status": "verified_fulltext_player_save_case",
+    "priority": 2,
+    "note": "2006 2月全文可讀，該次通關贊助收入15億屬單一存檔，不保證所有球團/設定皆相同。"
+  },
+  {
+    "name": "信長の野望 戦記：PS2 三代新人選秀／回春實例",
+    "url": "https://metakin2007.blog22.fc2.com/blog-entry-335.html",
+    "role": "2005 原玩家選秀現場記錄：未發掘到的選手仍可能於指名名單出現、佐伯貴弘18歲再登場",
+    "status": "search_index_fulltext_direct_403_player_case",
+    "priority": 3,
+    "note": "可檢索長篇日文正文，但工具直接開啟為403；2007 GBA 系列同站文章必須排除。玩家的佐伯18歲為該存檔案例。"
+  },
+  {
+    "name": "2005 Livedoor：やきゅつく！３攻略日記",
+    "url": "https://blog.livedoor.jp/yakyutuku3/archives/50080400.html",
+    "role": "2005 年 PS2 三代首年資金不足→存檔破產重開；原初名冊和2000日圓票價的玩家實例",
+    "status": "verified_fulltext_player_save_case",
+    "priority": 3,
+    "note": "2005/07/29 part1 全文可檢索；含戲劇化的架空城市背景故事，不能把該段當遊戲機制，僅保留首年破產及選人/票價資料。"
   }
 ]
