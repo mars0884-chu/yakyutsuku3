@@ -272,15 +272,17 @@
   },
   "bahamut_external_20261011_r38": {
     "search_scope": "G2 巴哈2006金手指1及其舊來源；2005~2006 half_half311 經歷一到五年實玩日記；2005 Livedoor 起步破產案例；2005 FC2 玩家選秀；2008 PS2 綜合版第25串；另外交叉看 G2 初期經營法、2018 巴哈碼、2016 一年模式及歷史外站名。",
-    "new_url_records": 8,
-    "source_total": 81,
+    "new_url_records": 9,
+    "source_total": 82,
     "exact_new_code": "巴哈2006年 G2 sn12：資金最大（PAR）七行，原文完整；原帖提醒PAR硬體相性，未經實機驗證。",
     "case_studies_added": 5,
-    "par_code_rows_added": 1,
+    "par_code_rows_added": 2,
     "source_types": "G2直接回403但搜尋索引保留完整碼；half_half311四篇可直接讀全文；FC2 metakin直讀403但搜尋索引可讀長篇；Livedoor舊日記有全文；2008 PS2第25串全文可讀但2、2003、3混談。",
     "documented_no_duplicate": "half_half 2005首年12億的基本設定與Codevis既有實例重合，不再貼一遍，只補實際交易/三冠案例。原有XT資金碼、資金每月MAX與PAR七行不是同一組，不混碼。",
     "cross_version_exception": "巴哈精華初期經營法雖2006重編但正文明講2003版松阪，故繼續留版本待核；2008 PS2第25串亦混版且赤星能力上限有人說A有人說B，不升級為三代已確認數值。",
     "new_unresolved": "2005 Livedoor 僅讀到首則完整文章，其他連載仍可能有可讀正文；half_half 5年日記已讀並有案例。Jenova Shift_JIS、巴哈G2其餘403、舊外站無原址仍未恢復。",
-    "exhaustion_status": "仍有可讀資料分支，不能宣告挖到底。本次已把有把握的獨立內容整合，未檢查的全文與失效來源維持待查。"
+    "exhaustion_status": "這一輪仍找到新可讀來源 Chaos-File 的完整歷史代碼與其原始來源鏡像，故不能宣告公開資料挖盡。繼續區分 403/失效外站與可讀原文。",
+    "additional_2006_code_rows": 3,
+    "code_crosscheck": "巴哈 G2 sn12 的 PAR 資金最大第一組7行與 Hiscode/Chaos-File 相符；另一組只有第5行 9CFF80FC B0D54435 不同，採獨立完整組，兩組切勿同時開。2006原文亦有年齢18歳.ver2 XT/PAR 及秘書変更 XT 模板，均未實機驗證。"
   }
 }
