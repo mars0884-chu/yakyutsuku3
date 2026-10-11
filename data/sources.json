@@ -406,5 +406,45 @@
     "status": "verified_fulltext_player_optional_rules",
     "priority": 3,
     "note": "已和既有 2023 前言章去重，僅補 5 個不重複主題至同一章：開局名單、外籍人／續約限制、先發輪替與休息、蝴蝶球禁用和失敗條件。不視為遊戲內建公式。"
+  },
+  {
+    "name": "やきゅつくNET／一年模式（イチネンモード）歷史戰力表",
+    "url": "http://yakyutsuku.net/itinenmode.html",
+    "role": "PS2 やきゅつく3 討論串列出的歷史外站線索",
+    "status": "historical_reference_unavailable",
+    "priority": 4,
+    "note": "2006 crazyboys00 第39回攻略文與2007 45年目討論記錄此網站曾有人氣球團比較；現無法取得原頁，不能冒充已匯入戰力表。"
+  },
+  {
+    "name": "ゲーム開発攻略／やきゅつく3 歷史專區",
+    "url": "http://www.gamerkaihathu.com/yakyu/yakyu3.htm",
+    "role": "PS2 やきゅつく3 討論串列出的歷史外站線索",
+    "status": "historical_reference_unavailable",
+    "priority": 4,
+    "note": "2006/2007 三代討論串列為外部攻略網站；目前正文不可讀。"
+  },
+  {
+    "name": "VERSUS／プロ野球チームをつくろう!3 舊攻略站",
+    "url": "http://versus.s52.xrea.com/game/yakyutsuku/index.php",
+    "role": "PS2 やきゅつく3 討論串列出的歷史外站線索",
+    "status": "historical_reference_unavailable",
+    "priority": 4,
+    "note": "2006 三代40年目列出專區 URL；2006 網站目錄有 VERSUS 舊攻略站資料，現內容不可讀。"
+  },
+  {
+    "name": "JCOM 個人攻略連結／akihiko-9392",
+    "url": "http://members2.jcom.home.ne.jp/akihiko-9392/",
+    "role": "PS2 やきゅつく3 討論串列出的歷史外站線索",
+    "status": "historical_reference_unavailable",
+    "priority": 4,
+    "note": "2006 三代40年目列出此 URL；無法確認現站正文與細部攻略。"
+  },
+  {
+    "name": "2009 PS2 やきゅつく第27串（多版本混談）",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1251974024",
+    "role": "2009 PS2 版本混合討論，非三代單獨攻略",
+    "status": "readable_fulltext_mixed_ps2_versions",
+    "priority": 3,
+    "note": "整串可讀，但包含 2、2003、3 的玩家經驗，不能將未指明代別的數值轉為 PS2 三代已確認規則。"
   }
 ]

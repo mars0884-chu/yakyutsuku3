@@ -189,5 +189,25 @@
     "duplicate_guide_table_rows": 0,
     "status": "長期歷史外連 Geocities/Datapot/ya3.tsukuclear/部分 G2 正文未能恢復；不等於不存在，也不能宣稱全部挖完。",
     "recognition": "沿用使用者 R31 實測結果：混合四 ZIP 387 去重列（351/347 確認）；777 單獨 103 去重列，桌機與手機均 91 確認。這是候選分級而非人工真值正確率。本版不更動影像辨識程式。"
+  },
+  "bahamut_external_20261011_r34": {
+    "scope": "巴哈 PS2 三代討論／精華對外連結交叉 2006 第40年、2007 第45年及2009 PS2 第27串；另查 2006 crazyboys00 第39回一年模式文章。",
+    "historical_urls": [
+      "http://yakyutsuku.net/itinenmode.html",
+      "http://www.gamerkaihathu.com/yakyu/yakyu3.htm",
+      "http://versus.s52.xrea.com/game/yakyutsuku/index.php",
+      "http://members2.jcom.home.ne.jp/akihiko-9392/"
+    ],
+    "readable_mixed_thread": "https://kako.5ch.io/test/read.cgi/gamespo/1251974024",
+    "link_evidence": "第40年、第45年公開歷史討論提供 URL；やきゅつくNET 的一年模式頁亦有 2006 部落格引述。VERSUS 另可從當年站點目錄查到攻略站定位。",
+    "availability": "四個舊站正文目前無法可靠開啟，只能歷史來源記錄，不推定任何已失傳公式。",
+    "variant_warning": "2009 PS2 多版本串包含 2、2003、3，不能未經版本辨識直接匯入三代數值；巴哈 NDS/DC 同樣排除。",
+    "dedup": "31 章攻略已刪除 5 個跨章重複的步驟段落、19 筆重複主題資料列，共減少 38 筆顯示資料。保留單一主題完整規則與具獨立價值的內容。",
+    "dedup_removed_sections": 5,
+    "dedup_removed_rows": 19,
+    "dedup_removed_display_entries": 38,
+    "flat_rows": 742,
+    "unique_book_table_rows": 1451,
+    "unresolved": "巴哈部分精華仍 403；舊站未復原。不能宣告全部公開來源已挖乾淨。"
   }
 }

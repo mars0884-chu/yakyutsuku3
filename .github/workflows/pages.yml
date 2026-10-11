@@ -61,6 +61,8 @@ jobs:
         run: node scripts/smoke-r32.mjs
       - name: Verify r33 Bahamut skill codes and no duplicate guide rows
         run: node scripts/smoke-r33.mjs
+      - name: Verify r34 guide semantic dedup and source index
+        run: node scripts/smoke-r34.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
