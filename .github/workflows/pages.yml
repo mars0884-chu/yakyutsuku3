@@ -69,6 +69,8 @@ jobs:
         run: node scripts/smoke-r36.mjs
       - name: Verify r37 cited historical guides and alternate facility strategy
         run: node scripts/smoke-r37.mjs
+      - name: Verify r38 2006 Bahamut original PAR code and documented PS2 cases
+        run: node scripts/smoke-r38.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
