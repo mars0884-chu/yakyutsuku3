@@ -638,5 +638,13 @@
     "status": "verified_fulltext_player_save_case",
     "priority": 3,
     "note": "2005/07/29 part1 全文可檢索；含戲劇化的架空城市背景故事，不能把該段當遊戲機制，僅保留首年破產及選人/票價資料。"
+  },
+  {
+    "name": "2008 PS2 やきゅつく第25串（2/2003/3 混版）",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1208183421",
+    "role": "2008 年公開可讀 1,001 樓討論的混版玩家旁證；個別球員數值與衰退可能因代別或存檔不同而矛盾",
+    "status": "verified_fulltext_mixed_ps2_versions_no_new_hard_rules",
+    "priority": 3,
+    "note": "原帖 #1~3 說明 PS2 2、2003、3 會一起討論；例如赤星肩力 A/B 說法相互矛盾，不可寫成三代固定上限或排行。確認可讀完整原串，但不匯入不確定數值。"
   }
 ]
