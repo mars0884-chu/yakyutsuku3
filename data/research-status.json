@@ -209,5 +209,31 @@
     "flat_rows": 742,
     "unique_book_table_rows": 1451,
     "unresolved": "巴哈部分精華仍 403；舊站未復原。不能宣告全部公開來源已挖乾淨。"
+  },
+  "bahamut_external_20261011_r35": {
+    "search_scope": "續查巴哈 6035 精華/全文檢索；由 PS2 三代2006第40年串及2007第45年串追出五個特殊討論串（只查到索引）。另全文對照2005~2009 改造碼185則、Wazap 29攻略列表二頁、Jenova攻略主索引/技能、Wazap原型與經營企劃。",
+    "verified_new_fulltext_urls": [
+      "https://kako.5ch.io/test/read.cgi/gamespo/1122038561",
+      "https://wazap.com/cheat/%E3%83%A1%E3%82%B8%E3%83%A3%E3%83%BC/371082/",
+      "https://wazap.com/cheat/%E5%90%84%E9%81%B8%E6%89%8B%E3%81%AE%E8%83%BD%E5%8A%9B/127284/",
+      "https://wazap.com/cheat/%E9%80%9A%E5%B8%B8%E4%BC%81%E7%94%BB%E3%83%87%E3%83%BC%E3%82%BF/182846/",
+      "https://wazap.com/cheat/%E5%85%A8%E5%9B%BD%E8%A1%8C%E4%BA%8B%E4%B8%80%E8%A6%A7/182850/"
+    ],
+    "player_aliases_added": 22,
+    "player_aliases_crosschecked_existing": 8,
+    "pitcher_sample_crosschecked_existing": 34,
+    "seasonal_events_added": 1,
+    "seasonal_japanese_names_corrected": 11,
+    "normal_planning_added": 7,
+    "new_uncorroborated_legacy_code_rows": 16,
+    "new_source_index_records": 15,
+    "source_total": 71,
+    "guide_chapters": 31,
+    "guide_entry_change": 47,
+    "strict_unique_table_rows": 1497,
+    "version_exclusions": "改造碼串中 DS/やきゅつく2 的求碼討論排除；2009 PS2混代未採未標三代數值；Wazap原型是玩家投稿，非官方權威。",
+    "source_status": "Wazap與歷史改造碼原帖可讀；Jenova現存但編碼破字；五個特殊 2ch 討論串仍只有歷史引用；巴哈多個 G1/G2 網址 403，未取得全文部分不偽稱已挖到。",
+    "open_questions": "所有無法取得全文與紙本攻略的潛在資料無法確認完整度；改造碼未做實機驗收；批次找人R31姓名真值與手機實機尚未通過。",
+    "convergence": "本輪特定查詢的末段結果多次回到 Gamezukushi/Sheep/Ikasumi/Wazap/40年目原串。只能描述已查公開可檢索範圍逐漸收斂，不能保證不存在新公開鏡像。"
   }
 }

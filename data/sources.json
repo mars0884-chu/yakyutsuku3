@@ -446,5 +446,125 @@
     "status": "readable_fulltext_mixed_ps2_versions",
     "priority": 3,
     "note": "整串可讀，但包含 2、2003、3 的玩家經驗，不能將未指明代別的數值轉為 PS2 三代已確認規則。"
+  },
+  {
+    "name": "2005～2009 PS2 三代原始改造碼專串（185 則）",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1122038561",
+    "role": "含復號主碼、按鍵觸發、設施解鎖、HDD 相依地址與 PAR2 不相容回報",
+    "status": "verified_fulltext_code_hardware_unverified",
+    "priority": 1,
+    "note": "實際可讀原帖 #155~162、#178~184；代碼只證實歷史貼文存在，不等於實機可用；跨代 DS、2 改造碼排除。"
+  },
+  {
+    "name": "Wazap 2007 メジャー：30 組改名球員對照",
+    "url": "https://wazap.com/cheat/%E3%83%A1%E3%82%B8%E3%83%A3%E3%83%BC/371082/",
+    "role": "30 筆日文改名→原型姓名；與既有 35 筆表對照補入 22 筆",
+    "status": "verified_fulltext_player_submitted_unverified",
+    "priority": 1,
+    "note": "單一投稿；ディオニジオ誤標投手、H・ポサダ等字母錯誤另註疑義，不當成官方名稱或選手數值。"
+  },
+  {
+    "name": "Wazap 2005 各選手の能力（投手原文紀錄）",
+    "url": "https://wazap.com/cheat/%E5%90%84%E9%81%B8%E6%89%8B%E3%81%AE%E8%83%BD%E5%8A%9B/127284/",
+    "role": "已存在的 34 名投手樣本提供更早來源與原始記錄；避免同表重複匯入",
+    "status": "verified_fulltext_crosscheck_34_existing",
+    "priority": 1,
+    "note": "包括註明 27 歲能力樣本的末次彬、未取得初始數值的推薦清單，不能全部當固定初始值。"
+  },
+  {
+    "name": "Wazap 2006 通常企画データ",
+    "url": "https://wazap.com/cheat/%E9%80%9A%E5%B8%B8%E4%BC%81%E7%94%BB%E3%83%87%E3%83%BC%E3%82%BF/182846/",
+    "role": "補入既有企劃逆引沒有的 7 項一般企劃原文／繁中／費用及效果",
+    "status": "verified_fulltext_player_submitted_unverified",
+    "priority": 1,
+    "note": "原帖欄位格式簡略，對無法確認的發動閾值只標來源，不杜撰。"
+  },
+  {
+    "name": "Wazap 2006 全国行事一覧（季節活動交叉）",
+    "url": "https://wazap.com/cheat/%E5%85%A8%E5%9B%BD%E8%A1%8C%E4%BA%8B%E4%B8%80%E8%A6%A7/182850/",
+    "role": "補漏桜前線到来、修正季節活動日文原名與アイデアメモ道具誤植",
+    "status": "verified_fulltext_crosscheck_calendar",
+    "priority": 1,
+    "note": "原文部分標點/事件寫法有差異，優先用雙來源原名及已整理的週次。"
+  },
+  {
+    "name": "Jenova 2006 舊站首頁：やきゅつく3",
+    "url": "https://hccweb5.bai.ne.jp/jenova/game/yakyu/yakyu.html",
+    "role": "本次成功讀取站點主索引，包含 Idea Memo／Team Color／技能／選手庫子頁",
+    "status": "readable_index_mojibake_text",
+    "priority": 2,
+    "note": "網站確實現存且可檢索鏈結，但頁面 Shift_JIS 中文介面抓取成亂碼；只核對索引，不直接將亂碼當規則匯入。"
+  },
+  {
+    "name": "Jenova 原始選手技能列表（旧編碼）",
+    "url": "https://hccweb5.bai.ne.jp/jenova/game/yakyu/skill-player.html",
+    "role": "原文技能說明與觸發條件舊清單",
+    "status": "readable_mojibake_not_normalized",
+    "priority": 2,
+    "note": "209 行索引/正文可讀到亂碼，但本輪未獲得可靠 Shift_JIS 解碼文本；不可盲抄錯字。"
+  },
+  {
+    "name": "Jenova Team Color 章（旧編碼）",
+    "url": "https://hccweb5.bai.ne.jp/jenova/game/yakyu/skill-team.html",
+    "role": "團隊風格的舊站單頁索引",
+    "status": "readable_mojibake_not_normalized",
+    "priority": 2,
+    "note": "頁面現存但抓取 Shift_JIS 亂碼，已知 Sheep/Gamezukushi 對照足夠，暫不重複匯入。"
+  },
+  {
+    "name": "2005 PS2 三代一年模式攻略專串（歷史索引）",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1123144019",
+    "role": "2006 三代40年目原帖引用的專屬一年模式串",
+    "status": "historical_thread_indexed_fulltext_unavailable",
+    "priority": 2,
+    "note": "歷史原帖網址可核對；當前直接開啟出錯，未確認全文。"
+  },
+  {
+    "name": "2005 PS2 三代性格判定專串（歷史索引）",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1125833415",
+    "role": "2006 三代40年目原帖引用的性格判定串",
+    "status": "historical_thread_indexed_fulltext_unavailable",
+    "priority": 2,
+    "note": "當前沒有可靠全文，不猜測性格與技能公式。"
+  },
+  {
+    "name": "2005 PS2 三代會員球員清單展示串（歷史索引）",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1122724628",
+    "role": "2006 三代40年目原帖引用的自家陣容分享串",
+    "status": "historical_thread_indexed_fulltext_unavailable",
+    "priority": 3,
+    "note": "玩家分享非固定名單；無直接全文，不能推定球員初始能力。"
+  },
+  {
+    "name": "2005 PS2 三代日記專串（歷史索引）",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1122856470",
+    "role": "2006 三代40年目原帖引用遊玩日記",
+    "status": "historical_thread_indexed_fulltext_unavailable",
+    "priority": 3,
+    "note": "今次無法可靠讀取全篇，僅保留原文引用。"
+  },
+  {
+    "name": "2005 PS2 三代攻略專串（歷史索引）",
+    "url": "https://kako.5ch.io/test/read.cgi/gameover/1122437345",
+    "role": "2007 年45年目原帖另引攻略專串",
+    "status": "historical_thread_indexed_fulltext_unavailable",
+    "priority": 2,
+    "note": "與正常 40/45 年目串不同，現未讀取原文。"
+  },
+  {
+    "name": "2006 PAR 用碼舊彙整站（0zero）",
+    "url": "http://hp19.0zero.jp/291/saikoro22/",
+    "role": "2006/12 原三代改造碼串 #138 引用的 PAR 彙整網",
+    "status": "historical_reference_unavailable",
+    "priority": 3,
+    "note": "僅歷史原帖網址，站內正文目前不可取得。"
+  },
+  {
+    "name": "Wazap 2007 イモネンモード（效果不明改造碼）",
+    "url": "https://wazap.com/cheat/%E3%82%A4%E3%83%A2%E3%83%8D%E3%83%B3%E3%83%A2%E3%83%BC%E3%83%89/329736/",
+    "role": "兩行 9CAD93CC / 9CAD93D4 特殊碼但標題似筆誤、效果不詳",
+    "status": "verified_fulltext_uninterpretable_code_not_usable",
+    "priority": 3,
+    "note": "原文未提供功能敘述，僅外部網址；不能列入可直接使用的改造碼。"
   }
 ]

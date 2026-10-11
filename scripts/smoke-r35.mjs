@@ -1,0 +1,26 @@
+import fs from 'node:fs/promises';
+const read=async p=>JSON.parse(await fs.readFile(new URL('../data/'+p,import.meta.url),'utf8'));
+const [b,c,s,st]=await Promise.all(['guide-book.json','cheats.json','sources.json','research-status.json'].map(read));
+const ok=(v,m)=>{if(!v)throw Error(m)};
+ok(b.length===31,'Lost chapters');
+const cc=b.find(x=>x.id==='cheats_20261005'),mods=b.find(x=>x.id==='models_20261005'),idea=b.find(x=>x.id==='idea');
+ok(JSON.stringify(c[0])===JSON.stringify(cc),'Cheats sync broken');
+const alias=mods.sections.find(x=>x.title.startsWith('PS2 改名'));
+ok(alias.rows.length===57,'Expected 35 old +22 new aliases');
+ok(new Set(alias.rows.map(x=>x[0])).size===57,'Repeated alias');
+ok(alias.rows.some(x=>x[0]==='アツイ'&&x[1]==='松井秀喜'),'Missing corroborated Matsui');
+const season=idea.sections.find(x=>x.title==='季節活動時間表');
+ok(season.rows.length===25,'Expected 25 unique seasonal events');
+ok(season.rows.some(x=>x[0].startsWith('桜前線到来')&&x[1]==='桜'),'Missing cherry blossom event');
+ok(season.rows.some(x=>x[0].startsWith('紙飛行機選手権')&&x[1]==='プラモデル'),'Paper airplane memo wrongly translated');
+const planning=idea.sections.find(x=>x.title.startsWith('Wazap 2006 補缺'));
+ok(planning?.rows.length===7,'Missing seven normal plans');
+const raw=cc.sections.find(x=>x.title.startsWith('2005～2009 公開原串補完'));
+ok(raw?.rows.length===16,'Wrong raw-code items');
+ok(raw.rows.every(x=>x[1].trim()&&/未實測|尚未驗證|未驗證|可用碼/.test(x[2])),'Raw-code hardware uncertainty missing');
+const originalSet=new Set();for(const ch of b){let n=ch.sections.reduce((z,x)=>z+(x.rows?.length||0)+(x.items?.length||0),0);ok(n===ch.count,'Incorrect chapter '+ch.id);for(let sec of ch.sections)for(let row of sec.rows||[]){let key=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!originalSet.has(key),'Duplicate guide row '+key.slice(0,70));originalSet.add(key)}}
+ok(s.length===71,'Source count not 71');
+ok(new Set(s.map(x=>x.url)).size===s.length,'Duplicate source URL');
+ok(st.bahamut_external_20261011_r35?.new_source_index_records===15,'Research status missing');
+ok((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim()==='2026.10.11-r35','Wrong version');
+console.log('R35: 31 chapters, 22 new player aliases, 7 normal plans, 25 seasonal events, 16 historical raw-code items, 71 unique sources, '+originalSet.size+' unique table rows');
