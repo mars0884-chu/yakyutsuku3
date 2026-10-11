@@ -361,5 +361,18 @@
     "scope_convergence": "擴充關鍵字（原版選手資料／金手指／Idea Memo／2005-2026攻略／變化球球數）本輪末段主要重新出現Gamezukushi、Sheep、Ikasumi、舊Wiki索引與已收錄的MOD日記，尚未出現可驗證的全新獨立全文站。不能把此次搜尋收斂推論成所有歷史鏡像絕對不存在。",
     "still_inaccessible": "部分巴哈 G1/G2 403，tsukuclear 效果別企劃站、mimizun原始鏡像、GeoCities、舊Wiki子頁與 Jenova Shift_JIS 破字仍不可完整恢復。記錄為無法取回正文而非不存在。",
     "no_changes": "批次圖像CV引擎、原版3767人名冊、已驗證的金手指資料不修改。"
+  },
+  "bahamut_external_20261011_r43": {
+    "scope": "由2012第53年原帖引用找2011～2012第52年（991則），一般kako/medaka直取失敗，另發現n2ch鏡像101-及201-分頁可讀；掃讀一年模式自訂A/B位置推薦與單一輪值受傷/醫務室原始回報；51年串的同型鏡像仍不可讀。",
+    "successful_mirror": "https://n2ch.net/r/FbB------F/gamespo/1317196650/101-?guid=ON",
+    "archive_access": "直接讀101-及201-範圍有可讀原文，首頁1-和301後工具回Unicode解碼/內部錯誤；不能宣稱991則全讀、不可把下一分頁失效當來源不存在。",
+    "sources_added": 1,
+    "total_sources": 93,
+    "new_year_mode_position_rows": 8,
+    "new_recovery_vs_prevention_rows": 4,
+    "interpretation": "一年模式推薦A/B是作者2011#105自訂評價而非原版全選手Rank；#196首年單一輪值負例、#197需3名先發與中繼支援，與notitle2009一人輪值攻略存在條件分歧。#225醫務室加速療傷、#226作者把浴場更正泳池，其他玩家推薦大浴場且有人受傷數沒明顯改善，仍未建立硬性機率。",
+    "archive_link_status": "原始 https://kako.5ch.io/test/read.cgi/gamespo/1317196650 與medaka直接失敗，但部分n2ch分頁成功；同串51年目 mirror目前也失敗。",
+    "excludes": "其他代別如DC/2003的文字不直接當三代；單季排名、玩家的A/B評分、傷病統計不是官方能力值。",
+    "still_unresolved": "巴哈G1/G2 403、歷史站GeoCities/tsukuclear/mimizun、舊Wiki子頁、Jenova舊編碼及n2ch未開段落；這輪找回又一份可讀原始串，因此不能宣告全部公開資料已收斂到終點。"
   }
 }
