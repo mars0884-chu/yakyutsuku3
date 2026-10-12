@@ -28,5 +28,6 @@ ok(status.bahamut_external_20261012_r50?.new_guide_rows===15,'Research audit not
 const version=(await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim();
 const app=await fs.readFile(new URL('../app.js',import.meta.url),'utf8');
 const sw=await fs.readFile(new URL('../sw.js',import.meta.url),'utf8');
-ok(version==='2026.10.12-r50'&&app.includes("APP_VERSION='2026.10.12-r50'")&&sw.includes("CACHE='yt3-v20261012-50'"),'PWA version/cache mismatch');
+const release=Number(version.split('-r').at(-1));
+ok(/^2026\.10\.12-r\d+$/.test(version)&&release>=50&&app.includes(`APP_VERSION='${version}'`)&&sw.includes(`CACHE='yt3-v20261012-${release}'`),'PWA version/cache mismatch');
 console.log('R50: '+sources.length+' unique sources, 15 new dated bilingual case rows, '+seen.size+' unique guide rows');
