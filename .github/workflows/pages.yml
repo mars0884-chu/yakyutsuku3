@@ -83,6 +83,8 @@ jobs:
         run: node scripts/smoke-r43.mjs
       - name: Verify r44 historical 52-year archives and 2005 PS2 FAQs
         run: node scripts/smoke-r44.mjs
+      - name: Verify r45 original one-year mode left-handed targets and player lineup
+        run: node scripts/smoke-r45.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
