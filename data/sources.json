@@ -870,5 +870,37 @@
     "status": "historical_citation_unavailable",
     "priority": 4,
     "note": "出自mixi《教えて下さい！！！》第21則，2005原網址http://bbs6.fc2.com/cgi-bin/e.cgi/hamakyu/；本輪直取無法載入，沒有任何可稽核正文，不能整理為已確認球員資料。"
+  },
+  {
+    "name": "2006 mixi カリブ／ゴッデス留學解鎖問答（與現有表互證）",
+    "url": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=10575948",
+    "role": "原版 PS2 三代留學地解鎖條件的玩家交叉驗證",
+    "status": "public_6_of_8_replies_accessible_not_official",
+    "priority": 2,
+    "note": "8回覆公開頁目前呈現#2、3、4、5、7、8共6則；エアーズ交通經濟、カリブ環境運動、カンウ生活與既有 Gamezukushi 對照。ゴッデス北美Pipe玩家尚未成功解鎖，門檻不從此帖猜。"
+  },
+  {
+    "name": "2005 mixi 鬼強い選手たち OB 實玩數字",
+    "url": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=2685129",
+    "role": "2005～06 PS2 三代 OB 能力／單季／累計玩家案例",
+    "status": "public_7_of_12_replies_accessible_mixed_version_exclusion",
+    "priority": 2,
+    "note": "公開可看7/12回覆；王898轟、A・ロードリー .393／57轟、金丸411勝、奈良弘司5連最多勝、古谷稔4連最多救援均屬玩家個案；#10明確DC江夏101勝與三代無關、排除。"
+  },
+  {
+    "name": "2005 Livedoor 野球好き★-7&Nine- PS2 三代第9／10年冠軍",
+    "url": "https://blog.livedoor.jp/ray_drop/archives/30505401.html",
+    "role": "原版2005巨人球團重建、9年聯盟冠軍／10年日本一玩家紀錄",
+    "status": "verified_public_original_2005_play_diary",
+    "priority": 3,
+    "note": "2005/08/20可讀原始日記；巨人開局幾年墊底後九年聯盟冠軍、十年日本一。單人實玩流程而非固定建隊法。"
+  },
+  {
+    "name": "2005 Livedoor 野球好き★-7&Nine- PS2 三代開局原文",
+    "url": "https://blog.livedoor.jp/ray_drop/archives/29561522.html",
+    "role": "2005/08/03與十年目冠軍互證的巨人開局資料",
+    "status": "verified_public_original_2005_first_year_diary",
+    "priority": 3,
+    "note": "開局保留阿部、二岡、清水、木佐貫、林、野間口，經兩年墊底、五、四、二再突破；與同作者2005/08/20奪冠報告為同一實玩系列，避免雙重計人。"
   }
 ]
