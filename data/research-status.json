@@ -486,5 +486,30 @@
     "topic": "公開第259樓 Camp年齡搭配、Banri留學回國一週前改人事排程獲得精神技能、Camp可教5/教練留學6與2012第52年原串8技能槽不同口徑。",
     "confidence": "玩家單篇回報與不同年代說法；尚未實機確認。保留日文原文、繁中解釋、證據差異，不給虛假必然成功率。",
     "exhaustion": "仍有登入牆mixi留言、巴哈403與歷史死站，沒有可合法直接讀取的全文，不能聲稱每一篇已挖乾淨。"
+  },
+  "bahamut_external_20261012_r50": {
+    "scope": "同輪沿2005–2007 PS2 三代原始論壇串、巴哈及外部鏡像、mixi主題索引繼續追查，將2007年官方客服答覆的玩家轉述、2006學院/盜壘/契約及2007王貞治個案整合，未更動金手指、名冊或CV辨識引擎。",
+    "source_before": 95,
+    "source_after": 103,
+    "new_urls": 8,
+    "new_sections": 5,
+    "new_guide_rows": 18,
+    "primary_ps2_threads": [
+      "https://kako.5ch.io/test/read.cgi/gamespo/1157525747",
+      "https://kako.5ch.io/test/read.cgi/gamespo/1178709384"
+    ],
+    "manufacturer_reply_evidence": "2007第44年目第28則玩家轉貼據稱SEGA寄回的BUG說明：賽前スタメン変更可能影響自己/對手以外球隊的投手數值，替代OFFICE→グラウンド→作戦室→オーダー設定。第5及24–37則有部分多次重現與未重現的回覆。這是玩家轉述，不等同可獨立檢驗的官方公告或本專案實機驗證。",
+    "new_mixi_index": "https://mixi.jp/list_bbs.pl?id=88318",
+    "mixi_visibility": "公開可讀兩頁55個主題的索引；PS2三代相關Academy、盜壘、契約與王貞治部分留言可讀，其餘有登入限制。只錄可讀內容並排除DC/PS2 2/2003、DS混版話題。",
+    "dedup": "Team Color反向屬性、四壞誤記盜壘、年薪低價策略已於既有攻略收錄；本版新增具日期/出處的佐證與相互矛盾的操作注意，未複製數值為官方公式。",
+    "inaccessible": [
+      "https://kako.5ch.io/test/read.cgi/gamespo/1170922632",
+      "https://kako.5ch.io/test/read.cgi/gamespo/1151312142",
+      "巴哈部分G2/G1直接403",
+      "GeoCities歷史失效網頁",
+      "mixi未登入留言"
+    ],
+    "research_boundary": "已核對本次新增來源和現有條目去重，但不能對全部歷史論壇每一樓/登入內容與所有公共網址宣稱絕對挖盡；來源受限即標注未讀，沒有把無法找到說成不存在。",
+    "no_changes": "不修改PS2 3767人名冊、不修改非AI本機影像辨識模型或幾何/去重邏輯、不修改其他repository。"
   }
 }
