@@ -18,6 +18,8 @@ const sd=c('study').sections.find(x=>x.title.startsWith('2012 第52年 Pipe 原�
 ok(sd?.rows.length===4,'Four correction records missing');
 ok(sd.rows[0][0].includes('2500 → 4000')&&sd.rows[0][1].includes('#626'),'2012 source correction not enforced');
 ok(c('acquire').sections.find(x=>x.title.startsWith('2011 第52年原帖補充：'))?.rows.length===3,'New historical conversion candidates missing');
+ok(c('acquire').sections.find(x=>x.title.startsWith('2005 PS2 第20年原串：'))?.rows.length===2,'2005 player event notes missing');
+ok(c('conditioning').sections.find(x=>x.title.startsWith('2005 PS2 第20年原串：'))?.rows.length===2,'2005 HUD question-mark and fatigue labels missing');
 ok(c('bugs').sections.find(x=>x.title.startsWith('2009 第51年串：'))?.rows.length===1,'CPU acquired attribute reset caution missing');
 ok(JSON.stringify(c('cheats_20261005'))===JSON.stringify(cheats[0]),'Cheat mirror unexpectedly drifted');
 const seen=new Set();for(const ch of book){ok(ch.count===ch.sections.reduce((n,s)=>n+(s.items?.length||0)+(s.rows?.length||0),0),'Bad count '+ch.id);for(const s of ch.sections)for(const row of s.rows||[]){let k=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Duplicate exact row '+k.slice(0,70));seen.add(k)}}
