@@ -822,5 +822,53 @@
     "status": "readable_public_full_6_comments_version_mixed",
     "priority": 3,
     "note": "公開可讀 6 則回應，部分回覆明確談第二代，因此只採明指三代的發文、結尾與可判別者；相性／Team Color 因果未獲確認。"
+  },
+  {
+    "name": "2023 ゲーム好き交流掲示板 × がめづくし MLB 架空原型訂正",
+    "url": "https://gamezukinahito.bbs.fc2.com/?act=reply&tid=8320615",
+    "role": "原型候選證據、兩位資料作者2023互相討論及更正、架空球員原文能力",
+    "status": "verified_readable_thread_author_revision_not_official",
+    "priority": 2,
+    "note": "可讀完整互動串；イザベル→Esteban Loaiza 與 メヒア→José Mesa 是兩位資料作者認同並修改後的推測，非SEGA正式對照表；其他六名仍列未定。"
+  },
+  {
+    "name": "2006 mixi PS2三代 100年間の総決算",
+    "url": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=5334774",
+    "role": "2006 玩家100年實玩原始紀錄／勝率、球員統計和技能收藏",
+    "status": "readable_public_full_original_0_comments",
+    "priority": 2,
+    "note": "2006/03/18 單篇原帖公開可讀；100年日本一57次、王1030轟、大野500勝、大豐單季77轟、技能收藏進度均是單一玩家存檔，不是硬性能力上限。"
+  },
+  {
+    "name": "2005–2006 mixi 教えて下さい！！！長篇新手問答",
+    "url": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=1598312",
+    "role": "2005起新手、交易、Camp與球隊經營歷史問答",
+    "status": "readable_public_23_of_52_comments_remaining_login_required",
+    "priority": 3,
+    "note": "52則留言中頁面明列『剩餘29件需登入』。本次公開可讀部分可看到1+金錢換1交易模式和訓練玩家討論；未存取登入範圍，非完整FAQ。"
+  },
+  {
+    "name": "2005–2006 mixi 新作の不満点",
+    "url": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=1708954",
+    "role": "2005年首發版玩家操作缺點與Bug回報",
+    "status": "readable_public_14_of_30_comments_remaining_login_required",
+    "priority": 3,
+    "note": "30留言中16則需登入；公開部分包含受傷時オーダー被おまかせ重設、魔術數=1且無賽事的秘書錯詞單筆回報。多為主觀意見，不誤當遊戲固定公式。"
+  },
+  {
+    "name": "2015 FC2《伊賀ニンジャーズ》PS2 三代遊玩文章",
+    "url": "https://kuronokuru1985.blog.fc2.com/blog-entry-744.html",
+    "role": "原版PS2長期實玩文章索引",
+    "status": "indexed_page_direct_403_content_unverified",
+    "priority": 4,
+    "note": "搜尋快照明示2015/11/28 伊賀ニンジャーズ限制打法，但本輪實際開啟返回403，未取到文章正文；只列歷史線索，不能稱已查完。"
+  },
+  {
+    "name": "2005 mixi 留下的 FC2 舊版外國人討論 BBS 線索",
+    "url": "https://bbs6.fc2.com/cgi-bin/e.cgi/hamakyu/",
+    "role": "2005外國人球員討論串歷史外鏈",
+    "status": "historical_citation_unavailable",
+    "priority": 4,
+    "note": "出自mixi《教えて下さい！！！》第21則，2005原網址http://bbs6.fc2.com/cgi-bin/e.cgi/hamakyu/；本輪直取無法載入，沒有任何可稽核正文，不能整理為已確認球員資料。"
   }
 ]
