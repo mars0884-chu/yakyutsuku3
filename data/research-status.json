@@ -493,7 +493,7 @@
     "source_after": 103,
     "new_urls": 8,
     "new_sections": 5,
-    "new_guide_rows": 18,
+    "new_guide_rows": 15,
     "primary_ps2_threads": [
       "https://kako.5ch.io/test/read.cgi/gamespo/1157525747",
       "https://kako.5ch.io/test/read.cgi/gamespo/1178709384"
@@ -510,6 +510,7 @@
       "mixi未登入留言"
     ],
     "research_boundary": "已核對本次新增來源和現有條目去重，但不能對全部歷史論壇每一樓/登入內容與所有公共網址宣稱絕對挖盡；來源受限即標注未讀，沒有把無法找到說成不存在。",
-    "no_changes": "不修改PS2 3767人名冊、不修改非AI本機影像辨識模型或幾何/去重邏輯、不修改其他repository。"
+    "no_changes": "不修改PS2 3767人名冊、不修改非AI本機影像辨識模型或幾何/去重邏輯、不修改其他repository。",
+    "counting_note": "五段分別4/4/3/2/2列，共15筆新表列；另同步修訂既有對左打線注意，並非額外三筆。"
   }
 }
