@@ -533,5 +533,24 @@
     ],
     "dedup": "R50共15列、R51再新增14列。31章日本原文／繁中內容單一列位交叉去重、原型及數值個案不造假高信心。",
     "exhaustion": "這一輪持續找到新可讀資料，且仍有未讀原文、登入牆、索引-only與過去鏡像失效，不能宣稱所有公開來源永久挖盡；未取得正文不等於不存在。"
+  },
+  "bahamut_external_20261012_r52": {
+    "scope": "繼續沿mixi 55主題清單的PS2三代主題與公開Livedoor 2005原始球團日記，交叉2006留學條件、OB使用成績和巨人首十年的重建進度。",
+    "source_before": 109,
+    "source_after": 113,
+    "new_sources": 4,
+    "new_guide_rows": 10,
+    "new_sections": 3,
+    "reference_urls": [
+      "https://mixi.jp/view_bbs.pl?comm_id=88318&id=10575948",
+      "https://mixi.jp/view_bbs.pl?comm_id=88318&id=2685129",
+      "https://blog.livedoor.jp/ray_drop/archives/29561522.html",
+      "https://blog.livedoor.jp/ray_drop/archives/30505401.html"
+    ],
+    "player_data_safety": "2005 mixi強力選手串有12留言僅7可讀，明指DC第10回覆江夏101勝排除；王898轟有新增技能，其他年成績不代表官方必然上限。",
+    "study_crosscheck": "2006 mixiカリブローグ=既有カリブ（環境＋運動）、エアーズ交通經濟、カンウ生活；ゴッデス北美Pipe玩家未解鎖，與Gamezukushi資料核對但不假稱實機。",
+    "original_diary": "同作者2005/08/03和08/20兩篇不雙重計數；9年聯盟勝、10年日本一為一檔玩家個案。",
+    "dedup": "R49後累計R50 15列＋R51 14列＋R52 10列＝39列，31章1744唯一表格列。兩篇日記同一個人的記錄，原版玩家樣本不拿來當固定Rank。",
+    "limitations": "mixi登入限制、巴哈少數G1/G2 403及歷史失效鏡像尚未完整復原。能查到索引不代表可讀全文；不宣稱世界上的公開內容已絕對無新發現。"
   }
 }
