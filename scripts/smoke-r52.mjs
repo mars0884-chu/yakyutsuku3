@@ -25,5 +25,6 @@ const seen=new Set();for(const c of book){
  }
 }
 const [v,app,sw]=await Promise.all(['VERSION','app.js','sw.js'].map(n=>fs.readFile(new URL('../'+n,import.meta.url),'utf8')));
-ok(v.trim()==='2026.10.12-r52'&&app.includes("APP_VERSION='2026.10.12-r52'")&&sw.includes("CACHE='yt3-v20261012-52'"),'R52 release strings inconsistent');
+const version=v.trim(),n=Number(version.split('-r').at(-1));
+ok(/^2026\.10\.12-r\d+$/.test(version)&&n>=52&&app.includes(`APP_VERSION='${version}'`)&&sw.includes(`CACHE='yt3-v20261012-${n}'`),'R52 or later release strings inconsistent');
 console.log('R52: '+sources.length+' unique sources, '+seen.size+' unique guide rows, new 10 verified-source case rows.');
