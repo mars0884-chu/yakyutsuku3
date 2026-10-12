@@ -424,5 +424,28 @@
     "crossversion": "全部為2005 PS2 三代發售當年的當次擴張選秀經驗，不能當全年全版固定Rank，2011年玩家A/B列表保留獨立年代。",
     "source_count": "未新增URL，既有2005原串來源唯一保留",
     "status": "收錄本輪經查有效且既有攻略未完整呈現的6個具體資料列；五個歷史子串、部分巴哈403、失效原站與破字頁仍未取得全文，無法宣稱公開來源不存在其他內容。"
+  },
+  "bahamut_external_20261012_r46": {
+    "scope": "針對 R45 新讀2005第20年目全文的Idea配方、Sheep與Ikasumi舊經營企劃表交叉核對，修正本專案已存在錯誤。",
+    "sources": [
+      "https://kako.5ch.io/test/read.cgi/gamespo/1123809103",
+      "https://www.ikasumi.org/yakyu3/cp.html",
+      "https://www.sheepplus.com/yakyutsuku3/management/planning.html"
+    ],
+    "ballboy_before": "バスケットボール＋サッカーボール＋バス（本工具原誤寫需3卡）",
+    "ballboy_corrected": "バスケットボール＋サッカーボール（只需2卡），2005第822則與兩家攻略來源相符。",
+    "confirmed_shop_regions": [
+      "関東 パソコン＋引っ越し屋",
+      "近畿 ハリセン＋引っ越し屋",
+      "九州・沖縄 明太子＋引っ越し屋"
+    ],
+    "still_unverified": [
+      "北海道・東北 わんこそば＋引っ越し屋（原帖失敗）",
+      "北信越・東海 自動車＋引っ越し屋（僅討論猜測）",
+      "中国・四国 未知（候選未確認）"
+    ],
+    "source_url_growth": 0,
+    "source_reason": "3家來源均已存在資料庫；補的是舊攻略誤寫及由未驗證升級成兩個可讀來源互證，拒絕重複新增URL。",
+    "note": "以上為公開可讀資料的交叉確認，未經本次 PS2 實機驗收；保持日本原文與繁中並列。全站公開資料仍有403與歷史失效來源，不可宣告絕對沒有新內容。"
   }
 }
