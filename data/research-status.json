@@ -584,5 +584,51 @@
     "dedup": "Gamezukushi已收錄留學Pipe 6500/8000及自創球員初始年數分段，不重抄；R53 30億年俸與二軍壓薪已有，不重加；2026 note戲劇化作者自稱完全虛構，不列規則。",
     "limits": "Wazap索引可讀但原頁直取失敗；2005 metakin2007 #340原頁重導迴圈只得索引，不把未取得全文誤列驗證來源；mixi需登入的留言、部分巴哈403、歷史站失效仍未取全。",
     "exhaustion": "本輪取得2015原文及未整理2021 FAQ，故仍不能聲稱全球公開資料絕對永久挖盡；已追查的分支把已確認、索引-only、舊歷史/失效清楚分開。"
+  },
+  "bahamut_external_20261012_r56": {
+    "scope": "持續追查跨世代選手圖文博客，僅採明確『⑧プロ野球チームをつくろう！3』節點6篇全文，用作本作球員技能第二手佐證。",
+    "source_before": 116,
+    "source_after": 122,
+    "new_urls": 6,
+    "new_guide_rows": 6,
+    "players": [
+      {
+        "name": "土肥 義弘",
+        "skill": "上位チームに強い",
+        "url": "https://ameblo.jp/yakyutsuku777/entry-12614263410.html"
+      },
+      {
+        "name": "岡崎 太一",
+        "skill": "好リード",
+        "url": "https://ameblo.jp/yakyutsuku777/entry-12694435608.html"
+      },
+      {
+        "name": "染田 賢作",
+        "skill": "直球の出来次第",
+        "url": "https://ameblo.jp/yakyutsuku777/entry-12797935897.html"
+      },
+      {
+        "name": "犬伏 稔昌",
+        "skill": "左キラー",
+        "url": "https://ameblo.jp/yakyutsuku777/entry-12604284042.html"
+      },
+      {
+        "name": "浅間 敬太",
+        "skill": "WSカーブ",
+        "url": "https://ameblo.jp/yakyutsuku777/entry-12684804119.html"
+      },
+      {
+        "name": "須永 英輝",
+        "skill": "下位球団キラー",
+        "url": "https://ameblo.jp/yakyutsuku777/entry-12792016879.html"
+      }
+    ],
+    "qualification": "作者網站主要記錄PS2二代及不同世代；本次只讀清楚標示2005 PS2三代的技能描述。其他代別、DS架空對應及現實球員成績絕不寫入PS2三代資料。除浅間敬太WSカーブ可與既有Seed互證，其他逐筆尚未完成全部3767名原表校對，保留為第二手資料。",
+    "exclusions": [
+      "2026 note 作者自稱完全虛構的劇情不可當遊戲規則",
+      "2015/2005直接取得失敗但索引可讀的網站不得謊稱全文",
+      "先前115?來源以目前116為準；混版敘述只按三代專段採錄"
+    ],
+    "exhaustion": "跨代圖文仍有大量個別球員、部分歷史站無法取得；本輪有新增可讀內容，故不宣稱所有公開有效資料都已挖盡。"
   }
 }
