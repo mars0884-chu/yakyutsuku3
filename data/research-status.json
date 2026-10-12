@@ -512,5 +512,26 @@
     "research_boundary": "已核對本次新增來源和現有條目去重，但不能對全部歷史論壇每一樓/登入內容與所有公共網址宣稱絕對挖盡；來源受限即標注未讀，沒有把無法找到說成不存在。",
     "no_changes": "不修改PS2 3767人名冊、不修改非AI本機影像辨識模型或幾何/去重邏輯、不修改其他repository。",
     "counting_note": "五段分別4/4/3/2/2列，共15筆新表列；另同步修訂既有對左打線注意，並非額外三筆。"
+  },
+  "bahamut_external_20261012_r51": {
+    "scope": "持續由歷史mixi公開主題、2023遊戲攻略作者討論及2005年串外鏈逐層追查，收錄玩家100年經營存檔統計和架空外國球員原型的作者修訂，不變更原版名冊、金手指或非AI批次辨識核心。",
+    "source_before": 103,
+    "source_after": 109,
+    "source_added": 6,
+    "guide_added_sections": 2,
+    "new_guide_rows": 14,
+    "new_guide_rows_since_r49": 29,
+    "model_author_discussion": "https://gamezukinahito.bbs.fc2.com/?act=reply&tid=8320615",
+    "model_revisions": "イザベル→エステバン・ロアイザ、メヒア→ホセ・メサ僅資料作者2023修訂推測，非SEGA官方對照。其他角色保持未定。",
+    "player_hundred_year": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=5334774",
+    "player_sample": "2006單一玩家100年紀錄日本一57次、王1030轟、大野500勝、江夏693救援、大豐單季77轟；不可推定一般球員必然上限或規則。",
+    "unread_or_partial": [
+      "https://mixi.jp/view_bbs.pl?comm_id=88318&id=1598312 公開23/52",
+      "https://mixi.jp/view_bbs.pl?comm_id=88318&id=1708954 公開14/30",
+      "https://kuronokuru1985.blog.fc2.com/blog-entry-744.html 直接403",
+      "https://bbs6.fc2.com/cgi-bin/e.cgi/hamakyu/ 歷史引用失效"
+    ],
+    "dedup": "R50共15列、R51再新增14列。31章日本原文／繁中內容單一列位交叉去重、原型及數值個案不造假高信心。",
+    "exhaustion": "這一輪持續找到新可讀資料，且仍有未讀原文、登入牆、索引-only與過去鏡像失效，不能宣稱所有公開來源永久挖盡；未取得正文不等於不存在。"
   }
 }
