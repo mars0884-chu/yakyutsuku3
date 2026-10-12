@@ -91,6 +91,8 @@ jobs:
         run: node scripts/smoke-r47.mjs
       - name: Verify r48 city month-start mechanics and historic trade save-corruption warnings
         run: node scripts/smoke-r48.mjs
+      - name: Verify r49 public 2005 mixi skill claims and login-bound visibility
+        run: node scripts/smoke-r49.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
