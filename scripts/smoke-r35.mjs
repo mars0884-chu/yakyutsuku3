@@ -22,5 +22,5 @@ const originalSet=new Set();for(const ch of b){let n=ch.sections.reduce((z,x)=>z
 ok(s.length>=71,'Source count below r35 baseline');
 ok(new Set(s.map(x=>x.url)).size===s.length,'Duplicate source URL');
 ok(st.bahamut_external_20261011_r35?.new_source_index_records===15,'Research status missing');
-ok(/^2026\.10\.11-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=35,'Expected r35 or newer version');
+ok(/^2026\.10\.(11|12)-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=35,'Expected r35 or newer version');
 console.log('R35: 31 chapters, 22 new player aliases, 7 normal plans, 25 seasonal events, 16 historical raw-code items, 71 unique sources, '+originalSet.size+' unique table rows');

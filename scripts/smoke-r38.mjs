@@ -27,5 +27,5 @@ ok(h.sections.find(x=>x.title.startsWith('2005～2006：PS2 三代'))?.rows.leng
 const seen=new Set();
 for(const ch of book){ok(ch.count===ch.sections.reduce((n,s)=>n+(s.rows?.length||0)+(s.items?.length||0),0),'Bad count '+ch.id);for(const sec of ch.sections)for(const row of sec.rows||[]){let k=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Duplicate row '+k.slice(0,70));seen.add(k)}}
 ok(rs.bahamut_external_20261011_r38?.new_url_records===9,'Missing source audit');
-ok(/^2026\.10\.11-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=38,'Expected r38 or newer');
+ok(/^2026\.10\.(11|12)-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=38,'Expected r38 or newer');
 console.log('R38 verified: 82 unique sources, two 7-line PAR variants and 3 age/secretary codes, 5 original 2005–2006 cases, '+seen.size+' unique table rows');

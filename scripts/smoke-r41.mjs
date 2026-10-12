@@ -26,5 +26,5 @@ ok(c('cheap').sections.find(x=>x.title.startsWith('2012 原始 FAQ：'))?.rows.l
 const seen=new Set();
 for(const chapter of b){ok(chapter.count===chapter.sections.reduce((n,x)=>n+(x.items?.length||0)+(x.rows?.length||0),0),'Bad '+chapter.id);for(const sec of chapter.sections)for(const row of sec.rows||[]){let k=JSON.stringify(row.map(v=>String(v).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Duplicate guide row '+k.slice(0,90));seen.add(k)}}
 ok(r.bahamut_external_20261011_r41?.new_structured?.idea_memo_hex_labels===68,'Missing r41 source audit');
-ok(/^2026\.10\.11-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=41,'Expected r41 or newer');
+ok(/^2026\.10\.(11|12)-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=41,'Expected r41 or newer');
 console.log('R41 OK: 92 sources, 68 bilingual hex labels, 9 HDD/non-HDD memory templates, '+seen.size+' unique table rows');

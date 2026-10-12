@@ -20,5 +20,5 @@ ok(c('created').sections.find(x=>x.title.startsWith('自創球員年數上限：
 ok(c('bugs').sections.find(x=>x.title==='高影響 Bug／異常行為').rows.filter(x=>x[0]==='「器用」異常高打率').length===1,'Duplicated Bug');
 const seen=new Set();for(const ch of book){ok(ch.count===ch.sections.reduce((n,z)=>n+(z.items?.length||0)+(z.rows?.length||0),0),'Bad chapter '+ch.id);for(const z of ch.sections)for(const row of z.rows||[]){let k=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Duplicate table row '+k.slice(0,60));seen.add(k)}}
 ok(rs.bahamut_external_20261011_r40?.source_counts?.added===4,'Missing R40 audit');
-ok(/^2026\.10\.11-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=40,'Expected r40 or newer');
+ok(/^2026\.10\.(11|12)-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=40,'Expected r40 or newer');
 console.log('R40 VERIFIED: 88 distinct sources, 18 conversion options, 11 cautious binary fields, 5 record tactics, 31 chapters, '+seen.size+' unique table rows');

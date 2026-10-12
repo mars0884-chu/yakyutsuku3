@@ -16,5 +16,5 @@ const urls=['http://yakyutsuku.net/itinenmode.html','http://www.gamerkaihathu.co
 for(const u of urls)check(sources.filter(s=>s.url===u&&s.status==='historical_reference_unavailable').length===1,'Missing historical URL '+u);
 const audit=status.bahamut_external_20261011_r34;
 check(audit?.dedup_removed_sections===5&&audit?.dedup_removed_rows===19&&audit?.dedup_removed_display_entries===38,'Wrong audit');
-check(/^2026\.10\.11-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=34,'Expected r34 or newer version');
+check(/^2026\.10\.(11|12)-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=34,'Expected r34 or newer version');
 console.log('R34 source-index and semantic guide dedup OK: '+unique.size+' unique rows');

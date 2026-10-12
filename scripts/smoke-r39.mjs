@@ -17,5 +17,5 @@ ok(bugs.rows.find(x=>x[0]==='7～10 月外國人')[1].includes('#959'),'2007 pri
 const set=new Set();
 for(const ch of book){ok(ch.count===ch.sections.reduce((n,z)=>n+(z.items?.length||0)+(z.rows?.length||0),0),'Bad count '+ch.id);for(const z of ch.sections)for(const row of z.rows||[]){let k=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!set.has(k),'Duplicate guide row '+k.slice(0,75));set.add(k)}}
 ok(status.bahamut_external_20261011_r39?.added_sources===2,'Research record incomplete');
-ok(/^2026\.10\.11-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=39,'Expected r39 or newer');
+ok(/^2026\.10\.(11|12)-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=39,'Expected r39 or newer');
 console.log('R39 complete: 31 chapters, 84 sources, 6 modded ERA triplicates, 3 camp skill aptitude tips, '+set.size+' unique table rows');
