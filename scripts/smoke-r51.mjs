@@ -15,7 +15,7 @@ for(const [id,url,n,term1,term2] of targets){
 const mc=book.find(c=>c.id==='models_20261005').sections.find(s=>s.source===targets[0][1]);
 ok(mc.rows[0][1].includes('非 SEGA 正式')&&mc.rows[1][1].includes('≠官方'),'Unofficial model links must be qualified');
 const hc=book.find(c=>c.id==='history_20261005').sections.find(s=>s.source===targets[1][1]);
-ok(hc.rows.some(r=>r[1].includes('單一玩家')),'100 year record is a personal run');
+ok(hc.rows[0][1].includes('作者自述')&&hc.rows[2][1].includes('同一檔'),'100 year record must be limited to one player's save');
 ok(audit.bahamut_external_20261012_r51?.source_after===109&&audit.bahamut_external_20261012_r51?.new_guide_rows===14,'Research source audit drift');
 ok(JSON.stringify(book.find(c=>c.id==='cheats_20261005'))===JSON.stringify(cheats[0]),'Cheat mirror diverged');
 const seen=new Set();for(const c of book){
