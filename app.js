@@ -1,5 +1,5 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='2026.10.12-r52';
+const APP_VERSION='2026.10.12-r54';
 const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,batchSort:'screen',batchSortDir:'asc'};
 const HEADER_ZH={"名前":"姓名","年齢":"年齡","成長":"成長型","投/打":"投／打","出身":"出身地","高校":"高中","大学":"大學","社会人":"社會人","タイプ":"投手類型","ランク":"Rank","体力":"體力","球速":"球速","球威":"球威","制球":"控球","精神":"精神","守備":"守備","捕球":"接球","肩力":"臂力","送球":"傳球","スライダー":"滑球","速スラ":"高速滑球","カットB":"卡特球","カーブ":"曲球","Sカーブ":"S曲球","ドロップ":"Drop曲球","シュート":"噴射球","速シュート":"高速噴射球","シンカー":"伸卡球","スクリュー":"螺旋球","速シンカー":"高速伸卡球","サークルC":"圈指變速","2シーム":"二縫線","Cアップ":"變速球","フォーク":"指叉球","SFF":"快速指叉","縦スラ":"縱滑球","パーム":"掌心球","ナックル":"蝴蝶球","スキル1":"技能1","スキル2":"技能2","スキル3":"技能3","モデル":"原型","右巧":"對右巧打","左巧":"對左巧打","長打":"長打","バント":"短打","選球眼":"選球眼","走力":"跑力","走塁":"跑壘","リード":"配球","捕手":"捕手","一塁":"一壘","二塁":"二壘","三塁":"三壘","遊撃":"游擊","外野":"外野","リーグ":"聯盟／地區","アカデミー":"學院"};
 const BASE_COLS=['名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
@@ -11,8 +11,8 @@ async function getJSON(url,opts={}){const r=await fetch(url,{cache:opts.cache||'
 const ROSTER_DB='yakyutsuku3-roster-v1',ROSTER_STORE='kv',ROSTER_KEY='players-3767';
 function rosterDB(){return new Promise((resolve,reject)=>{if(!('indexedDB'in window))return reject(new Error('IndexedDB unavailable'));const q=indexedDB.open(ROSTER_DB,1);q.onupgradeneeded=()=>q.result.createObjectStore(ROSTER_STORE);q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error||new Error('IndexedDB open failed'))})}
 async function rosterCacheGet(){try{const db=await rosterDB();return await new Promise((resolve,reject)=>{const tx=db.transaction(ROSTER_STORE,'readonly'),q=tx.objectStore(ROSTER_STORE).get(ROSTER_KEY);q.onsuccess=()=>resolve(q.result||null);q.onerror=()=>reject(q.error)}).finally(()=>db.close())}catch(e){return null}}
-async function rosterCachePut(players){if(!Array.isArray(players)||players.length<1000)return;try{const db=await rosterDB();await new Promise((resolve,reject)=>{const tx=db.transaction(ROSTER_STORE,'readwrite');tx.objectStore(ROSTER_STORE).put({players,updatedAt:Date.now()},ROSTER_KEY);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});db.close()}catch(e){console.warn('roster cache',e)}}
-function validRoster(x){return Array.isArray(x)&&x.length>=3500&&x.length<=4500&&x.every((p,i)=>i>20||p&&p['名前'])}
+async function rosterCachePut(players){if(!validRoster(players))return false;try{const db=await rosterDB();await new Promise((resolve,reject)=>{const tx=db.transaction(ROSTER_STORE,'readwrite');tx.objectStore(ROSTER_STORE).put({players,updatedAt:Date.now()},ROSTER_KEY);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});db.close();return true}catch(e){console.warn('roster cache',e);return false}}
+function validRoster(x){return Array.isArray(x)&&x.length===3767&&x.every(p=>p&&typeof p['名前']==='string'&&p['名前'].trim()&&p._slug)&&new Set(x.map(p=>p._slug)).size===15}
 async function loadRoster(force=false){
   let netErr=null;
   try{const p=await getJSON(`./data/players.json${force?`?v=${Date.now()}`:''}`);if(!validRoster(p))throw new Error(`名冊筆數異常 ${Array.isArray(p)?p.length:'?'}`);await rosterCachePut(p);return{players:p,source:'網站名冊'}}catch(e){netErr=e}
@@ -191,7 +191,29 @@ function flattenCheats(){const out=[];for(const ch of state.cheats){for(const se
 function renderCheats(){const q=norm($('#cheatQuery').value);const rows=flattenCheats().filter(x=>!q||norm(`${x.chapter} ${x.title} ${x.text}`).includes(q)).slice(0,260);$('#cheatResults').innerHTML=rows.map(x=>`<article class="card"><h3>${esc(x.title)}</h3>${x.row?`<table><tr>${x.headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr><tr>${x.row.map(v=>`<td>${String(v).includes('\n')||/[0-9A-F]{8}/.test(String(v))?`<pre>${esc(v)}</pre>`:esc(v)}</td>`).join('')}</tr></table>`:`<p>${esc(x.text)}</p>`}${x.source?`<div class="meta"><a href="${esc(x.source)}" target="_blank" rel="noreferrer">來源</a></div>`:''}</article>`).join('')||'<div class="card">沒有符合的金手指資料。</div>'}
 $('#cheatQuery').addEventListener('input',debounce(renderCheats));$('#clearCheat').onclick=()=>{$('#cheatQuery').value='';renderCheats()};
 function renderSources(){$('#sourceList').innerHTML=state.sources.map(s=>`<article class="card"><h3><a href="${esc(s.url)}" target="_blank" rel="noreferrer">${esc(s.name)}</a></h3><div class="source-role">${esc(s.role)}</div><div class="source-note">${esc(s.note)}</div><div class="meta">狀態：${esc(s.status)}｜優先級 ${esc(s.priority)}</div></article>`).join('')}
-$('#refreshData').onclick=async()=>{const b=$('#refreshData');b.disabled=true;$('#dataStatus').textContent='更新完整名冊…';try{await loadData(true)}catch(e){$('#dataStatus').textContent='名冊更新失敗：'+e.message}finally{b.disabled=false}};
+// 只更新完整名冊，不因其他攻略檔案失敗而把更新誤報失敗。
+async function refreshCompleteRoster(){
+  const b=$('#refreshData'),info=$('#dataStatus'),previousCount=state.players.length,previousSource=state.rosterSource;
+  b.disabled=true;info.textContent='從網站下載完整名冊（3,767 人）…';
+  try{
+    let fresh,networkError;
+    for(let attempt=0;attempt<2;attempt++){
+      try{
+        // 手動要求真正的網路版本：SW 不得拿離線舊快取冒充更新成功。
+        fresh=await getJSON('./data/players.json?fresh='+Date.now()+'-'+attempt,{cache:'no-store'});
+        if(!validRoster(fresh))throw new Error('網站名冊不完整（應為 3,767 人／15 個來源）');
+        break;
+      }catch(e){networkError=e;if(attempt===0)await new Promise(resolve=>setTimeout(resolve,500))}
+    }
+    if(!fresh||!validRoster(fresh))throw networkError||new Error('無法取得完整名冊');
+    const indexed=indexPlayers(fresh),saved=await rosterCachePut(fresh);
+    state.players=indexed;state.rosterSource='網站名冊';state.page=1;renderPlayers();
+    info.textContent='完整名冊更新成功：3,767 人／15 個來源'+(saved?'，已儲存供離線查詢':'；本次可查詢，但瀏覽器離線儲存失敗');
+  }catch(e){
+    info.textContent='完整名冊更新失敗：'+(e?.message||e)+'。已保留 '+previousCount.toLocaleString()+' 人（'+previousSource+'），請確認網路或網站部署後重試。';
+  }finally{b.disabled=false}
+}
+$('#refreshData').onclick=refreshCompleteRoster;
 
 // --- 批次截圖找人：固定版面分列 → 本機 OCR 獨立讀字 → 再與完整球員資料庫比對；不使用特定截圖／特定姓名校準表。---
 // Add files from multiple pickers without clearing earlier selections.

@@ -19,5 +19,6 @@ const rows=new Set();for(const c of book){
  }
 }
 const [version,app,sw]=await Promise.all(['VERSION','app.js','sw.js'].map(n=>fs.readFile(new URL('../'+n,import.meta.url),'utf8')));
-check(version.trim()==='2026.10.12-r53'&&app.includes("APP_VERSION='2026.10.12-r53'")&&sw.includes("CACHE='yt3-v20261012-53'"),'R53 PWA version inconsistent');
+const ver=version.trim(),n=Number(ver.split('-r').at(-1));
+check(/^2026\.10\.12-r\d+$/.test(ver)&&n>=53&&app.includes(`APP_VERSION='${ver}'`)&&sw.includes(`CACHE='yt3-v20261012-${n}'`),'R53 or later PWA version inconsistent');
 console.log('R53: '+sources.length+' sources, '+rows.size+' unique bilingual guide rows, 26/33 public salary replies with explicit uncertainty.');

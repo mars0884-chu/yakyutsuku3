@@ -1,0 +1,15 @@
+import fs from 'node:fs/promises';
+const read=n=>fs.readFile(new URL('../'+n,import.meta.url),'utf8');
+const [app,sw,version,html,refresh]=await Promise.all(['app.js','sw.js','VERSION','index.html','scripts/refresh-data.mjs'].map(read));
+const check=(v,m)=>{if(!v)throw Error(m)};
+check(version.trim()==='2026.10.12-r54','Version');
+check(app.includes("APP_VERSION='2026.10.12-r54'")&&sw.includes("CACHE='yt3-v20261012-54'"),'Inconsistent PWA versions');
+check(html.includes('id="refreshData"'),'No refresh button');
+check(app.includes("$('#refreshData').onclick=refreshCompleteRoster"),'No active refresh handler');
+const f=app.slice(app.indexOf('async function refreshCompleteRoster()'),app.indexOf("$('#refreshData').onclick=refreshCompleteRoster"));
+check(!f.includes('loadData(true)')&&f.includes('data/players.json?fresh='),'Refreshing unrelated files or using cached roster');
+check(f.includes('validRoster(fresh)')&&f.includes('previousCount')&&f.includes('rosterCachePut(fresh)'),'Missing validation or safe fallback');
+check(app.includes('x.length===3767')&&app.includes('size===15'),'Player count validation missing');
+check(sw.includes("u.searchParams.has('fresh')")&&sw.includes("fetch(e.request,{cache:'no-store'})"),'SW must not fake fresh updates');
+check(refresh.includes('all.length!==3767')&&refresh.includes('rows.length!==expected'),'Build integrity check gone');
+console.log('R54 strict refresh: 3,767 players, 15 source groups, offline-safe fallback.');
