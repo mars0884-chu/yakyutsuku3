@@ -87,6 +87,8 @@ jobs:
         run: node scripts/smoke-r45.mjs
       - name: Verify r46 two-card ball-boy and three confirmed shop recipes
         run: node scripts/smoke-r46.mjs
+      - name: Verify r47 station rebuild and pitcher rotation player reports
+        run: node scripts/smoke-r47.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
