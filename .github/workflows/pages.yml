@@ -93,7 +93,7 @@ jobs:
         run: node scripts/smoke-r48.mjs
       - name: Verify r49 public 2005 mixi skill claims and login-bound visibility
         run: node scripts/smoke-r49.mjs
-      - name: Verify r50 public PS2 / mixi source audit, bilingual cases and Safari cache\n        run: node scripts/smoke-r50.mjs\n      - name: Build complete 3,767-player roster
+      - name: Verify r50 public PS2 / mixi source audit, bilingual cases and Safari cache\n        run: node scripts/smoke-r50.mjs\n      - name: Verify r51 restored player save records, author-revised MLB candidates and source status\n        run: node scripts/smoke-r51.mjs\n      - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
         run: npm run vendor:cover
