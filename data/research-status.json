@@ -466,5 +466,15 @@
     ],
     "uncertainties": "回覆未受控驗證，混版言論與個人配隊數值不能當硬規則；新加入的3筆只描述可讀原文的經驗與可能原因。",
     "exhaustion": "52年目十個分頁可訪問；仍有歷史站失效及巴哈403可追，不能宣告全網絕對挖盡。"
+  },
+  "bahamut_external_20261012_r48": {
+    "scope": "繼續逐頁審核2011–2012 PS2 第52年目 #701–991 段落，交叉既有HomeTown與Trade改造碼資料。",
+    "original": "https://n2ch.net/r/FbB------F/gamespo/1317196650/1-?guid=ON",
+    "new_guide_rows": 1,
+    "existing_code_warning_strengthened": 1,
+    "source_url_growth": 0,
+    "original_posts": "#765 使用Trade 2 turn/必定成功/全選手可選的PAR碼時存檔凍結及存檔損毀；#766/#768 一般城市建築月初生、企劃建物例外。",
+    "qualification": "2012一則玩家存檔個案和另一位玩家的城市機制回答，不是跨版本實機重現；不可作成必定發生或官方公式。",
+    "source_status": "95 unique URLs retained. Other 2005 one-year subthreads and historical references only indexed, 403/失效/編碼失真仍未復原，不能宣告完整挖盡。"
   }
 }
