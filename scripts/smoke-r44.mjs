@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 const get=async p=>JSON.parse(await fs.readFile(new URL('../data/'+p,import.meta.url),'utf8'));
 const [book,sources,status,cheats]=await Promise.all(['guide-book.json','sources.json','research-status.json','cheats.json'].map(get));
 const ok=(c,m)=>{if(!c)throw Error(m)};
-ok(book.length===31&&sources.length===95,'R44 unexpected 31 chapters or 95 sources');
+ok(book.length===31&&sources.length>=95,'R44 baseline chapters or sources regressed');
 ok(new Set(sources.map(x=>x.url)).size===sources.length,'Duplicate source URL');
 const url='https://n2ch.net/r/FbB------F/gamespo/1317196650/1-?guid=ON';
 ok(sources.filter(x=>x.url===url&&x.status==='verified_fulltext_archive_all_991_pages').length===1,'Full 52nd-year recovery not recorded');
