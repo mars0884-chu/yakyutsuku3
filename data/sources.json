@@ -758,5 +758,69 @@
     "status": "readable_archive_primary_full_thread_partial_content_reviewed",
     "priority": 1,
     "note": "經第51年串原始前串引用進入；第882～981樓正文可讀，#885~890有百貨/銀行→商場、便利商店/遊戲廳變化詳解，原作者#888自行訂正錯字。未逐頁核對全981則。"
+  },
+  {
+    "name": "2006 PS2 三代第40年目原始討論串",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1157525747",
+    "role": "2006年 1,001 則《やきゅつく3》原文／玩家育成與成績個案",
+    "status": "verified_fulltext_accessible_selective_review",
+    "priority": 3,
+    "note": "原始串全文可讀；第 40 年目串首篇可追 39 年目，但 39 原帖目前不可直接讀。球隊經驗值正反屬性等與現有 Gamezukushi 重複者不另增攻略。"
+  },
+  {
+    "name": "2007 PS2 三代第44年目原始討論串",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1178709384",
+    "role": "2007年 1,001 則原文／賽前先發畫面干擾他球隊成績",
+    "status": "verified_fulltext_accessible_manufacturer_reply_as_player_repost",
+    "priority": 3,
+    "note": "#5、#24–37 內含重現討論及 #28 玩家轉貼稱為 SEGA 回覆的異常說明與迴避路徑，尚非可獨立查核官方通告；部分人未重現。已補 Bug 攻略。"
+  },
+  {
+    "name": "2007 PS2 三代第43年目（第44年帖引用）",
+    "url": "https://kako.5ch.io/test/read.cgi/gamespo/1170922632",
+    "role": "第44年帖前串歷史地址",
+    "status": "historical_thread_linked_fulltext_unavailable",
+    "priority": 3,
+    "note": "第44年 #1 明確指向 43 年目，改用 kako 格式查找但本次仍無法讀到正文；只能證實被引用的線索，不視為已審閱。"
+  },
+  {
+    "name": "mixi 2005–2018 プロ野球チームをつくろう！ 社群主題列表",
+    "url": "https://mixi.jp/list_bbs.pl?id=88318",
+    "role": "歷史主題索引，混有 2／2003／DC／DS 等不同版本",
+    "status": "readable_public_topic_index_55_mixed_versions",
+    "priority": 3,
+    "note": "目前可讀 2 頁共 55 個主題；逐題按 PS2《やきゅつく3》判別，其他版本僅作排除記錄。主題列表可讀不代表內文所有留言均公開。"
+  },
+  {
+    "name": "mixi 2006 海外アカデミー／Academy 舊玩家經驗",
+    "url": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=5887734",
+    "role": "2006 年海外 Academy 道具傳言、委內瑞拉與改名選手候選",
+    "status": "readable_public_subset_login_required",
+    "priority": 3,
+    "note": "12 則留言中部分公開；美國 Academy 書包＋模型車＋塑膠模型傳言被兩名玩家否定，另有委內瑞拉書包個案。原型仍推測。"
+  },
+  {
+    "name": "mixi 2006 盗塁について☆ 三壞球指令",
+    "url": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=12893530",
+    "role": "盜壘與四壞球記數異常及 Team Color 實戰個案",
+    "status": "readable_public_subset_login_required",
+    "priority": 3,
+    "note": "11 則留言，部分未登入可讀；#6 3-ball 指令與四壞被計盜壘、福本三位數案例為玩家紀錄；不代表必定觸發。"
+  },
+  {
+    "name": "mixi 2006 契約更改について／續約年薪",
+    "url": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=13200623",
+    "role": "2006 年新人季後五年約與續約暴漲玩家個案",
+    "status": "readable_public_subset_login_required",
+    "priority": 3,
+    "note": "5 則留言，公開畫面只呈現首文和其中一則回覆；未讀留言不作結論。"
+  },
+  {
+    "name": "mixi 2007 期待外れの王／王貞治使用差異",
+    "url": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=16752519",
+    "role": "相同 OB 於不同球隊與打序的成績對照",
+    "status": "readable_public_full_6_comments_version_mixed",
+    "priority": 3,
+    "note": "公開可讀 6 則回應，部分回覆明確談第二代，因此只採明指三代的發文、結尾與可判別者；相性／Team Color 因果未獲確認。"
   }
 ]
