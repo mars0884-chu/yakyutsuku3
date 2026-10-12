@@ -99,6 +99,8 @@ jobs:
         run: node scripts/smoke-r51.mjs
       - name: Verify r52 2005-2006 PS2 player cases, unlock conditions and source uniqueness
         run: node scripts/smoke-r52.mjs
+      - name: Verify r53 historical player salary evidence and confidence limits
+        run: node scripts/smoke-r53.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
