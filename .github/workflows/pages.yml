@@ -109,6 +109,8 @@ jobs:
         run: node scripts/smoke-r56.mjs
       - name: Verify r57 coach skill index, source fidelity and no duplicate rows
         run: node scripts/smoke-r57.mjs
+      - name: Verify r58 roster caching, compact responsive layout and browsable cheats
+        run: node scripts/smoke-r58.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail

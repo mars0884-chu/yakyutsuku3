@@ -1,6 +1,6 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='2026.10.12-r57';
-const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,batchSort:'screen',batchSortDir:'asc'};
+const APP_VERSION='2026.10.12-r58';
+const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,batchSort:'screen',batchSortDir:'asc',batchShowAll:false,cheatExpandAll:false};
 const HEADER_ZH={"名前":"姓名","年齢":"年齡","成長":"成長型","投/打":"投／打","出身":"出身地","高校":"高中","大学":"大學","社会人":"社會人","タイプ":"投手類型","ランク":"Rank","体力":"體力","球速":"球速","球威":"球威","制球":"控球","精神":"精神","守備":"守備","捕球":"接球","肩力":"臂力","送球":"傳球","スライダー":"滑球","速スラ":"高速滑球","カットB":"卡特球","カーブ":"曲球","Sカーブ":"S曲球","ドロップ":"Drop曲球","シュート":"噴射球","速シュート":"高速噴射球","シンカー":"伸卡球","スクリュー":"螺旋球","速シンカー":"高速伸卡球","サークルC":"圈指變速","2シーム":"二縫線","Cアップ":"變速球","フォーク":"指叉球","SFF":"快速指叉","縦スラ":"縱滑球","パーム":"掌心球","ナックル":"蝴蝶球","スキル1":"技能1","スキル2":"技能2","スキル3":"技能3","モデル":"原型","右巧":"對右巧打","左巧":"對左巧打","長打":"長打","バント":"短打","選球眼":"選球眼","走力":"跑力","走塁":"跑壘","リード":"配球","捕手":"捕手","一塁":"一壘","二塁":"二壘","三塁":"三壘","遊撃":"游擊","外野":"外野","リーグ":"聯盟／地區","アカデミー":"學院"};
 const BASE_COLS=['名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -13,11 +13,40 @@ function rosterDB(){return new Promise((resolve,reject)=>{if(!('indexedDB'in win
 async function rosterCacheGet(){try{const db=await rosterDB();return await new Promise((resolve,reject)=>{const tx=db.transaction(ROSTER_STORE,'readonly'),q=tx.objectStore(ROSTER_STORE).get(ROSTER_KEY);q.onsuccess=()=>resolve(q.result||null);q.onerror=()=>reject(q.error)}).finally(()=>db.close())}catch(e){return null}}
 async function rosterCachePut(players){if(!validRoster(players))return false;try{const db=await rosterDB();await new Promise((resolve,reject)=>{const tx=db.transaction(ROSTER_STORE,'readwrite');tx.objectStore(ROSTER_STORE).put({players,updatedAt:Date.now()},ROSTER_KEY);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});db.close();return true}catch(e){console.warn('roster cache',e);return false}}
 function validRoster(x){return Array.isArray(x)&&x.length===3767&&x.every(p=>p&&typeof p['名前']==='string'&&p['名前'].trim()&&p._slug)&&new Set(x.map(p=>p._slug)).size===15}
+async function downloadPackagedRoster(url,onProgress=()=>{}){
+  const response=await fetch(url,{cache:'default'});
+  if(!response.ok)throw new Error('完整名冊檔案 HTTP '+response.status);
+  const size=Number(response.headers.get('content-length'))||0;
+  if(!response.body?.getReader)return response.json();
+  const reader=response.body.getReader(),decoder=new TextDecoder(),chunks=[];
+  let received=0;
+  while(true){const {done,value}=await reader.read();if(done)break;received+=value.byteLength;chunks.push(decoder.decode(value,{stream:true}));onProgress(size?Math.min(99,Math.floor(received/size*100)):null,received)}
+  chunks.push(decoder.decode());return JSON.parse(chunks.join(''));
+}
+function rosterLoadProgress(percent,bytes){
+  const target=$('#dataStatus');if(!target)return;
+  target.textContent='首次載入內附完整名冊：'+(percent===null?(bytes/1048576).toFixed(1)+' MB':percent+'%')+'（之後從本機開啟）';
+}
 async function loadRoster(force=false){
+  // 二次造訪從 IndexedDB 直接啟動，絕不每次重新下載同一份名冊。
+  if(!force){const saved=await rosterCacheGet();if(saved&&validRoster(saved.players))return{players:saved.players,source:'已儲存本機（離線可查）'}}
   let netErr=null;
-  try{const p=await getJSON(`./data/players.json${force?`?v=${Date.now()}`:''}`);if(!validRoster(p))throw new Error(`名冊筆數異常 ${Array.isArray(p)?p.length:'?'}`);await rosterCachePut(p);return{players:p,source:'網站名冊'}}catch(e){netErr=e}
-  const cached=await rosterCacheGet();if(cached&&validRoster(cached.players))return{players:cached.players,source:'手機/瀏覽器快取'};
-  const seed=await getJSON('./data/players-seed.json');return{players:seed,source:`Seed（完整名冊尚未取得：${netErr?.message||'offline'}）`};
+  try{
+    // 同源 JSON 在部署時已打包；Service Worker 也會預存這個檔案。
+    const p=await downloadPackagedRoster('./data/players.json',rosterLoadProgress);
+    if(!validRoster(p))throw new Error('名冊資料不完整，應有 3,767 人');
+    const saved=await rosterCachePut(p);
+    return{players:p,source:saved?'完整名冊已下載／離線可查':'網站完整名冊（裝置未能儲存，需保持網站快取）'};
+  }catch(e){netErr=e}
+  // Safari 私密模式或 IndexedDB 不可用時，仍可利用 SW 已預存的完整名冊。
+  try{
+    const c=await caches.match('./data/players.json');
+    if(c?.ok){const p=await c.json();if(validRoster(p)){await rosterCachePut(p);return{players:p,source:'離線名冊快取'}}}
+  }catch{}
+  const cached=await rosterCacheGet();
+  if(cached&&validRoster(cached.players))return{players:cached.players,source:'本機備份（離線可查）'};
+  const seed=await getJSON('./data/players-seed.json');
+  return{players:seed,source:'備援少量範例；完整名冊尚未可用（'+(netErr?.message||'離線')+'）'};
 }
 function indexPlayers(players){return players.map((p,i)=>({...p,_uid:p._uid||`${p._slug||'p'}-${i}`,_search:norm(Object.entries(p).filter(([k])=>!k.startsWith('_')).map(([k,v])=>`${k} ${HEADER_ZH[k]||''} ${v}`).join(' ')+' '+(p._group||'')+' '+(p._position||''))}))}
 async function loadData(forceRoster=false){
@@ -60,7 +89,7 @@ function renderComparePanel(){
  el.querySelectorAll('[data-compare-open]').forEach(btn=>btn.onclick=()=>openPlayer(btn.dataset.compareOpen));
 }
 function filteredPlayers(){const q=norm($('#playerQuery').value),g=$('#filterGroup').value,p=$('#filterPos').value,r=$('#filterRank').value;return state.players.filter(x=>(!q||x._search.includes(q))&&(!g||x._group===g)&&(!p||x._position===p)&&(!r||x['ランク']===r))}
-function renderPlayers(){const list=filteredPlayers();const pages=Math.max(1,Math.ceil(list.length/state.pageSize));state.page=Math.min(state.page,pages);const start=(state.page-1)*state.pageSize,rows=list.slice(start,start+state.pageSize);$('#playerCount').textContent=`${list.length.toLocaleString()} 人`;$('#pageInfo').textContent=`${state.page} / ${pages}`;$('#prevPage').disabled=state.page<=1;$('#nextPage').disabled=state.page>=pages;const cols=['名前','ランク','年齢','成長','投/打','体力','球速','右巧','左巧','長打','走力'].filter(k=>rows.some(x=>x[k]!==undefined&&x[k]!==''));let h='<thead><tr>'+cols.map(k=>`<th>${esc(HEADER_ZH[k]||k)}</th>`).join('')+'<th>守位</th><th>分類</th><th>比較</th></tr></thead><tbody>';for(const x of rows){h+='<tr>'+cols.map(k=>k==='名前'?`<td class="name" data-uid="${esc(x._uid)}">${esc(x[k])}</td>`:`<td class="${k==='ランク'?'rank':''}">${esc(x[k]||'—')}</td>`).join('')+`<td>${esc(x._position||'')}</td><td>${esc(x._group||'')}</td><td><button type=\"button\" class=\"compare-add\" data-compare-add=\"${esc(x._uid)}\">${compareUids.has(x._uid)?'移除':'＋比較'}</button></td></tr>`}h+='</tbody>';$('#playerTable').innerHTML=h;$('#playerTable').querySelectorAll('[data-uid]').forEach(td=>td.onclick=()=>openPlayer(td.dataset.uid));
+function renderPlayers(){const list=filteredPlayers();const pages=Math.max(1,Math.ceil(list.length/state.pageSize));state.page=Math.min(state.page,pages);const start=(state.page-1)*state.pageSize,rows=list.slice(start,start+state.pageSize);$('#playerCount').textContent=`${list.length.toLocaleString()} 人`;$('#pageInfo').textContent=`${state.page} / ${pages}`;$('#prevPage').disabled=state.page<=1;$('#nextPage').disabled=state.page>=pages;const cols=['名前','ランク','年齢','成長','投/打'].filter(k=>rows.some(x=>x[k]!==undefined&&x[k]!==''));let h='<thead><tr>'+cols.map(k=>`<th>${esc(HEADER_ZH[k]||k)}</th>`).join('')+'<th>守位</th><th>分類</th><th>比較</th></tr></thead><tbody>';for(const x of rows){h+='<tr>'+cols.map(k=>k==='名前'?`<td class="name" data-uid="${esc(x._uid)}">${esc(x[k])}</td>`:`<td class="${k==='ランク'?'rank':''}">${esc(x[k]||'—')}</td>`).join('')+`<td>${esc(x._position||'')}</td><td>${esc(x._group||'')}</td><td><button type=\"button\" class=\"compare-add\" data-compare-add=\"${esc(x._uid)}\">${compareUids.has(x._uid)?'移除':'＋比較'}</button></td></tr>`}h+='</tbody>';$('#playerTable').innerHTML=h;$('#playerTable').querySelectorAll('[data-uid]').forEach(td=>td.onclick=()=>openPlayer(td.dataset.uid));
  $('#playerTable').querySelectorAll('[data-compare-add]').forEach(btn=>btn.onclick=()=>toggleCompare(btn.dataset.compareAdd));
  renderComparePanel();
 }
@@ -73,11 +102,10 @@ $('#closeDrawer').onclick=$('.shade').onclick=()=>{$('#drawer').classList.remove
 
 const GUIDE_CATEGORIES=[
   {id:'all',title:'全部攻略',chapters:[]},
-  {id:'start',title:'開局／經營',chapters:['start','economy','facilities','home','idea','recommended','leagueops']},
-  {id:'people',title:'找人／契約',chapters:['acquire','cheap','aging','random','academy','models_20261005']},
+  {id:'start',title:'開局／經營',chapters:['start','economy','facilities','home','idea','recommended','leagueops','history_20261005']},
+  {id:'people',title:'找人／契約',chapters:['acquire','cheap','aging','random','academy','models_20261005','lastdig_20261005']},
   {id:'train',title:'養成／能力',chapters:['camp','study','skills','pitch','experiments_20261005','conditioning','created']},
-  {id:'play',title:'實戰／模式',chapters:['team','advanced','tips','one','bugs']},
-  {id:'deep',title:'深入／考古',chapters:['new_20261005','lastdig_20261005','history_20261005','sources','research']}
+  {id:'play',title:'實戰／補充',chapters:['team','advanced','tips','one','bugs','new_20261005','sources','research']}
 ];
 function guideSectionHTML(sec){
   const title=esc(sec.title||''),note=sec.note?`<div class="guide-note">${esc(sec.note)}</div>`:'',source=sec.source?`<details class="guide-source"><summary>資料來源</summary><a href="${esc(sec.source)}" target="_blank" rel="noreferrer">開啟原文</a></details>`:'';
@@ -187,9 +215,33 @@ $('#backGuideSearch').onclick=()=>{$('#guideQuery').value=guideSearchBackup||'';
 $('#guideQuery').addEventListener('input',debounce(renderGuides));
 $('#clearGuide').onclick=()=>{$('#guideQuery').value='';guideSearchBackup='';state.guideTopic='all';$('#backGuideSearch').classList.add('hidden');$('#showIdeaAll').classList.remove('hidden');renderGuideTopics();renderGuides()};
 
-function flattenCheats(){const out=[];for(const ch of state.cheats){for(const sec of ch.sections||[]){if(sec.type==='table'){for(const row of sec.rows||[])out.push({chapter:ch.title,title:sec.title,text:(row||[]).join('｜'),row,headers:sec.headers,source:sec.source})}else if(sec.type==='facts'){for(const row of sec.rows||[])out.push({chapter:ch.title,title:sec.title,text:(row||[]).join('｜'),row,headers:['項目','內容'],source:sec.source})}else for(const item of sec.items||[])out.push({chapter:ch.title,title:sec.title,text:item,source:sec.source})}}return out}
-function renderCheats(){const q=norm($('#cheatQuery').value);const rows=flattenCheats().filter(x=>!q||norm(`${x.chapter} ${x.title} ${x.text}`).includes(q)).slice(0,260);$('#cheatResults').innerHTML=rows.map(x=>`<article class="card"><h3>${esc(x.title)}</h3>${x.row?`<table><tr>${x.headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr><tr>${x.row.map(v=>`<td>${String(v).includes('\n')||/[0-9A-F]{8}/.test(String(v))?`<pre>${esc(v)}</pre>`:esc(v)}</td>`).join('')}</tr></table>`:`<p>${esc(x.text)}</p>`}${x.source?`<div class="meta"><a href="${esc(x.source)}" target="_blank" rel="noreferrer">來源</a></div>`:''}</article>`).join('')||'<div class="card">沒有符合的金手指資料。</div>'}
-$('#cheatQuery').addEventListener('input',debounce(renderCheats));$('#clearCheat').onclick=()=>{$('#cheatQuery').value='';renderCheats()};
+function cheatSectionHTML(sec,index,opened=false){
+  const total=(sec.rows||sec.items||[]).length;
+  const name=esc(sec.title||'其他');
+  const source=sec.source?`<div class="cheat-source"><a href="${esc(sec.source)}" target="_blank" rel="noreferrer">查看日文原文／來源</a></div>`:'';
+  const content=sec.type==='table'||sec.type==='facts'
+    ?`<div class="cheat-table-wrap"><table class="cheat-table"><thead><tr>${(sec.headers||(sec.type==='facts'?['項目','內容']:[])).map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${(sec.rows||[]).map(row=>`<tr>${row.map(v=>`<td>${/[0-9A-F]{8}\\s+[0-9A-F]{8}/.test(String(v))||String(v).includes('\\n')?`<pre>${esc(v)}</pre>`:esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`
+    :`<div class="cheat-notes">${(sec.items||[]).map(item=>`<p>${esc(item)}</p>`).join('')}</div>`;
+  return `<details class="cheat-section" data-cheat-section="${index}" ${opened?'open':''}><summary><b>${name}</b><small>${total} 項</small></summary><div class="cheat-section-body">${content}${source}</div></details>`;
+}
+function renderCheats(){
+  const query=$('#cheatQuery').value.trim(),q=norm(query),out=$('#cheatResults');
+  const list=state.cheats.flatMap(ch=>(ch.sections||[]));
+  let shown=[];
+  for(const [index,sec] of list.entries()){
+    if(!q){shown.push(cheatSectionHTML(sec,index,state.cheatExpandAll));continue}
+    const title=norm(sec.title||'').includes(q),clone={...sec};
+    if(sec.rows)clone.rows=title?sec.rows:sec.rows.filter(row=>norm(row.join('｜')).includes(q));
+    else clone.items=title?sec.items:(sec.items||[]).filter(t=>norm(t).includes(q));
+    if((clone.rows||clone.items||[]).length)shown.push(cheatSectionHTML(clone,index,true));
+  }
+  out.innerHTML=shown.length?`<div class="cheat-index">${shown.join('')}</div>`:'<div class="card">沒有符合的金手指資料。</div>';
+  const count=$('#cheatCount');if(count)count.textContent=q?`符合 ${shown.length} 個分類`:`${list.length} 個分類／可展開瀏覽`;
+  const toggle=$('#toggleCheatAll');if(toggle){toggle.textContent=state.cheatExpandAll?'全部收合':'全部展開';toggle.classList.toggle('hidden',!!q)}
+}
+$('#cheatQuery').addEventListener('input',debounce(renderCheats));
+$('#clearCheat').onclick=()=>{$('#cheatQuery').value='';state.cheatExpandAll=false;renderCheats()};
+$('#toggleCheatAll').onclick=()=>{state.cheatExpandAll=!state.cheatExpandAll;renderCheats()};
 function renderSources(){$('#sourceList').innerHTML=state.sources.map(s=>`<article class="card"><h3><a href="${esc(s.url)}" target="_blank" rel="noreferrer">${esc(s.name)}</a></h3><div class="source-role">${esc(s.role)}</div><div class="source-note">${esc(s.note)}</div><div class="meta">狀態：${esc(s.status)}｜優先級 ${esc(s.priority)}</div></article>`).join('')}
 // 只更新完整名冊，不因其他攻略檔案失敗而把更新誤報失敗。
 async function refreshCompleteRoster(){
@@ -660,7 +712,21 @@ function consolidateRows(raw,expected=0){
   out.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));
   return out
 }
-function resolveUniqueCandidates(rows){for(const r of rows)r.resolved=null;const used=new Set(rows.filter(r=>r.match?.p?._uid).map(r=>r.match.p._uid)),pending=rows.filter(r=>!r.match);for(let guard=0;guard<rows.length;guard++){let pick=null;for(const r of pending){if(r.resolved)continue;const av=(r.candidates||[]).filter(x=>!used.has(x.p._uid));if(!av.length)continue;const a=av[0],b=av[1],gap=a.score-(b?.score||0),quality=a.score+gap*.45+a.meta*.015;const safe=(a.score>=.72&&gap>=.035)||(a.score>=.67&&a.meta>=1&&gap>=.04)||(a.score>=.64&&a.meta>=2&&gap>=.045);if(!safe)continue;if(!pick||quality>pick.quality)pick={r,a,gap,quality}}if(!pick)break;pick.r.resolved=pick.a;pick.r.status='推定';used.add(pick.a.p._uid)}return rows}
+function annotateIndependentAgreement(rows,original){
+  const byKey=new Map(original.map(r=>[r.file+'#'+r.row,r]));
+  for(const row of rows){
+    row._independentAgree=0;
+    const evidence=(row.sources||[]).map(k=>byKey.get(k)).filter(Boolean);
+    if(evidence.length<2)continue;
+    const best=row.candidates?.[0]?.p?._uid;if(!best)continue;
+    const agreed=evidence.filter(r=>r.candidates?.[0]?.p?._uid===best&&(r.candidates[0].visualScore||r.candidates[0].nameScore||0)>=.59);
+    const meta=agreed.map(r=>r.parsed||{});
+    const conflict=(key)=>new Set(meta.map(p=>p[key]).filter(Boolean)).size>1;
+    if(agreed.length>=2&&!conflict('pos')&&!conflict('hand'))row._independentAgree=agreed.length;
+  }
+  return rows;
+}
+function resolveUniqueCandidates(rows){for(const r of rows)r.resolved=null;const used=new Set(rows.filter(r=>r.match?.p?._uid).map(r=>r.match.p._uid)),pending=rows.filter(r=>!r.match);for(let guard=0;guard<rows.length;guard++){let pick=null;for(const r of pending){if(r.resolved)continue;const av=(r.candidates||[]).filter(x=>!used.has(x.p._uid));if(!av.length)continue;const a=av[0],b=av[1],gap=a.score-(b?.score||0),quality=a.score+gap*.45+a.meta*.015;const safe=(a.score>=.72&&gap>=.035)||(a.score>=.67&&a.meta>=1&&gap>=.04)||(a.score>=.64&&a.meta>=2&&gap>=.045)||(r._independentAgree>=2&&a.score>=.62&&gap>=.025&&a.meta>=1);if(!safe)continue;if(!pick||quality>pick.quality)pick={r,a,gap,quality}}if(!pick)break;pick.r.resolved=pick.a;pick.r.status='推定';used.add(pick.a.p._uid)}return rows}
 function dedupeRecognizedRows(rows,expected=0){const seen=new Map(),rest=[];for(const r of rows){const p=r.match?.p||r.resolved?.p;if(p?._uid){const old=seen.get(p._uid),quality=(r.match?.score||r.resolved?.score||r.score||0)+(r.ocrConfidence||0)/5000;if(!old||quality>old.quality)seen.set(p._uid,{row:r,quality})}else rest.push(r)}let out=[...seen.values()].map(x=>x.row).concat(rest);out.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));if(expected&&out.length>expected)out=out.slice(0,expected);return out}
 function batchDisplayPlayer(r){return r.match?.p||r.resolved?.p||null}
 const GRADE_SCORE={'SS':15,'S+':14,'S':13,'A+':12,'A':11,'B+':10,'B':9,'C+':8,'C':7,'D+':6,'D':5,'E+':4,'E':3,'F':2,'G':1};
@@ -670,13 +736,14 @@ function batchCompare(a,b,key){const pa=batchDisplayPlayer(a),pb=batchDisplayPla
 function sortBatchRows(rows){let out=[...rows].sort((a,b)=>batchCompare(a,b,state.batchSort));if(state.batchSortDir==='desc'&&['screen','name','rank'].includes(state.batchSort))out.reverse();if(state.batchSortDir==='asc'&&!['screen','name','rank'].includes(state.batchSort))out.reverse();return out}
 function setBatchSort(key){if(state.batchSort===key)state.batchSortDir=state.batchSortDir==='asc'?'desc':'asc';else{state.batchSort=key;state.batchSortDir=['screen','name','rank'].includes(key)?'asc':'desc'}renderBatchResults()}
 function batchGroupName(p,r){const pos=p?._position||POSMAP[r?.parsed?.pos]||'';if(pos==='投手')return'投手';if(pos==='捕手')return'捕手';if(['一壘手','二壘手','三壘手','游擊手'].includes(pos))return'內野手';if(pos==='外野手')return'外野手';return'其他'}
+const BATCH_SUMMARY_COLS=['_screen','_status','名前','ランク','年齢','_position','投/打'];
 const BATCH_COMMON=['_screen','_status','名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','_position'];
 const BATCH_PITCH=[...BATCH_COMMON,'タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
 const BATCH_BAT=[...BATCH_COMMON,'体力','右巧','左巧','長打','バント','選球眼','走力','走塁','精神','守備','捕球','肩力','送球','リード','捕手','一塁','二塁','三塁','遊撃','外野','スキル1','スキル2','スキル3','モデル'];
 function batchHeaderLabel(k){return k==='_screen'?'#':k==='_status'?'狀態':k==='_position'?'守位':(HEADER_ZH[k]||k)}
 function batchSortArrow(k){return state.batchSort===k?(state.batchSortDir==='asc'?' ↑':' ↓'):''}
 function batchCell(r,p,k,displayIndex){if(k==='_screen')return String(displayIndex+1);if(k==='_status')return r.match?'確認':r.resolved?'推定':'候選';if(k==='_position')return esc(p?._position||POSMAP[r.parsed?.pos]||'—');if(k==='名前'){if(!p){const c=(r.candidates||[]).filter(x=>x?.p?.['名前']).slice(0,3);if(!c.length)return '未辨識';const link=x=>`<span class="name-link" data-uid="${esc(x.p._uid||'')}">${esc(x.p['名前'])}</span>`;return `<span class="candidate-only">${link(c[0])}<small class="candidate-note">待確認${c.length>1?'｜備選：'+c.slice(1).map(link).join(' ／ '):''}</small></span>`}const alts=(r.candidates||[]).filter(x=>x.p._uid!==p._uid).slice(0,2),alt=alts.length?`<small class="candidate-note">次選：${alts.map(x=>esc(x.p['名前'])).join(' / ')}</small>`:'';return `<span class="name-link" data-uid="${esc(p._uid)}">${esc(p['名前'])}</span>${alt}`}return esc(p?.[k]||'—')}
-function renderBatchGroup(title,rows,cols){const sorted=sortBatchRows(rows),sortable=new Set(['screen','name','rank','年齢','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野']);let h=`<section class="batch-group"><h3>${esc(title)} <small>${rows.length}</small></h3><div class="table-shell"><table class="data-table batch-detail-table"><thead><tr>`;for(const k of cols){const sk=k==='_screen'?'screen':k==='名前'?'name':k==='ランク'?'rank':k;h+=sortable.has(sk)?`<th class="sortable" data-sort="${esc(sk)}">${esc(batchHeaderLabel(k))}${batchSortArrow(sk)}</th>`:`<th>${esc(batchHeaderLabel(k))}</th>`}h+='</tr></thead><tbody>';sorted.forEach((r,i)=>{const p=batchDisplayPlayer(r);h+='<tr>'+cols.map(k=>`<td class="${k==='名前'?'name':''} ${k==='_status'?(r.match?'good':r.resolved?'estimate':'unresolved'):''}">${batchCell(r,p,k,i)}</td>`).join('')+'</tr>'});h+='</tbody></table></div></section>';return h}
+function renderBatchGroup(title,rows,cols){const sorted=sortBatchRows(rows),sortable=new Set(['screen','name','rank','年齢','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野']);let h=`<section class="batch-group"><h3>${esc(title)} <small>${rows.length}</small></h3><div class="table-shell"><table class="data-table batch-detail-table ${state.batchShowAll?'full-abilities':''}"><thead><tr>`;for(const k of cols){const sk=k==='_screen'?'screen':k==='名前'?'name':k==='ランク'?'rank':k;h+=sortable.has(sk)?`<th class="sortable" data-sort="${esc(sk)}">${esc(batchHeaderLabel(k))}${batchSortArrow(sk)}</th>`:`<th>${esc(batchHeaderLabel(k))}</th>`}h+='</tr></thead><tbody>';sorted.forEach((r,i)=>{const p=batchDisplayPlayer(r);h+='<tr>'+cols.map(k=>`<td class="${k==='名前'?'name':''} ${k==='_status'?(r.match?'good':r.resolved?'estimate':'unresolved'):''}">${batchCell(r,p,k,i)}</td>`).join('')+'</tr>'});h+='</tbody></table></div></section>';return h}
 async function recognizeText(worker,canvas){const r=await worker.recognize(canvas);return{text:cleanOCR(r?.data?.text||''),confidence:Number(r?.data?.confidence||0)}}
 async function runBatch(){
   $('#batchStatus').textContent='本機非 AI 引擎正在載入；請重新整理頁面後再試。';return;
@@ -751,20 +818,21 @@ async function runBatch(){
       }
     }
 
-    let rows=resolveUniqueCandidates(consolidateRows(state.batchRawRows,state.expectedTotal));rows=dedupeRecognizedRows(rows,state.expectedTotal);state.batchRows=rows;
+    let rows=resolveUniqueCandidates(annotateIndependentAgreement(consolidateRows(state.batchRawRows,state.expectedTotal),state.batchRawRows));rows=dedupeRecognizedRows(rows,state.expectedTotal);state.batchRows=rows;
     const matched=rows.filter(r=>r.match).length,inferred=rows.filter(r=>!r.match&&r.resolved).length;
     const mode=ios?(mobileNameOCR?'手機 CV＋本機 OCR':'手機 CV（姓名 OCR 未完成）'):'桌機 CV＋可用時 OCR 複核';
-    setBatchProgress(100,'完成：'+rows.length+' 人'+(state.expectedTotal?'／畫面名單上限 '+state.expectedTotal:'')+'；確認 '+matched+'，推定 '+inferred+'，候選 '+(rows.length-matched-inferred)+'｜'+mode);
+    setBatchProgress(100,'完成：'+rows.length+' 人'+(state.expectedTotal?'／畫面名單上限 '+state.expectedTotal:'')+'；系統確認 '+matched+'，推定 '+inferred+'，候選 '+(rows.length-matched-inferred)+'｜'+mode);
     renderBatchResults();
   }catch(e){console.error(e);$('#batchStatus').textContent='批次找人失敗：'+(e.message||e)}
   finally{if(paddle)try{await paddle.dispose()}catch{}if(worker)try{await worker.terminate()}catch{}$('#runBatch').disabled=false}
 }
 $('#runBatch').onclick=runBatch;
+$('#toggleBatchColumns').onclick=()=>{state.batchShowAll=!state.batchShowAll;$('#toggleBatchColumns').textContent=state.batchShowAll?'只看重點欄位':'展開全部能力';renderBatchResults()};
 function renderBatchResults(){
   const matched=state.batchRows.filter(r=>r.match).length,inferred=state.batchRows.filter(r=>!r.match&&r.resolved).length;
-  $('#batchSummary').textContent=state.batchRows.length?`結果 ${state.batchRows.length}${state.expectedTotal?` / 最多 ${state.expectedTotal}`:''}｜確認 ${matched}｜推定 ${inferred}｜候選 ${state.batchRows.length-matched-inferred}`:'';
+  $('#batchSummary').textContent=state.batchRows.length?`結果 ${state.batchRows.length}${state.expectedTotal?` / 最多 ${state.expectedTotal}`:''}｜系統確認 ${matched}｜推定 ${inferred}｜候選 ${state.batchRows.length-matched-inferred}（首選需人工核對）`:'';
   const groups={投手:[],捕手:[],內野手:[],外野手:[],其他:[]};for(const r of state.batchRows){const p=batchDisplayPlayer(r);groups[batchGroupName(p,r)].push(r)}
-  let h='';for(const key of ['投手','捕手','內野手','外野手','其他'])if(groups[key].length)h+=renderBatchGroup(key,groups[key],key==='投手'?BATCH_PITCH:BATCH_BAT);
+  let h='';for(const key of ['投手','捕手','內野手','外野手','其他'])if(groups[key].length)h+=renderBatchGroup(key,groups[key],state.batchShowAll?(key==='投手'?BATCH_PITCH:BATCH_BAT):BATCH_SUMMARY_COLS);
   $('#batchTable').innerHTML=h;
   $('#batchTable').querySelectorAll('[data-uid]').forEach(td=>td.onclick=()=>openPlayer(td.dataset.uid));
   $('#batchTable').querySelectorAll('th[data-sort]').forEach(th=>th.onclick=()=>setBatchSort(th.dataset.sort));

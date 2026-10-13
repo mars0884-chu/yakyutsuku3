@@ -8,7 +8,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./styles.css">
 <link rel="stylesheet" href="./engine/r16-layout.css">
-<link rel="stylesheet" href="./engine/r18-layout.css">
+<link rel="stylesheet" href="./engine/r18-layout.css"><link rel="stylesheet" href="./engine/r58-layout.css">
 <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./assets/icon-192-r2.png">
 </head>
@@ -46,7 +46,7 @@
     <label class="filebtn">選擇截圖<input id="batchFiles" type="file" accept="image/*" multiple></label>
     <label class="filebtn">加入 ZIP<input id="batchZip" type="file" accept=".zip,application/zip" multiple></label>
     <label class="filebtn">加入資料夾<input id="batchFolder" type="file" accept="image/*" multiple webkitdirectory directory></label>
-    <button id="runBatch" class="primary">開始找人</button>
+    <button id="runBatch" class="primary">開始找人</button><button id="toggleBatchColumns" type="button">展開全部能力</button>
     <button id="clearBatch">清除</button>
   </div>
   <div id="batchStatus" class="statusline">可一次選多張 OFFICE MENU 名單截圖。</div>
@@ -62,12 +62,12 @@
 </section>
 
 <section id="view-cheats" class="view">
-  <div class="searchbar"><input id="cheatQuery" type="search" placeholder="搜尋：資金、PAR、XT、交易、成長、設施…"><button id="clearCheat">清除</button></div>
+  <div class="searchbar"><input id="cheatQuery" type="search" placeholder="搜尋金手指：資金、PAR、XT、交易、技能…"><button id="toggleCheatAll" type="button">全部展開</button><button id="clearCheat">清除</button></div><div id="cheatCount" class="cheat-count"></div>
   <div id="cheatResults" class="cards"></div>
 </section>
 
 <section id="view-sources" class="view">
-  <div class="source-head"><b id="dataStatus">資料載入中…</b><button id="refreshData">更新完整名冊</button></div>
+  <div class="source-head"><b id="dataStatus">資料載入中…</b><button id="refreshData">重新下載名冊（選用）</button></div>
   <div id="sourceList" class="cards compact"></div>
 </section>
 </main>

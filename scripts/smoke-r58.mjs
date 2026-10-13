@@ -1,0 +1,17 @@
+import fs from 'node:fs/promises';
+const read=async p=>fs.readFile(new URL('../'+p,import.meta.url),'utf8');
+const [app,html,sw,version,css,book,cheats]=await Promise.all(['app.js','index.html','sw.js','VERSION','engine/r58-layout.css','data/guide-book.json','data/cheats.json'].map(read));
+const ok=(v,m)=>{if(!v)throw Error(m)};
+ok(version.trim()==='2026.10.12-r58'&&app.includes("APP_VERSION='2026.10.12-r58'")&&sw.includes("CACHE='yt3-v20261012-58'"),'R58 release consistency');
+ok(html.includes('engine/r58-layout.css')&&html.includes('id="toggleBatchColumns"')&&html.includes('id="toggleCheatAll"'),'R58 UI controls');
+ok(css.includes('max-width:100%')&&css.includes('table-layout:fixed')&&css.includes('.cheat-index'),'Compact table and cheat CSS');
+ok(app.includes("BATCH_SUMMARY_COLS=['_screen','_status','名前','ランク','年齢','_position','投/打']")&&app.includes('state.batchShowAll?'),'Batch must default to compact with full detail optional');
+ok(app.includes('annotateIndependentAgreement(')&&app.includes('r._independentAgree>=2')&&app.includes('a.meta>=1'),'Only evidence-confirmed cross-page estimate uplift');
+ok(!app.includes("id:'deep'")&&app.includes("id:'play',title:'實戰／補充'"),'Archaeology navigation consolidation');
+ok(app.includes('if(!force){const saved=await rosterCacheGet()')&&app.indexOf('if(!force){const saved=await rosterCacheGet()')<app.indexOf("downloadPackagedRoster('./data/players.json'"),'IndexedDB first without repeated network fetch');
+ok(sw.includes('"./data/players.json"')&&sw.includes("e.respondWith(cacheFirst(e.request))")&&sw.includes("u.searchParams.has('fresh')"),'Roster must be available offline and allow explicit manual refresh');
+ok(app.includes('reader.read()')&&app.includes('rosterLoadProgress'),'First download progress');
+ok(app.includes('cheatSectionHTML')&&app.includes('cheatExpandAll')&&app.includes('clone.rows=title?sec.rows'),'Cheat full expand/browse/search');
+const b=JSON.parse(book),c=JSON.parse(cheats);ok(b.length===31&&c[0].sections.length>=12,'Guide and cheat corpus unchanged');
+const flat=b.flatMap(x=>x.id==='cheats_20261005'?[]:[x.id]);ok(flat.length===30,'Noncheat guides count');
+console.log('R58: stored roster first, bundled 3767 offline, compact tables, four guide categories, expandable 16 cheat sections and conservative crosspage evidence.');
