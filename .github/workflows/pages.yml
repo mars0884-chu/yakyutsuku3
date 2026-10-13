@@ -115,6 +115,8 @@ jobs:
         run: node scripts/smoke-r59.mjs
       - name: Verify r60 content-sized tables and mobile horizontal scrolling
         run: node scripts/smoke-r60.mjs
+      - name: Verify r61 seven-topic reading edition and full pitcher-batter tables
+        run: node scripts/smoke-r61.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
