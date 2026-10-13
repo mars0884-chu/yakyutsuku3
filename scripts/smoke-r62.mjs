@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises';import vm from 'node:vm';const rd=p=>fs.readFile(new URL('../'+p,import.meta.url),'utf8');
-const [app,engine,sort,html,sw,css,version,guide,data]=await Promise.all(['app.js','engine/r18-batch.js','engine/table-sort.js','index.html','sw.js','engine/r62-layout.css','VERSION','engine/guide-reading.js','data/guide-book.json'].map(rd));
+const [app,engine,sort,html,sw,css,version,guide,sourceBook]=await Promise.all(['app.js','engine/r18-batch.js','engine/table-sort.js','index.html','sw.js','engine/r62-layout.css','VERSION','engine/guide-reading.js','data/guide-book.json'].map(rd));
 const ok=(v,m)=>{if(!v)throw Error(m)};
 ok(version.trim()==='2026.10.12-r62'&&app.includes("APP_VERSION='2026.10.12-r62'")&&sw.includes("CACHE='yt3-v20261012-62'"),'Version mismatch');
 ok(html.indexOf('engine/table-sort.js')<html.indexOf('app.js')&&html.includes('engine/r62-layout.css')&&sw.includes('"./engine/table-sort.js"'),'Sort script/CSS missing');
@@ -14,7 +14,7 @@ ok(S.sortRows(data,'年齢','desc',v=>v.age).map(v=>v.id).join('')==='BAC','Age 
 ok(S.sortRows(data,'年齢','asc',v=>v.age).map(v=>v.id).join('')==='ABC','Age ascending/null last'); 
 ok(S.compare('A+','B','体力','desc')<0&&S.compare('B','A','長打','desc')>0,'Grades');
 ok(S.compare('候選','確認','_status','desc')>0,'Status');
-const gctx={window:{}};vm.runInNewContext(guide,gctx,{timeout:1000});const out=gctx.window.YT3_GuideReading.compile(JSON.parse(data));
+const gctx={window:{}};vm.runInNewContext(guide,gctx,{timeout:1000});const out=gctx.window.YT3_GuideReading.compile(JSON.parse(sourceBook));
 ok(out.chapters.length===7&&out.chapters.every(ch=>!/^第.+篇/.test(ch.title)),'Must have topical categories not books');
 ok(out.chapters.reduce((n,ch)=>n+ch.sections.length,0)+out.archive.length===out.sourceSections,'Section preservation');
 ok(app.includes('<h2>攻略分類</h2>')&&app.includes('子分類快速跳轉')&&app.includes('guide-book-toc" open'),'Simple topic/subcategory navigation');
