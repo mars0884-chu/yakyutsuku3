@@ -2,11 +2,7 @@
    Claude header alignment, no Tesseract, no PaddleOCR, no roster-total clipping. */
 (function(){'use strict';
  const byId=id=>document.getElementById(id),runButton=byId('runBatch');if(!runButton)return;
- // Restrict tables to a useful overview; the name opens complete player details.
- if(typeof window.renderBatchGroup==='function'){
-  const wide=window.renderBatchGroup;
-  window.renderBatchGroup=(title,rows)=>wide(title,rows,['_screen','_status','名前','ランク','年齢','_position','投/打']);
- }
+ // The active application owns all result columns; do not force a summary over full tables.
  // Use a task yield instead of RAF: Safari can pause requestAnimationFrame when the bookmark is backgrounded.
  const frame=()=>new Promise(resolve=>setTimeout(resolve,0));
  const update=(num,message)=>{byId('batchStatus').textContent=`${message}｜${Math.min(100,Math.round(num))}%`};
@@ -120,7 +116,7 @@
  window.yt3TentativeCandidate=tentativeCandidate;
 
  const batchGroupOf=name=>String(name||'').match(/^(.+?)__/)?.[1]||'單張截圖';
- const output=(r,i)=>({canvas:r.canvas,file:r.file,row:r.row,batchGroup:batchGroupOf(r.file),firstIndex:i,
+ const output=(r,i)=>({canvas:r.canvas,file:r.file,row:r.row,batchGroup:batchGroupOf(r.file),screenCategory:r.category||'',firstIndex:i,
     parsed:{pos:({投手:'投',捕手:'捕',內野手:'一',外野手:'外'})[r.category]||''},sources:r.sources||[],
     match:r.match||null,resolved:r.match?null:tentativeCandidate(r.candidates,state.players),candidates:r.candidates||[],score:r.candidates?.[0]?.score||0,
     raw:r.mode,status:r.match?'確認':'候選'});

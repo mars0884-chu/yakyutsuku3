@@ -3,7 +3,7 @@ import vm from 'node:vm';
 const read=async p=>fs.readFile(new URL('../'+p,import.meta.url),'utf8');
 const [app,html,sw,version,bookJs,raw,css]=await Promise.all(['app.js','index.html','sw.js','VERSION','engine/guide-reading.js','data/guide-book.json','engine/r61-layout.css'].map(read));
 const ok=(x,msg)=>{if(!x)throw Error(msg)};
-ok(version.trim()==='2026.10.12-r61'&&app.includes("APP_VERSION='2026.10.12-r61'")&&sw.includes("CACHE='yt3-v20261012-61'"),'Release');
+const v=Number(version.trim().split('-r').at(-1));ok(v>=61&&app.includes(`APP_VERSION='${version.trim()}'`)&&sw.includes(`CACHE='yt3-v20261012-${v}'`),'Release');
 ok(html.indexOf('engine/guide-reading.js')<html.indexOf('<script src="./app.js"')&&html.includes('id="playerResults"')&&html.includes('id="sourceResearch"'),'HTML reading/players/source');
 const scope={window:{}};vm.runInNewContext(bookJs,scope,{timeout:1500});
 const original=JSON.parse(raw),out=scope.window.YT3_GuideReading.compile(original),all=original.filter(c=>c.id!=='cheats_20261005').reduce((sum,c)=>sum+c.sections.length,0);
@@ -13,7 +13,7 @@ ok(unique.size===all&&live.length+out.archive.length===all,'Guide section lost o
 ok(live.some(x=>x.originalChapterId==='lastdig_20261005')&&live.some(x=>x.originalChapterId==='research')&&live.some(x=>x.originalChapterId==='history_20261005'),'Historical practical details not integrated');
 ok(out.chapters.find(c=>c.id==='ideas').sections.some(s=>s.title.includes('經營企劃完整逆引')),'Idea combinations gone');
 ok(!live.some(x=>x.originalChapterId==='sources')&&out.archive.some(x=>x.originalChapterId==='sources'),'Research source audits wrongly in gameplay');
-ok(app.includes("batchShowAll:true")&&app.includes("groups={投手:[],野手:[]}"),'Batch grouping/default full content');
+ok(app.includes("batchShowAll:true")&&app.includes('BATCH_SCREEN_GROUPS')&&app.includes('renderBatchGroup('),'Batch screenshot grouping/default full content');
 ok(app.includes("playerGroupHTML('投手',pitch)+playerGroupHTML('野手',bat)")&&app.includes('PLAYER_PITCH_FIELDS')&&app.includes('PLAYER_BAT_FIELDS'),'Player grouping/full attributes');
 ok(css.includes('.player-detail-table')&&css.includes('.guide-book-part')&&sw.includes('"./engine/r61-layout.css"')&&css.includes('.full-abilities th:nth-child(7)'),'Mobile UI/cache and all full columns');
 console.log('R61 integrated '+live.length+' guide sections into 7 volumes, '+out.archive.length+' source audit sections; preserved '+all+' original sections. Full player/batch pitch-vs-bat tables.');

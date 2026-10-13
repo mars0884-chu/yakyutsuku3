@@ -1,0 +1,7 @@
+/* Every real data header sorts, and full tables retain free horizontal scroll on iPhone. */
+#view-players .column-sort,#view-batch .column-sort{display:inline-flex;align-items:center;padding:3px 4px;margin:-3px -4px;border:0;border-radius:4px;background:transparent;color:inherit;font:inherit;font-weight:700;white-space:nowrap;cursor:pointer}
+#view-players .column-sort:hover,#view-batch .column-sort:hover,#view-players .column-sort:focus-visible,#view-batch .column-sort:focus-visible{background:#d8eded;outline:1px solid #167a76}
+#view-players th[aria-sort="ascending"] .column-sort,#view-players th[aria-sort="descending"] .column-sort,#view-batch th[aria-sort="ascending"] .column-sort,#view-batch th[aria-sort="descending"] .column-sort{color:#075b56;text-decoration:underline;text-underline-offset:3px}
+#view-batch .batch-group>.table-shell,#view-players .player-group>.table-shell{overflow:auto;max-width:100%;-webkit-overflow-scrolling:touch}
+#view-batch .batch-detail-table.full-abilities td.name{min-width:145px;max-width:215px;white-space:normal}
+@media(max-width:700px){#view-batch .batch-detail-table.full-abilities td.name{min-width:120px;max-width:172px}}

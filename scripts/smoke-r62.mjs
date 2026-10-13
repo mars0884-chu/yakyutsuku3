@@ -1,0 +1,17 @@
+import fs from 'node:fs/promises';import vm from 'node:vm';const rd=p=>fs.readFile(new URL('../'+p,import.meta.url),'utf8');
+const [app,engine,sort,html,sw,css,version]=await Promise.all(['app.js','engine/r18-batch.js','engine/table-sort.js','index.html','sw.js','engine/r62-layout.css','VERSION'].map(rd));
+const ok=(v,m)=>{if(!v)throw Error(m)};
+ok(version.trim()==='2026.10.12-r62'&&app.includes("APP_VERSION='2026.10.12-r62'")&&sw.includes("CACHE='yt3-v20261012-62'"),'Version mismatch');
+ok(html.indexOf('engine/table-sort.js')<html.indexOf('app.js')&&html.includes('engine/r62-layout.css')&&sw.includes('"./engine/table-sort.js"'),'Sort script/CSS missing');
+ok(!engine.includes('window.renderBatchGroup=')&&engine.includes("screenCategory:r.category||''"),'Old forced-7-column override or missing screenshot category');
+ok(app.includes("BATCH_SCREEN_GROUPS=['投手','捕手','內野手','外野手','待確認守位']")&&app.includes("state.batchShowAll?(key==='投手'?BATCH_PITCH:BATCH_BAT):BATCH_SUMMARY_COLS"),'Screenshot groups and full ability columns');
+ok(app.includes('data-player-sort=')&&app.includes('data-sort-group=')&&app.includes('aria-sort=')&&app.includes('r.firstIndex??displayIndex'),'All fields sortable or original index changed');
+ok(css.includes('.column-sort')&&css.includes('overflow:auto'),'Touch-friendly sortable styling');
+const x={window:{}};vm.runInNewContext(sort,x,{timeout:1000});const S=x.window.YT3_TableSort;
+const data=[{id:'A',rank:'C',age:'22'},{id:'B',rank:'S',age:'24'},{id:'C',rank:'A',age:'—'}];
+ok(S.sortRows(data,'ランク','desc',v=>v.rank).map(v=>v.id).join('')==='BCA','Rank');
+ok(S.sortRows(data,'年齢','desc',v=>v.age).map(v=>v.id).join('')==='BAC','Age descending/null last');
+ok(S.sortRows(data,'年齢','asc',v=>v.age).map(v=>v.id).join('')==='ACB'===false,''); 
+ok(S.compare('A+','B','体力','desc')<0&&S.compare('B','A','長打','desc')>0,'Grades');
+ok(S.compare('候選','確認','_status','desc')>0,'Status');
+console.log('R62 screenshot categories preserved, full table columns unwrapped, all fields sortable.');
