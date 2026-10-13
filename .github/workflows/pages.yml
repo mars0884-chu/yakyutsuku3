@@ -107,6 +107,8 @@ jobs:
         run: node scripts/smoke-r55.mjs
       - name: Verify r56 PS2-only player skill crosschecks and separate other game versions
         run: node scripts/smoke-r56.mjs
+      - name: Verify r57 coach skill index, source fidelity and no duplicate rows
+        run: node scripts/smoke-r57.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
