@@ -1,0 +1,14 @@
+import fs from 'node:fs/promises';
+const read=async p=>fs.readFile(new URL('../'+p,import.meta.url),'utf8');
+const [css,html,app,sw,ver]=await Promise.all(['engine/r60-layout.css','index.html','app.js','sw.js','VERSION'].map(read));
+const ok=(v,m)=>{if(!v)throw Error(m)};
+const pos=html.indexOf('engine/r60-layout.css');ok(pos>html.indexOf('engine/r58-layout.css')&&pos>=0,'New layout must load after r58');
+ok(ver.trim()==='2026.10.12-r60'&&app.includes("APP_VERSION='2026.10.12-r60'")&&sw.includes("CACHE='yt3-v20261012-60'"),'Release mismatch');
+ok(sw.includes('"./engine/r58-layout.css","./engine/r60-layout.css"'),'Offline responsive CSS absent');
+for(const s of ['#view-batch .batch-detail-table:not(.full-abilities)','table-layout:auto','width:max-content','max-width:234px','#view-batch .batch-groups{display:flex','@media(max-width:700px)','overflow-x:auto','#view-players #playerTable','#view-guides .guide-table','#view-cheats .cheat-table','.compare-table'])ok(css.includes(s),'Missing content-sized layout '+s);
+const batch=css.slice(css.indexOf('#view-batch .batch-detail-table:not(.full-abilities){'),css.indexOf('#view-batch .batch-detail-table:not(.full-abilities) th,'));
+ok(!batch.includes('width:100%')&&!batch.includes('table-layout:fixed'),'Batch regression: stretched columns');
+const guide=css.slice(css.indexOf('#view-guides .guide-table{'),css.indexOf('#view-guides .guide-table th,'));
+ok(!guide.includes('width:100%')&&!guide.includes('table-layout:fixed'),'Guide regression: stretched columns');
+const cols=[32,58,234,49,51,65,59];ok(cols.reduce((s,x)=>s+x,0)<640,'Compact seven columns cannot exceed 640px at desktop');
+console.log('R60: seven concise columns <=640px plus borders, mobile scroll, compact players/guides/cheats/comparison, offline CSS included.');
