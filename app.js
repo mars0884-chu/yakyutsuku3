@@ -1,5 +1,5 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='2026.10.12-r58';
+const APP_VERSION='2026.10.12-r59';
 const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,batchSort:'screen',batchSortDir:'asc',batchShowAll:false,cheatExpandAll:false};
 const HEADER_ZH={"名前":"姓名","年齢":"年齡","成長":"成長型","投/打":"投／打","出身":"出身地","高校":"高中","大学":"大學","社会人":"社會人","タイプ":"投手類型","ランク":"Rank","体力":"體力","球速":"球速","球威":"球威","制球":"控球","精神":"精神","守備":"守備","捕球":"接球","肩力":"臂力","送球":"傳球","スライダー":"滑球","速スラ":"高速滑球","カットB":"卡特球","カーブ":"曲球","Sカーブ":"S曲球","ドロップ":"Drop曲球","シュート":"噴射球","速シュート":"高速噴射球","シンカー":"伸卡球","スクリュー":"螺旋球","速シンカー":"高速伸卡球","サークルC":"圈指變速","2シーム":"二縫線","Cアップ":"變速球","フォーク":"指叉球","SFF":"快速指叉","縦スラ":"縱滑球","パーム":"掌心球","ナックル":"蝴蝶球","スキル1":"技能1","スキル2":"技能2","スキル3":"技能3","モデル":"原型","右巧":"對右巧打","左巧":"對左巧打","長打":"長打","バント":"短打","選球眼":"選球眼","走力":"跑力","走塁":"跑壘","リード":"配球","捕手":"捕手","一塁":"一壘","二塁":"二壘","三塁":"三壘","遊撃":"游擊","外野":"外野","リーグ":"聯盟／地區","アカデミー":"學院"};
 const BASE_COLS=['名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
@@ -14,18 +14,23 @@ async function rosterCacheGet(){try{const db=await rosterDB();return await new P
 async function rosterCachePut(players){if(!validRoster(players))return false;try{const db=await rosterDB();await new Promise((resolve,reject)=>{const tx=db.transaction(ROSTER_STORE,'readwrite');tx.objectStore(ROSTER_STORE).put({players,updatedAt:Date.now()},ROSTER_KEY);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});db.close();return true}catch(e){console.warn('roster cache',e);return false}}
 function validRoster(x){return Array.isArray(x)&&x.length===3767&&x.every(p=>p&&typeof p['名前']==='string'&&p['名前'].trim()&&p._slug)&&new Set(x.map(p=>p._slug)).size===15}
 async function downloadPackagedRoster(url,onProgress=()=>{}){
+  onProgress(0,0);
   const response=await fetch(url,{cache:'default'});
   if(!response.ok)throw new Error('完整名冊檔案 HTTP '+response.status);
   const size=Number(response.headers.get('content-length'))||0;
-  if(!response.body?.getReader)return response.json();
+  if(!response.body?.getReader){const data=await response.json();onProgress(100,0);return data}
   const reader=response.body.getReader(),decoder=new TextDecoder(),chunks=[];
   let received=0;
   while(true){const {done,value}=await reader.read();if(done)break;received+=value.byteLength;chunks.push(decoder.decode(value,{stream:true}));onProgress(size?Math.min(99,Math.floor(received/size*100)):null,received)}
-  chunks.push(decoder.decode());return JSON.parse(chunks.join(''));
+  chunks.push(decoder.decode());const data=JSON.parse(chunks.join(''));onProgress(100,received);return data;
 }
 function rosterLoadProgress(percent,bytes){
-  const target=$('#dataStatus');if(!target)return;
-  target.textContent='首次載入內附完整名冊：'+(percent===null?(bytes/1048576).toFixed(1)+' MB':percent+'%')+'（之後從本機開啟）';
+  const text='首次準備完整名冊：'+(percent===null?(bytes/1048576).toFixed(1)+' MB':percent+'%')+'（3,767 人，往後可離線使用）';
+  const source=$('#dataStatus');if(source)source.textContent=text;
+  const bar=$('#rosterLoad'),title=$('#rosterLoadText'),progress=$('#rosterLoadProgress');
+  if(bar)bar.classList.remove('hidden');
+  if(title)title.textContent=text;
+  if(progress){if(percent===null)progress.removeAttribute('value');else progress.value=percent}
 }
 async function loadRoster(force=false){
   // 二次造訪從 IndexedDB 直接啟動，絕不每次重新下載同一份名冊。
@@ -585,6 +590,14 @@ function cvFooterTotal(totalCanvas){
   return best&&best.agree===3&&best.score>=.58&&best.margin>=.02?best.n:0
 }
 function mergeRowOCR(row,parsed,cm,raw,confidence=0){
+  // 獨立證據：先用當次本機 OCR 原文比對，不能拿已合併 CV 候選來自我驗證。
+  const cvTop=row.candidates?.[0],textOnly=candidateMatch(parsed),ocrTop=textOnly?.candidates?.[0],ocrNext=textOnly?.candidates?.[1];
+  const label=normName(parsed?.name||[parsed?.surname,parsed?.given].filter(Boolean).join(''));
+  const ocrMargin=(ocrTop?.score||0)-(ocrNext?.score||0);
+  if(label.length>=3&&cvTop?.p?._uid&&cvTop.p._uid===ocrTop?.p?._uid&&
+     (cvTop.visualScore||cvTop.nameScore||0)>=.68&&(ocrTop.nameScore||0)>=.83&&ocrMargin>=.04){
+    row._ocrAgreedUid=cvTop.p._uid;
+  }
   const merged=mergeParsedNameEvidence(row.parsed,parsed),textCM=candidateMatch(merged),vis=visualCandidateMatch(row.canvas,merged);
   const options=[row.match?{match:row.match,candidates:row.candidates||[]}:null,cm,textCM,vis].filter(Boolean),quality=o=>o.match?.score||o.candidates?.[0]?.score||0;
   options.sort((a,b)=>quality(b)-quality(a));const best=options[0]||{match:null,candidates:row.candidates||[]};
@@ -726,7 +739,7 @@ function annotateIndependentAgreement(rows,original){
   }
   return rows;
 }
-function resolveUniqueCandidates(rows){for(const r of rows)r.resolved=null;const used=new Set(rows.filter(r=>r.match?.p?._uid).map(r=>r.match.p._uid)),pending=rows.filter(r=>!r.match);for(let guard=0;guard<rows.length;guard++){let pick=null;for(const r of pending){if(r.resolved)continue;const av=(r.candidates||[]).filter(x=>!used.has(x.p._uid));if(!av.length)continue;const a=av[0],b=av[1],gap=a.score-(b?.score||0),quality=a.score+gap*.45+a.meta*.015;const safe=(a.score>=.72&&gap>=.035)||(a.score>=.67&&a.meta>=1&&gap>=.04)||(a.score>=.64&&a.meta>=2&&gap>=.045)||(r._independentAgree>=2&&a.score>=.62&&gap>=.025&&a.meta>=1);if(!safe)continue;if(!pick||quality>pick.quality)pick={r,a,gap,quality}}if(!pick)break;pick.r.resolved=pick.a;pick.r.status='推定';used.add(pick.a.p._uid)}return rows}
+function resolveUniqueCandidates(rows){for(const r of rows)r.resolved=null;const used=new Set(rows.filter(r=>r.match?.p?._uid).map(r=>r.match.p._uid)),pending=rows.filter(r=>!r.match);for(let guard=0;guard<rows.length;guard++){let pick=null;for(const r of pending){if(r.resolved)continue;const av=(r.candidates||[]).filter(x=>!used.has(x.p._uid));if(!av.length)continue;const a=av[0],b=av[1],gap=a.score-(b?.score||0),quality=a.score+gap*.45+a.meta*.015;const safe=(a.score>=.72&&gap>=.035)||(a.score>=.67&&a.meta>=1&&gap>=.04)||(a.score>=.64&&a.meta>=2&&gap>=.045)||(r._independentAgree>=2&&a.score>=.62&&gap>=.025&&a.meta>=1)||(r._ocrAgreedUid===a.p?._uid&&a.score>=.66&&gap>=.025&&a.meta>=1);if(!safe)continue;if(!pick||quality>pick.quality)pick={r,a,gap,quality}}if(!pick)break;pick.r.resolved=pick.a;pick.r.status='推定';used.add(pick.a.p._uid)}return rows}
 function dedupeRecognizedRows(rows,expected=0){const seen=new Map(),rest=[];for(const r of rows){const p=r.match?.p||r.resolved?.p;if(p?._uid){const old=seen.get(p._uid),quality=(r.match?.score||r.resolved?.score||r.score||0)+(r.ocrConfidence||0)/5000;if(!old||quality>old.quality)seen.set(p._uid,{row:r,quality})}else rest.push(r)}let out=[...seen.values()].map(x=>x.row).concat(rest);out.sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));if(expected&&out.length>expected)out=out.slice(0,expected);return out}
 function batchDisplayPlayer(r){return r.match?.p||r.resolved?.p||null}
 const GRADE_SCORE={'SS':15,'S+':14,'S':13,'A+':12,'A':11,'B+':10,'B':9,'C+':8,'C':7,'D+':6,'D':5,'E+':4,'E':3,'F':2,'G':1};
@@ -887,4 +900,4 @@ $('#updateBtn').onclick=()=>checkAppUpdate(true);$('#applyUpdate').onclick=apply
 window.addEventListener('load',()=>{setTimeout(()=>checkAppUpdate(false),700);setInterval(()=>checkAppUpdate(false),10*60*1000)});
 
 if('serviceWorker'in navigator)window.addEventListener('load',async()=>{try{const reg=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});await reg.update()}catch(e){console.warn('service worker',e)}});
-loadData().catch(e=>{$('#dataStatus').textContent='資料載入失敗：'+e.message;console.error(e)});
+loadData().catch(e=>{$('#dataStatus').textContent='資料載入失敗：'+e.message;console.error(e)}).finally(()=>$('#rosterLoad')?.classList.add('hidden'));

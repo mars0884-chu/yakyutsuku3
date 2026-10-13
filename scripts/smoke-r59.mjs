@@ -1,0 +1,14 @@
+import fs from 'node:fs/promises';
+const read=async path=>fs.readFile(new URL('../'+path,import.meta.url),'utf8');
+const [app,html,css,version,sw]=await Promise.all(['app.js','index.html','engine/r58-layout.css','VERSION','sw.js'].map(read));
+const ok=(a,b)=>{if(!a)throw Error(b)};
+ok(version.trim()==='2026.10.12-r59'&&app.includes("APP_VERSION='2026.10.12-r59'")&&sw.includes("CACHE='yt3-v20261012-59'"),'R59 release');
+ok(html.includes('id="rosterLoad"')&&html.includes('id="rosterLoadProgress"')&&html.includes('engine/r58-layout.css'),'First-run progress in DOM');
+ok(app.includes("onProgress(0,0)")&&app.includes("onProgress(100,received)")&&app.includes('progress.value=percent')&&app.includes("$('#rosterLoad')?.classList.add('hidden')"),'Visible progress and cleanup missing');
+ok(css.includes('.roster-loading progress')&&css.includes('.cheat-section[open]'),'Progress and expanded fullwidth cheat sections');
+const ocr=app.slice(app.indexOf('function mergeRowOCR('),app.indexOf('function grayRegion('));
+ok(ocr.includes('const cvTop=row.candidates?.[0],textOnly=candidateMatch(parsed)')&&ocr.includes('ocrMargin>=.04')&&ocr.includes('row._ocrAgreedUid=cvTop.p._uid'),'Independent OCR agreement validation missing');
+const unique=app.slice(app.indexOf('function resolveUniqueCandidates('),app.indexOf('function dedupeRecognizedRows('));
+ok(unique.includes('r._ocrAgreedUid===a.p?._uid')&&unique.includes('gap>=.025&&a.meta>=1'),'OCR cannot override ambiguity without margin and position evidence');
+ok(!app.includes('100%人工')&&!app.includes('強制確認'),'Cannot embed user-labelled confidence as machine confidence');
+console.log('R59: first-download progress bar, bundled static roster offline, two independent local methods for confidence grading.');

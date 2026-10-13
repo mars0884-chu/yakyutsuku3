@@ -49,3 +49,9 @@ main,.view,.batch-group,.guide-section,.table-shell,.guide-table-wrap,.cheat-tab
   .cheat-index{grid-template-columns:minmax(0,1fr)}
   .cheat-table{min-width:460px}
 }
+
+/* R59: full-width when an expanded code group needs room; visible first-download progress. */
+#view-cheats .cheat-section[open]{grid-column:1/-1}
+.roster-loading{position:sticky;top:111px;z-index:23;display:flex;gap:12px;align-items:center;justify-content:center;padding:7px 14px;background:#fff9e8;border-bottom:1px solid #e6d9a7;font-size:12px}
+.roster-loading progress{width:min(36vw,320px);height:11px}
+@media(max-width:700px){.roster-loading{top:100px;flex-wrap:wrap;gap:5px}.roster-loading progress{width:100%;height:9px}}
