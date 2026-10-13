@@ -140,7 +140,7 @@ function guideChapterDetail(ch){return `<article class="guide-chapter"><div clas
 function visibleGuideBook(){return state.book}
 function renderGuideTopics(){
  const current=state.guideTopic;
- $('#guideTopics').innerHTML='<button class="chip '+(current==='all'?'active':'')+'" data-topic="all">全書目錄</button>'+state.book.map(ch=>`<button class="chip ${current==='chapter:'+ch.id?'active':''}" data-topic="chapter:${esc(ch.id)}">${esc(ch.title.replace(/^第.{1,3}篇[｜]/,''))}</button>`).join('');
+ $('#guideTopics').innerHTML='<button class="chip '+(current==='all'?'active':'')+'" data-topic="all">所有主題</button>'+state.book.map(ch=>`<button class="chip ${current==='chapter:'+ch.id?'active':''}" data-topic="chapter:${esc(ch.id)}">${esc(ch.title)}</button>`).join('');
  $('#guideTopics').querySelectorAll('[data-topic]').forEach(btn=>btn.onclick=()=>{state.guideTopic=btn.dataset.topic;state.guideExpandAll=false;renderGuideTopics();renderGuides()});
 }
 function guideQueryForms(v){
@@ -196,7 +196,7 @@ function guideChapterCompact(ch){
  const expand=ch.id==='ideas'?`<button type="button" class="guide-expand-all" data-expand-idea>${state.guideExpandAll?'全部收合':'全部展開'}</button>`:'';
  const contents=ch.parts.map(p=>`<div class="guide-toc-part"><b>${esc(p.title)}</b>${p.sections.map(s=>`<a href="#${esc(s.readingId)}">${esc(s.title)}</a>`).join('')}</div>`).join('');
  const sections=ch.parts.map(p=>`<section class="guide-book-part"><h3>${esc(p.title)}</h3>${p.sections.map(s=>`<div id="${esc(s.readingId)}" class="guide-book-section">${guideSectionHTML(s)}</div>`).join('')}</section>`).join('');
- return `<article class="guide-chapter guide-book"><div class="guide-chapter-head"><button type="button" class="guide-back" data-guide-back>← 全書目錄</button><h2>${esc(ch.title)}</h2>${expand}<p>${esc(ch.summary)}</p></div><details class="guide-book-toc"><summary>本篇目錄（${ch.sections.length} 節）</summary><nav>${contents}</nav></details>${sections}</article>`;
+ return `<article class="guide-chapter guide-book"><div class="guide-chapter-head"><button type="button" class="guide-back" data-guide-back>← 攻略分類</button><h2>${esc(ch.title)}</h2>${expand}<p>${esc(ch.summary)}</p></div><details class="guide-book-toc" open><summary>子分類快速跳轉（${ch.sections.length} 項）</summary><nav>${contents}</nav></details>${sections}</article>`;
 }
 function guideRowClean(book,query){return originalGuideRowSearch(book,query).filter(x=>x.section!=='經營企劃組合表（條件・組合・結果）');}
 function guideSearchCompact(hits){
@@ -223,7 +223,7 @@ function renderGuides(){
   root.querySelector('[data-guide-back]')?.addEventListener('click',()=>{state.guideTopic='all';renderGuideTopics();renderGuides()});
   return;
  }
- root.innerHTML='<div class="guide-library-head"><h2>攻略目錄</h2><p>依遊戲流程編成七篇；不同年代的攻略直接整合到相關主題。</p></div><div class="guide-volume-grid">'+book.map(ch=>`<button class="guide-index-card" data-guide-id="${esc(ch.id)}"><b>${esc(ch.title)}</b><span>${esc(ch.summary)}</span><small>${ch.parts.length} 單元／${ch.sections.length} 節</small></button>`).join('')+'</div>';
+ root.innerHTML='<div class="guide-library-head"><h2>攻略分類</h2><p>依玩法整理。選擇主題，再用子分類直接定位需要的資料。</p></div><div class="guide-volume-grid">'+book.map(ch=>`<button class="guide-index-card" data-guide-id="${esc(ch.id)}"><b>${esc(ch.title)}</b><span>${esc(ch.summary)}</span><small>${ch.parts.map(p=>p.title).join('／')}</small></button>`).join('')+'</div>';
  root.querySelectorAll('[data-guide-id]').forEach(btn=>btn.onclick=()=>{state.guideTopic='chapter:'+btn.dataset.guideId;renderGuideTopics();renderGuides();window.scrollTo({top:0,behavior:'smooth'})});
 }
 let guideSearchBackup='';
