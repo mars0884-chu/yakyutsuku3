@@ -38,3 +38,6 @@
 #view-players .player-detail-table th:first-child,#view-players .player-detail-table td:first-child{min-width:105px}
 #view-guides .guide-volume-grid,#view-guides .guide-book-toc nav{grid-template-columns:minmax(0,1fr)}
 }
+
+/* iPhone 舊 r18 規則會藏掉第七欄：完整能力模式不得隱藏任何欄。 */
+@media(max-width:700px){#view-batch .batch-detail-table.full-abilities th:nth-child(7),#view-batch .batch-detail-table.full-abilities td:nth-child(7){display:table-cell}}

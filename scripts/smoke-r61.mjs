@@ -15,5 +15,5 @@ ok(out.chapters.find(c=>c.id==='ideas').sections.some(s=>s.title.includes('經�
 ok(!live.some(x=>x.originalChapterId==='sources')&&out.archive.some(x=>x.originalChapterId==='sources'),'Research source audits wrongly in gameplay');
 ok(app.includes("batchShowAll:true")&&app.includes("groups={投手:[],野手:[]}"),'Batch grouping/default full content');
 ok(app.includes("playerGroupHTML('投手',pitch)+playerGroupHTML('野手',bat)")&&app.includes('PLAYER_PITCH_FIELDS')&&app.includes('PLAYER_BAT_FIELDS'),'Player grouping/full attributes');
-ok(css.includes('.player-detail-table')&&css.includes('.guide-book-part')&&sw.includes('"./engine/r61-layout.css"'),'Mobile UI/cache');
+ok(css.includes('.player-detail-table')&&css.includes('.guide-book-part')&&sw.includes('"./engine/r61-layout.css"')&&css.includes('.full-abilities th:nth-child(7)'),'Mobile UI/cache and all full columns');
 console.log('R61 integrated '+live.length+' guide sections into 7 volumes, '+out.archive.length+' source audit sections; preserved '+all+' original sections. Full player/batch pitch-vs-bat tables.');
