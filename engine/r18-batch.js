@@ -53,7 +53,7 @@
   const a=primary.m.candidates[0],b=alternate.m.candidates[0];
   if(a.p?._uid!==b.p?._uid)return primary;
   if(alternate.m.match&&alternate.score>=primary.score-.04)return alternate;
-  if(primary.score<.68||alternate.score<.68||(primary.m.margin||0)<.105||(alternate.m.margin||0)<.105)return primary;
+  if(primary.score<.67||alternate.score<.67||(primary.m.margin||0)<.10||(alternate.m.margin||0)<.10)return primary;
   const norm=s=>String(s||'').normalize('NFKC').replace(/\s/g,'');
   if(players.filter(p=>norm(p['名前'])===norm(a.p['名前'])).length!==1)return primary;
   return{...primary,m:{...primary.m,match:a,method:'independent crop corroboration'}};
@@ -105,20 +105,36 @@
      best.m.candidates?.[0]?.p?._uid===confirmed.m.match?.p?._uid)return confirmed;
   return voteAligned(attempts,players)||best;
  }
- // High-scoring first guesses are useful as tentative lookups, not confirmed IDs.
- function tentativeCandidate(candidates,players){
+ // Candidate rank ≠ confirmation. R63 uses the screenshot's independently
+ // decoded positional header to admit more first choices as "推定" only.
+ // Never train on an example ZIP, filename, or manually supplied answer.
+ function tentativeCandidate(candidates,players,category=''){
   const first=candidates?.[0],second=candidates?.[1];
-  if(!first?.p||!second)return null;
-  if(first.score<.57||first.score-second.score<.075||(first.visualScore??first.score)<.52)return null;
+  if(!first?.p||!second||!Number.isFinite(first.score)||!Number.isFinite(second.score))return null;
+  const gap=first.score-second.score,visual=first.visualScore??first.score;
   const norm=s=>String(s||'').normalize('NFKC').replace(/\s/g,'');
-  return players.filter(p=>norm(p['名前'])===norm(first.p['名前'])).length===1?first:null;
+  // Same visible name with multiple identities is never safe to auto-select.
+  if(players.filter(p=>norm(p['名前'])===norm(first.p['名前'])).length!==1)return null;
+  const pos=first.p._position||'';
+  const categoryMatches=category==='投手'?pos==='投手'
+    :category==='捕手'?pos==='捕手'
+    :category==='外野手'?pos==='外野手'
+    :category==='內野手'?['一壘手','二壘手','三壘手','游擊手'].includes(pos)
+    :false;
+  // When a game screenshot explicitly says 捕手/投手/內野手/外野手,
+  // a conflicting roster position must remain a candidate.
+  if(category&&!categoryMatches)return null;
+  const original=first.score>=.57&&gap>=.075&&visual>=.52;
+  const screenSupported=categoryMatches&&first.score>=.55&&gap>=.048&&visual>=.50;
+  const obviousFirst=first.score>=.65&&gap>=.035&&visual>=.59;
+  return original||screenSupported||obviousFirst?first:null;
  }
  window.yt3TentativeCandidate=tentativeCandidate;
 
  const batchGroupOf=name=>String(name||'').match(/^(.+?)__/)?.[1]||'單張截圖';
  const output=(r,i)=>({canvas:r.canvas,file:r.file,row:r.row,batchGroup:batchGroupOf(r.file),screenCategory:r.category||'',firstIndex:i,
     parsed:{pos:({投手:'投',捕手:'捕',內野手:'一',外野手:'外'})[r.category]||''},sources:r.sources||[],
-    match:r.match||null,resolved:r.match?null:tentativeCandidate(r.candidates,state.players),candidates:r.candidates||[],score:r.candidates?.[0]?.score||0,
+    match:r.match||null,resolved:r.match?null:tentativeCandidate(r.candidates,state.players,r.category||''),candidates:r.candidates||[],score:r.candidates?.[0]?.score||0,
     raw:r.mode,status:r.match?'確認':'候選'});
  runButton.onclick=async()=>{
   if(!state.batchFiles.length){alert('請先選擇截圖');return}

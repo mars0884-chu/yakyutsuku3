@@ -119,6 +119,8 @@ jobs:
         run: node scripts/smoke-r61.mjs
       - name: Verify r62 batch screenshot group fields and sortable full tables
         run: node scripts/smoke-r62.mjs
+      - name: Verify r63 evidence-based higher confidence without forced confirmation
+        run: node scripts/smoke-r63.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail
