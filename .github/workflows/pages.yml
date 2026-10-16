@@ -121,6 +121,8 @@ jobs:
         run: node scripts/smoke-r62.mjs
       - name: Verify r63 evidence-based higher confidence without forced confirmation
         run: node scripts/smoke-r63.mjs
+      - name: Verify r64 comparison supports 20 with compact scrolling on mobile
+        run: node scripts/smoke-r64.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail

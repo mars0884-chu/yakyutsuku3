@@ -4,7 +4,7 @@ const read=async path=>fs.readFile(new URL('../'+path,import.meta.url),'utf8');
 const [batch,app,version,sw]=await Promise.all(['engine/r18-batch.js','app.js','VERSION','sw.js'].map(read));
 const ok=(condition,msg)=>{if(!condition)throw Error(msg)};
 for(const [name,src] of [['r18-batch.js',batch],['app.js',app],['sw.js',sw]]){try{new Function(src)}catch(e){throw Error(name+': '+e.message)}}
-ok(version.trim()==='2026.10.12-r63'&&app.includes("APP_VERSION='2026.10.12-r63'")&&sw.includes("CACHE='yt3-v20261012-63'"),'Release/cache mismatch');
+const release=Number(version.trim().split('-r').at(-1));ok(release>=63&&app.includes(`APP_VERSION='${version.trim()}'`)&&sw.includes(`CACHE='yt3-v20261012-${release}'`),'R63+ release/cache mismatch');
 ok(batch.includes("tentativeCandidate(r.candidates,state.players,r.category||'')"),'Screenshot header not provided for candidate confidence');
 ok(batch.includes('categoryMatches')&&batch.includes('original||screenSupported||obviousFirst'),'Distinct evidence-based inference paths missing');
 ok(!batch.includes('window.renderBatchGroup=')&&!batch.includes('fetch('),'Do not force columns or invoke cloud recognition');

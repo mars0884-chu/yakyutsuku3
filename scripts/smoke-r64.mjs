@@ -1,0 +1,32 @@
+import fs from 'node:fs/promises';
+import vm from 'node:vm';
+const read=async n=>fs.readFile(new URL('../'+n,import.meta.url),'utf8');
+const [app,html,css,sw,version]=await Promise.all(['app.js','index.html','engine/r64-layout.css','sw.js','VERSION'].map(read));
+const check=(x,message)=>{if(!x)throw Error(message)};
+check(version.trim()==='2026.10.12-r64'&&app.includes("APP_VERSION='2026.10.12-r64'")&&sw.includes("CACHE='yt3-v20261012-64'"),'Release label');
+check(html.indexOf('r64-layout.css')>html.indexOf('r62-layout.css')&&sw.includes('"./engine/r64-layout.css"'),'New layout order or offline cache');
+check(css.includes('width:max-content')&&css.includes('position:sticky')&&css.includes('overflow:auto'),'Compact wide comparison table or scrolling lost');
+check(app.includes('const MAX_COMPARE_PLAYERS=20;')&&app.includes('compareUids.size>=MAX_COMPARE_PLAYERS'),'Need maximum 20 without losing cap');
+check(!app.includes("最多同時比較 4 位")&&!app.includes('${chosen.length}/4'),'Old 4-player cap survives');
+check(app.includes("id=\"comparePrev\"")&&app.includes("id=\"compareNext\"")&&app.includes('scrollLeft=previousLeft'),'Scroll arrows and preserved position required');
+const start=app.indexOf('const MAX_COMPARE_PLAYERS=20;'),end=app.indexOf('function filteredPlayers(){',start);
+check(start>=0&&end>start,'Comparator missing');
+const comparator=app.slice(start,end);
+let rendered=0,alerts=[],scrollEvents=[];
+const fakeScroll={scrollLeft:0,scrollTop:0,scrollBy:args=>scrollEvents.push(args)};
+const elements={
+ '#comparePanel':{innerHTML:'',classList:{add:()=>{},remove:()=>{}},querySelector:sel=>sel==='.compare-scroll'?fakeScroll:{onclick:null},querySelectorAll:()=>[]},
+};
+const players=Array.from({length:21},(_,i)=>({_uid:'u'+i,'名前':'球員'+(i+1),'ランク':i%3?'B':'S','体力':'A'}));
+const context={state:{players},BASE_COLS:['名前','ランク','体力'],HEADER_ZH:{},esc:x=>String(x),$:(s)=>elements[s],renderPlayers:()=>{rendered++;vm.runInContext('renderComparePanel()',context)},alert:message=>alerts.push(message),openPlayer:()=>{}};
+vm.createContext(context);vm.runInContext(comparator,context);
+for(let i=0;i<20;i++)vm.runInContext("toggleCompare('u"+i+"')",context);
+check(elements['#comparePanel'].innerHTML.includes('球員比較（20/20）'),'20 players should display');
+check((elements['#comparePanel'].innerHTML.match(/data-compare-remove=/g)||[]).length===20,'Must render all 20 columns');
+vm.runInContext("toggleCompare('u20')",context);
+check(alerts.length===1&&rendered===20,'21st must not mutate comparison');
+vm.runInContext("toggleCompare('u0')",context);
+vm.runInContext("toggleCompare('u20')",context);
+check(elements['#comparePanel'].innerHTML.includes('球員比較（20/20）')&&!alerts[1],'Remove then add must work');
+check(css.includes('@media(max-width:700px)')&&app.includes('scroller?.scrollBy({left:390'),'Responsive next/previous controls');
+console.log('R64: 20-player comparison, add/remove/full table, scroll arrows, compact non-stretched columns, mobile scroll, no recognition changes.');

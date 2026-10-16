@@ -1,5 +1,5 @@
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const APP_VERSION='2026.10.12-r63';
+const APP_VERSION='2026.10.12-r64';
 const state={players:[],guides:[],book:[],cheats:[],sources:[],page:1,pageSize:80,batchFiles:[],batchRows:[],batchRawRows:[],guideTopic:'all',expectedTotal:0,rosterSource:'',ocrReady:false,paddleReady:false,batchSort:'screen',batchSortDir:'asc',batchShowAll:true,cheatExpandAll:false,playerPages:{'投手':1,'野手':1},playerSorts:{},batchSortGroups:{},sourceArchive:[]};
 const HEADER_ZH={"名前":"姓名","年齢":"年齡","成長":"成長型","投/打":"投／打","出身":"出身地","高校":"高中","大学":"大學","社会人":"社會人","タイプ":"投手類型","ランク":"Rank","体力":"體力","球速":"球速","球威":"球威","制球":"控球","精神":"精神","守備":"守備","捕球":"接球","肩力":"臂力","送球":"傳球","スライダー":"滑球","速スラ":"高速滑球","カットB":"卡特球","カーブ":"曲球","Sカーブ":"S曲球","ドロップ":"Drop曲球","シュート":"噴射球","速シュート":"高速噴射球","シンカー":"伸卡球","スクリュー":"螺旋球","速シンカー":"高速伸卡球","サークルC":"圈指變速","2シーム":"二縫線","Cアップ":"變速球","フォーク":"指叉球","SFF":"快速指叉","縦スラ":"縱滑球","パーム":"掌心球","ナックル":"蝴蝶球","スキル1":"技能1","スキル2":"技能2","スキル3":"技能3","モデル":"原型","右巧":"對右巧打","左巧":"對左巧打","長打":"長打","バント":"短打","選球眼":"選球眼","走力":"跑力","走塁":"跑壘","リード":"配球","捕手":"捕手","一塁":"一壘","二塁":"二壘","三塁":"三壘","遊撃":"游擊","外野":"外野","リーグ":"聯盟／地區","アカデミー":"學院"};
 const BASE_COLS=['名前','ランク','年齢','成長','投/打','出身','高校','大学','社会人','タイプ','体力','球速','球威','制球','精神','守備','捕球','肩力','送球','右巧','左巧','長打','バント','選球眼','走力','走塁','リード','捕手','一塁','二塁','三塁','遊撃','外野','スライダー','速スラ','カットB','カーブ','Sカーブ','ドロップ','シュート','速シュート','シンカー','スクリュー','速シンカー','サークルC','2シーム','Cアップ','フォーク','SFF','縦スラ','パーム','ナックル','スキル1','スキル2','スキル3','モデル'];
@@ -65,11 +65,12 @@ async function loadData(forceRoster=false){
 function switchView(id){$$('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${id}`));$$('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.view===id));if(id==='players')renderPlayers();if(id==='guides')renderGuides();if(id==='cheats')renderCheats()}
 $$('.navbtn').forEach(b=>b.onclick=()=>switchView(b.dataset.view));
 // Player comparison is a local view, independent of screenshot recognition.
+const MAX_COMPARE_PLAYERS=20;
 const compareUids=new Set();
 function toggleCompare(uid){
  if(compareUids.has(uid))compareUids.delete(uid);
  else{
-  if(compareUids.size>=4){alert('最多同時比較 4 位球員。');return}
+  if(compareUids.size>=MAX_COMPARE_PLAYERS){alert(`最多同時比較 ${MAX_COMPARE_PLAYERS} 位球員；可以先移除一位再加入。`);return}
   if(!state.players.some(p=>p._uid===uid))return;
   compareUids.add(uid);
  }
@@ -77,6 +78,8 @@ function toggleCompare(uid){
 }
 function renderComparePanel(){
  const el=$('#comparePanel');if(!el)return;
+ const previousScroll=el.querySelector('.compare-scroll');
+ const previousLeft=previousScroll?.scrollLeft||0,previousTop=previousScroll?.scrollTop||0;
  const chosen=[...compareUids].map(uid=>state.players.find(p=>p._uid===uid)).filter(Boolean);
  if(!chosen.length){el.innerHTML='';el.classList.add('hidden');return}
  el.classList.remove('hidden');
@@ -85,10 +88,14 @@ function renderComparePanel(){
   .filter((k,i,arr)=>arr.indexOf(k)===i&&chosen.some(p=>p[k]!==undefined&&p[k]!==null&&p[k]!==''&&p[k]!=='–'));
  const title=k=>k==='_position'?'守位':k==='_group'?'分類':HEADER_ZH[k]||k;
  const value=(p,k)=>k.startsWith('_')?p[k]:(p[k]??'—');
- el.innerHTML=`<div class="compare-head"><b>球員比較（${chosen.length}/4）</b><button type="button" id="compareClear">清空比較</button></div>
+ el.innerHTML=`<div class="compare-head"><b>球員比較（${chosen.length}/${MAX_COMPARE_PLAYERS}）</b><div class="compare-actions"><button type="button" id="comparePrev" aria-label="向左查看更多球員">←</button><button type="button" id="compareNext" aria-label="向右查看更多球員">→</button><button type="button" id="compareClear">清空比較</button></div></div>
  <div class="compare-scroll" tabindex="0" aria-label="左右滑動查看球員能力比較">
  <table class="compare-table"><thead><tr><th scope="col">能力</th>${chosen.map(p=>`<th scope="col"><button type="button" class="compare-player" data-compare-open="${esc(p._uid)}">${esc(p['名前'])}</button><button type="button" class="compare-remove" data-compare-remove="${esc(p._uid)}" aria-label="移除 ${esc(p['名前'])}">×</button></th>`).join('')}</tr></thead>
  <tbody>${keys.map(k=>`<tr><th scope="row">${esc(title(k))}${HEADER_ZH[k]&&HEADER_ZH[k]!==k?`<small>${esc(k)}</small>`:''}</th>${chosen.map(p=>`<td>${esc(value(p,k)||'—')}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+ const scroller=el.querySelector('.compare-scroll');
+ if(scroller){scroller.scrollLeft=previousLeft;scroller.scrollTop=previousTop}
+ el.querySelector('#comparePrev').onclick=()=>scroller?.scrollBy({left:-390,behavior:'smooth'});
+ el.querySelector('#compareNext').onclick=()=>scroller?.scrollBy({left:390,behavior:'smooth'});
  el.querySelector('#compareClear').onclick=()=>{compareUids.clear();renderPlayers()};
  el.querySelectorAll('[data-compare-remove]').forEach(btn=>btn.onclick=()=>toggleCompare(btn.dataset.compareRemove));
  el.querySelectorAll('[data-compare-open]').forEach(btn=>btn.onclick=()=>openPlayer(btn.dataset.compareOpen));
