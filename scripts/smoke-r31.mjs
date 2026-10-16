@@ -25,8 +25,8 @@ assert(batch.includes('batchArchiveDetails'),'per-ZIP statistics missing');
 assert(batch.includes("row.batchGroup+'|'")&&batch.includes("const confirmedIds=new Set(results.filter(r=>r.match).map(r=>r.batchGroup"),
  'a player occurring in two ZIPs must not lose both confirmations');
 assert(html.includes('id="comparePanel"')&&app.includes('function renderComparePanel()')&&
- app.includes('const compareUids=new Set()')&&app.includes('compareUids.size>=4'),
- 'player comparison with 4-player cap is missing');
+ app.includes('const compareUids=new Set()')&&app.includes('const MAX_COMPARE_PLAYERS=20;')&&app.includes('compareUids.size>=MAX_COMPARE_PLAYERS'),
+ 'player comparison must support up to 20, with explicit cap');
 assert(app.includes('data-compare-add')&&app.includes('drawerCompare'),
  'must support compare from search and player details');
 assert(css.includes('.compare-scroll{overflow:auto')&&css.includes('position:sticky'),
@@ -46,4 +46,4 @@ const set=new Set();for(const ch of chapters){
 }
 const verified=JSON.parse(sources);
 assert(verified.some(x=>x.url.includes('bsn=6035&snA=121')&&x.status.includes('crosschecked')),'Bahamut PS2 article audit missing');
-console.log('r31 smoke passed: ZIP isolation, within-ZIP overlap, duplicates, 4-player comparison, guide and source audit; '+set.size+' unique guide facts');
+console.log('r31 smoke passed: ZIP isolation, within-ZIP overlap, duplicates, 20-player comparison, guide and source audit; '+set.size+' unique guide facts');
