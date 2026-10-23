@@ -3,7 +3,7 @@ import vm from 'node:vm';
 const read=async n=>fs.readFile(new URL('../'+n,import.meta.url),'utf8');
 const [app,html,css,sw,version]=await Promise.all(['app.js','index.html','engine/r64-layout.css','sw.js','VERSION'].map(read));
 const check=(x,message)=>{if(!x)throw Error(message)};
-check(version.trim()==='2026.10.12-r64'&&app.includes("APP_VERSION='2026.10.12-r64'")&&sw.includes("CACHE='yt3-v20261012-64'"),'Release label');
+check(/^2026\.10\.23-r67$/.test(version.trim())&&app.includes("APP_VERSION='2026.10.23-r67'")&&sw.includes("CACHE='yt3-v20261023-67'"),'Release label');
 check(html.indexOf('r64-layout.css')>html.indexOf('r62-layout.css')&&sw.includes('"./engine/r64-layout.css"'),'New layout order or offline cache');
 check(css.includes('width:max-content')&&css.includes('position:sticky')&&css.includes('overflow:auto'),'Compact wide comparison table or scrolling lost');
 check(app.includes('const MAX_COMPARE_PLAYERS=20;')&&app.includes('compareUids.size>=MAX_COMPARE_PLAYERS'),'Need maximum 20 without losing cap');

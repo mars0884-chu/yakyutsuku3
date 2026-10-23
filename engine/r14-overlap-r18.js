@@ -92,8 +92,11 @@ function analyze(inputs,aligned=[]){
   // Ambiguous boundaries are safer left unmerged than silently deleting players.
   const px=choosePixel(a,b),alternatives=choosePixel(a,b,true);
   const runner=px?alternatives.find(q=>q.k!==px.k&&q.avg>=.65):null;
+  // JPEG captures can lower a genuine four-row boundary by a few hundredths
+  // without changing the printed names.  Require a long overlap plus a clear
+  // lead over the next hypothesis before accepting this relaxed branch.
   const decisive=px&&
-    (px.k===1?px.avg>=.925:px.avg>=.805&&px.min>=.75)&&
+    (px.k===1?px.avg>=.925:px.k>=4?px.avg>=.77&&px.min>=.72:px.avg>=.805&&px.min>=.75)&&
     (!runner||px.avg-runner.avg>=.055||px.avg>=.94);
   const safePixel=decisive?px:null;
   const fallback=oldPair(a,b);

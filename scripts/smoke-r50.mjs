@@ -29,5 +29,5 @@ const version=(await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).
 const app=await fs.readFile(new URL('../app.js',import.meta.url),'utf8');
 const sw=await fs.readFile(new URL('../sw.js',import.meta.url),'utf8');
 const release=Number(version.split('-r').at(-1));
-ok(/^2026\.10\.12-r\d+$/.test(version)&&release>=50&&app.includes(`APP_VERSION='${version}'`)&&sw.includes(`CACHE='yt3-v20261012-${release}'`),'PWA version/cache mismatch');
+ok(/^2026\.10\.\d+-r\d+$/.test(version)&&release>=50&&app.includes(`APP_VERSION='${version}'`)&&sw.includes(`CACHE='yt3-v20261023-${release}'`),'PWA version/cache mismatch');
 console.log('R50: '+sources.length+' unique sources, 15 new dated bilingual case rows, '+seen.size+' unique guide rows');

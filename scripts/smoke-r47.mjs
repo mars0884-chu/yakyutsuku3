@@ -13,5 +13,5 @@ ok(home.source===url&&strategy.source===url,'Wrong provenance URL');
 ok(strategy.rows[1][1].includes('可能')&&strategy.rows[1][1].includes('沒有受控實驗'),'No player hypothesis caution');
 const unique=new Set();for(const c of book){ok(c.count===c.sections.reduce((n,s)=>n+(s.rows?.length||0)+(s.items?.length||0),0),'Bad count '+c.id);for(const s of c.sections)for(const row of s.rows||[]){const k=JSON.stringify(row.map(v=>String(v).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!unique.has(k),'Duplicate guide table row '+k.slice(0,70));unique.add(k)}}
 ok(status.bahamut_external_20261012_r47?.new_guide_rows===3,'Missing source research audit');
-ok(/^2026\.10\.12-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=47,'Expected r47 or newer');
+ok(/^2026\.10\.\d+-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=47,'Expected r47 or newer');
 console.log('R47: 3 sourced FAQ items, 31 chapters, '+unique.size+' unique guide rows, '+sources.length+' indexed sources');

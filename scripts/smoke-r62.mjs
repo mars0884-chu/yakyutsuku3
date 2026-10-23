@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';import vm from 'node:vm';const rd=p=>fs.readFile(new URL('../'+p,import.meta.url),'utf8');
 const [app,engine,sort,html,sw,css,version,guide,sourceBook]=await Promise.all(['app.js','engine/r18-batch.js','engine/table-sort.js','index.html','sw.js','engine/r62-layout.css','VERSION','engine/guide-reading.js','data/guide-book.json'].map(rd));
 const ok=(v,m)=>{if(!v)throw Error(m)};
-const rel=Number(version.trim().split('-r').at(-1));ok(rel>=62&&app.includes(`APP_VERSION='${version.trim()}'`)&&sw.includes(`CACHE='yt3-v20261012-${rel}'`),'R62+ version mismatch');
+const rel=Number(version.trim().split('-r').at(-1));ok(rel>=62&&app.includes(`APP_VERSION='${version.trim()}'`)&&sw.includes(`CACHE='yt3-v20261023-${rel}'`),'R62+ version mismatch');
 ok(html.indexOf('engine/table-sort.js')<html.indexOf('app.js')&&html.includes('engine/r62-layout.css')&&sw.includes('"./engine/table-sort.js"'),'Sort script/CSS missing');
 ok(!engine.includes('window.renderBatchGroup=')&&engine.includes("screenCategory:r.category||''"),'Old forced-7-column override or missing screenshot category');
 ok(app.includes("BATCH_SCREEN_GROUPS=['投手','捕手','內野手','外野手','待確認守位']")&&app.includes("state.batchShowAll?(key==='投手'?BATCH_PITCH:BATCH_BAT):BATCH_SUMMARY_COLS"),'Screenshot groups and full ability columns');

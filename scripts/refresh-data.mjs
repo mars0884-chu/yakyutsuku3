@@ -1,7 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 import * as cheerio from 'cheerio';
-const ROOT=path.resolve(new URL('..',import.meta.url).pathname);
+const ROOT=path.resolve(fileURLToPath(new URL('..',import.meta.url)));
 const OUT=path.join(ROOT,'data');
 const sources=[
 ['rookie-pitcher1','國內新人','投手',479],['rookie-pitcher2','國內新人','投手',425],['rookie-catcher','國內新人','捕手',198],['rookie-first','國內新人','一壘手',200],['rookie-second','國內新人','二壘手',205],['rookie-third','國內新人','三壘手',196],['rookie-shortstop','國內新人','游擊手',200],['rookie-outfielder','國內新人','外野手',498],['foreign-pitcher','外國人','投手',416],['foreign-catcher','外國人','捕手',142],['foreign-first','外國人','一壘手',137],['foreign-second','外國人','二壘手',143],['foreign-third','外國人','三壘手',147],['foreign-shortstop','外國人','游擊手',138],['foreign-outfielder','外國人','外野手',243]

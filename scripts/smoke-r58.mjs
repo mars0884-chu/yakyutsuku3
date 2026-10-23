@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 const read=async p=>fs.readFile(new URL('../'+p,import.meta.url),'utf8');
 const [app,html,sw,version,css,book,cheats]=await Promise.all(['app.js','index.html','sw.js','VERSION','engine/r58-layout.css','data/guide-book.json','data/cheats.json'].map(read));
 const ok=(v,m)=>{if(!v)throw Error(m)};
-const release=Number(version.trim().split('-r').at(-1));ok(release>=58&&app.includes(`APP_VERSION='${version.trim()}'`)&&sw.includes(`CACHE='yt3-v20261012-${release}'`),'R58+ release consistency');
+const release=Number(version.trim().split('-r').at(-1));ok(release>=58&&app.includes(`APP_VERSION='${version.trim()}'`)&&sw.includes(`CACHE='yt3-v20261023-${release}'`),'R58+ release consistency');
 ok(html.includes('engine/r58-layout.css')&&html.includes('id="toggleBatchColumns"')&&html.includes('id="toggleCheatAll"'),'R58 UI controls');
 ok(css.includes('max-width:100%')&&css.includes('table-layout:fixed')&&css.includes('.cheat-index'),'Compact table and cheat CSS');
 ok(app.includes("BATCH_SUMMARY_COLS=['_screen','_status','名前','ランク','年齢','_position','投/打']")&&app.includes('state.batchShowAll?')&&app.includes('batchShowAll:true'),'Batch summary optional and full detail default');

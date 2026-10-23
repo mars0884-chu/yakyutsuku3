@@ -27,5 +27,5 @@ const seen=new Set();for(const c of book){
 }
 const [version,app,sw]=await Promise.all(['VERSION','app.js','sw.js'].map(n=>fs.readFile(new URL('../'+n,import.meta.url),'utf8')));
 const ver=version.trim(),n=Number(ver.split('-r').at(-1));
-ok(/^2026\.10\.12-r\d+$/.test(ver)&&n>=51&&app.includes(`APP_VERSION='${ver}'`)&&sw.includes(`CACHE='yt3-v20261012-${n}'`),'PWA r51 or later mismatch');
+ok(/^2026\.10\.\d+-r\d+$/.test(ver)&&n>=51&&app.includes(`APP_VERSION='${ver}'`)&&sw.includes(`CACHE='yt3-v20261023-${n}'`),'PWA r51 or later mismatch');
 console.log('R51 verified: '+sources.length+' unique sources, 31 chapters, '+seen.size+' unique table rows, 14 player/model additions.');

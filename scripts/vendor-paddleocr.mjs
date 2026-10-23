@@ -1,11 +1,12 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
 import { build } from 'esbuild';
 
 const require=createRequire(import.meta.url);
-const ROOT=path.resolve(new URL('..',import.meta.url).pathname);
+const ROOT=path.resolve(fileURLToPath(new URL('..',import.meta.url)));
 const OUT=path.join(ROOT,'vendor','paddleocr');
 const MODELS=path.join(OUT,'models');
 const ORT=path.join(OUT,'ort');

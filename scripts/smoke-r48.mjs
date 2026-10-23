@@ -11,5 +11,5 @@ const row=ch.sections.find(s=>s.title.startsWith('Trade／HomeTown')).rows.find(
 ok(row[3].includes('存檔資料損毀')&&row[3].includes('#765')&&row[3].includes('玩家個案'),'Missing concrete save-corruption warning');
 let seen=new Set();for(const c of book){ok(c.count===c.sections.reduce((n,s)=>n+(s.rows?.length||0)+(s.items?.length||0),0),'Bad chapter '+c.id);for(const sec of c.sections)for(const row of sec.rows||[]){const key=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(key),'Duplicate guide row '+key.slice(0,70));seen.add(key)}}
 ok(status.bahamut_external_20261012_r48?.existing_code_warning_strengthened===1,'Research audit missing');
-ok(/^2026\.10\.12-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=48,'Expected r48 or newer');
+ok(/^2026\.10\.\d+-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=48,'Expected r48 or newer');
 console.log('R48: 1 new historical city timing FAQ, 1 stronger trade code warning, '+seen.size+' unique table rows');

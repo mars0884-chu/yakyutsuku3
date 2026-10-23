@@ -24,5 +24,5 @@ ok(c('bugs').sections.find(x=>x.title.startsWith('2009 第51年串：'))?.rows.l
 ok(JSON.stringify(c('cheats_20261005'))===JSON.stringify(cheats[0]),'Cheat mirror unexpectedly drifted');
 const seen=new Set();for(const ch of book){ok(ch.count===ch.sections.reduce((n,s)=>n+(s.items?.length||0)+(s.rows?.length||0),0),'Bad count '+ch.id);for(const s of ch.sections)for(const row of s.rows||[]){let k=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Duplicate exact row '+k.slice(0,70));seen.add(k)}}
 ok(status.bahamut_external_20261011_r44?.source_total===95,'Research audit missing');
-ok(/^2026\.10\.(11|12)-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=44,'Expected r44 or newer');
+ok(/^2026\.10\.\d+-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=44,'Expected r44 or newer');
 console.log('R44 verified: 95 URLs; year52 full 991 posts reachable; year50/51 source status qualified; '+seen.size+' table rows unique');

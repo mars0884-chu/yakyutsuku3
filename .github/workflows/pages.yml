@@ -123,6 +123,8 @@ jobs:
         run: node scripts/smoke-r63.mjs
       - name: Verify r64 comparison supports 20 with compact scrolling on mobile
         run: node scripts/smoke-r64.mjs
+      - name: Verify r67 local recognition safeguards and screenshot evidence fix
+        run: node scripts/smoke-r67.mjs
       - name: Build complete 3,767-player roster
         run: npm run refresh
       - name: Vendor game cover thumbnail

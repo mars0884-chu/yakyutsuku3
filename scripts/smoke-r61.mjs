@@ -3,7 +3,7 @@ import vm from 'node:vm';
 const read=async p=>fs.readFile(new URL('../'+p,import.meta.url),'utf8');
 const [app,html,sw,version,bookJs,raw,css]=await Promise.all(['app.js','index.html','sw.js','VERSION','engine/guide-reading.js','data/guide-book.json','engine/r61-layout.css'].map(read));
 const ok=(x,msg)=>{if(!x)throw Error(msg)};
-const v=Number(version.trim().split('-r').at(-1));ok(v>=61&&app.includes(`APP_VERSION='${version.trim()}'`)&&sw.includes(`CACHE='yt3-v20261012-${v}'`),'Release');
+const v=Number(version.trim().split('-r').at(-1));ok(v>=61&&app.includes(`APP_VERSION='${version.trim()}'`)&&sw.includes(`CACHE='yt3-v20261023-${v}'`),'Release');
 ok(html.indexOf('engine/guide-reading.js')<html.indexOf('<script src="./app.js"')&&html.includes('id="playerResults"')&&html.includes('id="sourceResearch"'),'HTML reading/players/source');
 const scope={window:{}};vm.runInNewContext(bookJs,scope,{timeout:1500});
 const original=JSON.parse(raw),out=scope.window.YT3_GuideReading.compile(original),all=original.filter(c=>c.id!=='cheats_20261005').reduce((sum,c)=>sum+c.sections.length,0);

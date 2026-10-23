@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 const read=async path=>fs.readFile(new URL('../'+path,import.meta.url),'utf8');
 const [app,html,css,version,sw]=await Promise.all(['app.js','index.html','engine/r58-layout.css','VERSION','sw.js'].map(read));
 const ok=(a,b)=>{if(!a)throw Error(b)};
-const n=Number(version.trim().split('-r').at(-1));ok(n>=59&&app.includes(`APP_VERSION='${version.trim()}'`)&&sw.includes(`CACHE='yt3-v20261012-${n}'`),'R59+ release');
+const n=Number(version.trim().split('-r').at(-1));ok(n>=59&&app.includes(`APP_VERSION='${version.trim()}'`)&&sw.includes(`CACHE='yt3-v20261023-${n}'`),'R59+ release');
 ok(html.includes('id="rosterLoad"')&&html.includes('id="rosterLoadProgress"')&&html.includes('engine/r58-layout.css'),'First-run progress in DOM');
 ok(app.includes("onProgress(0,0)")&&app.includes("onProgress(100,received)")&&app.includes('progress.value=percent')&&app.includes("$('#rosterLoad')?.classList.add('hidden')"),'Visible progress and cleanup missing');
 ok(css.includes('.roster-loading progress')&&css.includes('.cheat-section[open]'),'Progress and expanded fullwidth cheat sections');

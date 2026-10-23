@@ -1,11 +1,24 @@
 /* Safari / Chrome / Edge independent recognition. AI-free deterministic 16x16 glyph matching,
-   Claude header alignment, no Tesseract, no PaddleOCR, no roster-total clipping. */
+   Claude header alignment, no Tesseract or PaddleOCR; page totals are local CV evidence only. */
+window.YT3_LOW_CONFIDENCE=0.5;
+window.yt3IsUnrecognized=row=>!!row&&!row.match&&((row.candidates?.[0]?.score??row.score??0)<window.YT3_LOW_CONFIDENCE);
 (function(){'use strict';
  const byId=id=>document.getElementById(id),runButton=byId('runBatch');if(!runButton)return;
  // The active application owns all result columns; do not force a summary over full tables.
  // Use a task yield instead of RAF: Safari can pause requestAnimationFrame when the bookmark is backgrounded.
  const frame=()=>new Promise(resolve=>setTimeout(resolve,0));
  const update=(num,message)=>{byId('batchStatus').textContent=`${message}｜${Math.min(100,Math.round(num))}%`};
+ const detectRosterTotal=images=>{
+  if(typeof footerTotalCrop!=='function'||typeof cvFooterTotal!=='function')return 0;
+  const values=[];for(const item of images){try{const crop=footerTotalCrop(item.image,item.name),n=cvFooterTotal(crop.canvas);if(Number.isInteger(n)&&n>=20&&n<=200)values.push(n)}catch{}}
+  if(!values.length)return 0;const freq=new Map();for(const n of values)freq.set(n,(freq.get(n)||0)+1);
+  return [...freq.entries()].sort((a,b)=>b[1]-a[1]||b[0]-a[0])[0][0];
+ };
+ const capToRosterTotal=(rows,total)=>{
+  if(!(total>=20&&total<=200)||rows.length<=total)return rows;
+  // Keep the strongest evidence first; preserve screen order after clipping.
+  return rows.slice().sort((a,b)=>((b.match?3:b.resolved?2:1)-(a.match?3:a.resolved?2:1))||((b.score||0)-(a.score||0))||((a.firstIndex??9999)-(b.firstIndex??9999))).slice(0,total).sort((a,b)=>(a.firstIndex??9999)-(b.firstIndex??9999));
+ };
  const rowCanvas=(img,n,dy)=>{const c=document.createElement('canvas');c.width=280;c.height=16;const y=Math.round(41+15.9*(n-1))-1+dy;c.getContext('2d',{willReadFrequently:true}).drawImage(img,0,y,280,16,0,0,280,16);return c};
   // Cross-check the same printed name through independent vertical row crops.
  // This is deterministic pixel evidence; no learned answer list, APIs, or confidence relaxation.
@@ -151,12 +164,13 @@
     update(3+10*(i+1)/state.batchFiles.length,'分析遊戲表頭 '+(i+1)+' / '+state.batchFiles.length);
     await frame();
    }
+   state.expectedTotal=detectRosterTotal(images);
    update(14,'以實際影像比對跨頁重複');const grouped=yt3OfflineOverlapsV14(images,aligned);
    const selected=grouped.groups.map(g=>{
      const chosen=g.copies.reduce((a,b)=>{const sa=(aligned[a.imageIndex]?.valid&&aligned[a.imageIndex]?.loc?.score>=.65?1000000000:0)+a.canvas.width*a.canvas.height;const sb=(aligned[b.imageIndex]?.valid&&aligned[b.imageIndex]?.loc?.score>=.65?1000000000:0)+b.canvas.width*b.canvas.height;return sb>sa?b:a});
      return {chosen,copies:g.copies,category:chosen.screenCategory||''};
    });
-   const results=[];
+   let results=[];
    for(let i=0;i<selected.length;i++){
     const s=selected[i],copy=s.chosen,info=aligned[copy.imageIndex],number=copy.originalRow;
     let item=null;
@@ -207,6 +221,13 @@
        {canvas:copy.canvas,m:flatOriginal,score:flatOriginal.candidates?.[0]?.score??-9},
        state.players);
     }
+    // r65/r66：半形英文與混合姓名只在既有流程未確認時介入，仍以本機字形證據與守位限制為準。
+    if(!item.m?.match&&window.yt3HalfWidthLatin){
+      try{await window.yt3HalfWidthLatin.init();
+        const hw=window.yt3HalfWidthLatin.match(item.canvas,state.players,s.category);
+        if(hw?.best)item={canvas:item.canvas,score:hw.best.score,m:{...item.m,candidates:[hw.best,...hw.candidates.slice(1)],match:hw.best,margin:hw.margin,method:'半形／混合字形比對'}};
+      }catch(e){console.error(e)}
+    }
     const m=item.m;
     results.push(output({canvas:item.canvas,file:copy.file,row:number,category:s.category,
       candidates:m.candidates,match:m.match,mode:info?.valid?'本機全名冊 16×16 字形比對':'本機全名冊 16×16 原始列備援',
@@ -214,6 +235,8 @@
     update(15+80*(i+1)/Math.max(1,selected.length),'非 AI 姓名比對 '+(i+1)+' / '+selected.length);
     if(i%2===1)await frame();
    }
+   for(const row of results){row.unrecognized=window.yt3IsUnrecognized(row);if(row.unrecognized)row.resolved=null}
+   results=capToRosterTotal(results,state.expectedTotal);
    // Two unrelated row groups cannot both be confirmed as the exact same player.
    // A player can legitimately appear in different ZIP/season rosters. Only
    // duplicated names inside the SAME capture sequence require collision review.
@@ -227,7 +250,7 @@
    }
    const confirmedIds=new Set(results.filter(r=>r.match).map(r=>r.batchGroup+'|'+r.match.p?._uid));
    for(const row of results)if(row.resolved&&confirmedIds.has(row.batchGroup+'|'+row.resolved.p?._uid))row.resolved=null;
-   state.batchRawRows=results;state.batchRows=results;state.expectedTotal=0;renderBatchResults();
+   state.batchRawRows=results;state.batchRows=results;renderBatchResults();
    const confirmed=results.filter(r=>r.match).length;
    const actualRows=results.length;
    const inferred=results.filter(r=>!r.match&&r.resolved).length;
@@ -258,7 +281,7 @@
 
    const failed=aligned.filter(x=>!x.valid||x.loc.score<.65).length;
    const overlapCount=grouped.overlaps.reduce((n,e)=>n+e.k,0);
-   update(100,`完成：${grouped.rawRows} 有姓名原始列 → ${results.length} 個不同列位（跨頁去重 ${overlapCount}）；確認 ${confirmed}、推定 ${inferred}、候選 ${results.length-confirmed-inferred}；來源群組 ${grouped.sequenceGroups?.length||1}${failed?'；'+failed+' 張表頭改用備援':''}｜各來源獨立去重・全程本機、無 AI`);
+   update(100,`完成：${grouped.rawRows} 有姓名原始列 → ${results.length} 個不同列位（跨頁去重 ${overlapCount}）${state.expectedTotal?`；畫面合計上限 ${state.expectedTotal}`:''}；確認 ${confirmed}、推定 ${inferred}、候選 ${results.length-confirmed-inferred-results.filter(r=>r.unrecognized).length}、未辨識 ${results.filter(r=>r.unrecognized).length}；來源群組 ${grouped.sequenceGroups?.length||1}${failed?'；'+failed+' 張表頭改用備援':''}｜各來源獨立去重・全程本機、無 AI`);
   }catch(error){console.error(error);byId('batchStatus').textContent='辨識未完成：'+String(error?.message||error)}
   finally{runButton.disabled=false}
  };

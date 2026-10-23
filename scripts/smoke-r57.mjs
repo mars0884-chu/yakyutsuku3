@@ -15,5 +15,5 @@ check(section.rows.find(row=>row[0]==='エース伝承')?.[3].includes('球速 B
 check(section.note.includes('不是球員一定能達到')&&section.note.includes('教練技能與球員持有技能'),'Coach effects and player skills wrongly conflated');
 check(skill.count===skill.sections.reduce((n,s)=>n+(s.rows?.length||0)+(s.items?.length||0),0),'Chapter count drift');
 const keys=new Set();for(const ch of book)for(const se of ch.sections)for(const row of se.rows||[]){const k=JSON.stringify(row.map(v=>String(v).normalize('NFKC').replace(/\s+/g,' ').trim()));check(!keys.has(k),'Duplicate '+k.slice(0,70));keys.add(k)}
-const num=Number(version.trim().split('-r').at(-1));check(num>=57&&app.includes(`APP_VERSION='${version.trim()}'`)&&sw.includes(`CACHE='yt3-v20261012-${num}'`),'PWA version drift');
+const num=Number(version.trim().split('-r').at(-1));check(num>=57&&app.includes(`APP_VERSION='${version.trim()}'`)&&sw.includes(`CACHE='yt3-v20261023-${num}'`),'PWA version drift');
 console.log('R57: 17 discoverable coach skills, 28 previously published coach choices, no inflated source count.');

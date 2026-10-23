@@ -12,5 +12,5 @@ ok(section.rows.every(r=>r[2].includes('三代')||r[2].includes('本專案')),'R
 ok(skills.count===skills.sections.reduce((t,s)=>t+(s.rows?.length||0)+(s.items?.length||0),0),'Guide count');
 const rows=new Set();for(const ch of book)for(const se of ch.sections)for(const row of se.rows||[]){const k=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!rows.has(k),'Duplicate '+k.slice(0,60));rows.add(k)}
 ok(audit.bahamut_external_20261012_r56?.source_after===122,'R56 audit');
-const release=Number(v.trim().split('-r').at(-1));ok(release>=56&&a.includes(`APP_VERSION='${v.trim()}'`)&&w.includes(`CACHE='yt3-v20261012-${release}'`),'PWA cache/version mismatch');
+const release=Number(v.trim().split('-r').at(-1));ok(release>=56&&a.includes(`APP_VERSION='${v.trim()}'`)&&w.includes(`CACHE='yt3-v20261023-${release}'`),'PWA cache/version mismatch');
 console.log('R56: '+src.length+' distinct tracked sources, 6 PS2-third-game player skill crosschecks, '+rows.size+' unique rows');

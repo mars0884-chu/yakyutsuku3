@@ -19,5 +19,5 @@ ok(med.rows.some(x=>x[0].includes('１人ローテ')&&x[1].includes('3名先發'
 const seen=new Set();
 for(const c of book){ok(c.count===c.sections.reduce((n,s)=>n+(s.items?.length||0)+(s.rows?.length||0),0),'Wrong count '+c.id);for(const s of c.sections)for(const row of s.rows||[]){let k=JSON.stringify(row.map(v=>String(v).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Exact duplicate '+k.slice(0,80));seen.add(k)}}
 ok(status.bahamut_external_20261011_r43?.total_sources===93,'R43 provenance missing');
-ok(/^2026\.10\.(11|12)-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=43,'Expected r43 or newer');
+ok(/^2026\.10\.\d+-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=43,'Expected r43 or newer');
 console.log('R43: 93 source URLs, 8 sourced one-year rankings, 4 historical facility warnings, '+seen.size+' unique table rows');

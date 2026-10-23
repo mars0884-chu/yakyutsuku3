@@ -1,7 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 import sharp from 'sharp';
-const ROOT=path.resolve(new URL('..',import.meta.url).pathname);
+const ROOT=path.resolve(fileURLToPath(new URL('..',import.meta.url)));
 const ASSETS=path.join(ROOT,'assets');
 await fs.mkdir(ASSETS,{recursive:true});
 const url='https://www.gavas.jp/upload/save_image/12595.jpg';

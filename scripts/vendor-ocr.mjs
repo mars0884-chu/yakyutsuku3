@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-const ROOT=path.resolve(new URL('..',import.meta.url).pathname);
+import {fileURLToPath} from 'node:url';
+const ROOT=path.resolve(fileURLToPath(new URL('..',import.meta.url)));
 async function save(url,dst){await fs.mkdir(path.dirname(dst),{recursive:true});for(let n=0;n<4;n++){try{const r=await fetch(url);if(!r.ok)throw new Error(`${r.status} ${url}`);const b=Buffer.from(await r.arrayBuffer());await fs.writeFile(dst,b);console.log(path.relative(ROOT,dst),b.length);return}catch(e){if(n===3)throw e;await new Promise(r=>setTimeout(r,1000*(n+1)))}}}
 const jobs=[
 ['https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js','vendor/tesseract/tesseract.min.js'],

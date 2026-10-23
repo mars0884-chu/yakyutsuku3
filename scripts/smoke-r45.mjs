@@ -13,5 +13,5 @@ ok(sec.rows[1][2].includes('巨人')&&sec.rows[1][2].includes('撤回'),'Uncorre
 ok(sec.rows[4][1].includes('森野')&&sec.rows[5][1].includes('川村'),'Positions missing');
 const set=new Set();for(const ch of book){ok(ch.count===ch.sections.reduce((n,s)=>n+(s.items?.length||0)+(s.rows?.length||0),0),'Count invalid '+ch.id);for(const s of ch.sections)for(const row of s.rows||[]){const k=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!set.has(k),'Duplicate guide row '+k.slice(0,60));set.add(k)}}
 ok(status.bahamut_external_20261012_r45?.new_yearmode_rows===6,'Source audit missing');
-ok(/^2026\.10\.12-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=45,'Expected r45 or newer');
+ok(/^2026\.10\.\d+-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=45,'Expected r45 or newer');
 console.log('R45 OK: one-year mode 6 rows, corrected giants rumor, '+sources.length+' source URLs, '+set.size+' unique guide rows');

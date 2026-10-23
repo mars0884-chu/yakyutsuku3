@@ -18,5 +18,5 @@ ok(pitch.sections.find(x=>x.title.startsWith('2012 逐球樣本告訴'))?.rows.l
 const seen=new Set();
 for(const c of book){ok(c.count===c.sections.reduce((n,x)=>n+(x.items?.length||0)+(x.rows?.length||0),0),'Bad count '+c.id);for(const s of c.sections)for(const row of s.rows||[]){let k=JSON.stringify(row.map(x=>String(x).normalize('NFKC').replace(/\s+/g,' ').trim()));ok(!seen.has(k),'Duplicate table row '+k.slice(0,70));seen.add(k)}}
 ok(rs.bahamut_external_20261011_r42?.new_original_pitch_case_rows===3,'Source audit missing');
-ok(/^2026\.10\.(11|12)-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=42,'Expected r42 or newer');
+ok(/^2026\.10\.\d+-r\d+$/.test((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim())&&Number((await fs.readFile(new URL('../VERSION',import.meta.url),'utf8')).trim().split('-r').at(-1))>=42,'Expected r42 or newer');
 console.log('R42 pass: 92 sources, 3 original PS2 play-by-play pitch samples with source correction; '+seen.size+' unique table rows');
