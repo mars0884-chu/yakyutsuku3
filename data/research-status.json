@@ -1,0 +1,634 @@
+{
+  "checked_at": "2026-10-12",
+  "scope": "公開、可檢索、目前可讀取的 Web 資料",
+  "result": "本輪以 Gamezukushi 的「プロ野球チームをつくろう！3」分類為主來源做逐篇盤點。分類核心共整理為24篇：15篇完整名冊頁與9篇系統攻略頁。9篇系統攻略已逐頁交叉檢查，新增的精確條件已回填到既有攻略章，而非另做散亂索引；15篇名冊頁維持選手資料來源角色。站內相關連結再追後未出現此分類之外、但會改變核心攻略架構的新系統頁；另行的「やきゅつく3 プレイ日記」屬不同分類，仍作長期實玩旁證，不混作本分類核心攻略頁。",
+  "core_sources": [
+    "gamezukushi.com",
+    "wiki.yakyutsuku.game-syo.com",
+    "sheepplus.com",
+    "ikasumi.org",
+    "gamezukinahito.blog.fc2.com",
+    "hiscode.blog56.fc2.com",
+    "wazap.com",
+    "5ch/kako archives",
+    "crazyboys00.wordpress.com",
+    "forum.gamer.com.tw",
+    "ameblo.jp/skillove"
+  ],
+  "secondary_sources": [
+    "re-owls.com",
+    "codevis.nobody.jp",
+    "yuru-non-act2.blog.jp",
+    "ameblo.jp",
+    "notitle.moo.jp",
+    "KADOKAWA official guide catalog",
+    "Vector historical utility listing",
+    "mixi.jp",
+    "w.atwiki.jp/untsuku3"
+  ],
+  "boundary": "Gamezukushi /category/yakyutsuku3 這個分類本身目前已可視為逐篇盤點完成；但網站其他分類的長期實玩文章、未索引頁、日後新增文章仍可能提供新旁證，不能說整個網站未來永遠不會再有新資料。",
+  "gamezukushi_yakyutsuku3_category": {
+    "url": "https://gamezukushi.com/category/yakyutsuku3",
+    "status": "24篇核心文章已逐類盤點；15篇名冊＋9篇系統攻略。系統攻略已逐頁比對並把新增規則回填各攻略章。",
+    "roster_pages": [
+      "国内新人選手一覧 投手 あ行～さ行",
+      "国内新人選手一覧 投手 た行～わ行",
+      "国内新人選手一覧 捕手",
+      "国内新人選手一覧 一塁手",
+      "国内新人選手一覧 二塁手",
+      "国内新人選手一覧 三塁手",
+      "国内新人選手一覧 遊撃手",
+      "国内新人選手一覧 外野手",
+      "外国人選手一覧 投手",
+      "外国人選手一覧 捕手",
+      "外国人選手一覧 一塁手",
+      "外国人選手一覧 二塁手",
+      "外国人選手一覧 三塁手",
+      "外国人選手一覧 遊撃手",
+      "外国人選手一覧 外野手"
+    ],
+    "guide_pages": [
+      "キャンプ",
+      "チームカラー",
+      "国内新人・外国人選手の獲得について",
+      "投手の変化球について",
+      "アイデアメモと行事一覧",
+      "経営企画",
+      "つくろう選手について",
+      "ホームタウン",
+      "留学"
+    ],
+    "newly_integrated": [
+      "経営企画：特殊組合せ／一般企画門檻／費用／季節／前置／持續週數／一次性／隱藏滿足度與清潔度",
+      "新人・外国人：簽約時點、CPU搶人時點、Rank與爆發次數、衰退公式、交涉規則",
+      "留学：北美Pipeline精確加減值與Grand/Goddess解鎖條件",
+      "Camp：特殊訓練亂數、新球種初始與上限、Switch與轉守位",
+      "Team Color：四屬性經驗與相反屬性機制",
+      "つくろう選手：22歲固定與三段年數能力基準",
+      "変化球：同方向／反方向／縱向的控制實驗結論",
+      "HomeTown：抱怨3個月、Object設置／吸收／合併與限定企劃"
+    ]
+  },
+  "external_recheck_20261007": {
+    "result": "追加以 HomeTown、海外選手権、自主トレ、ネーミングライツ、球団友好度、レギュレーション、留学、爆発、トレード、Bug 等主題反查後，公開搜尋結果再次集中回到既有核心來源：Sheep、Ikasumi、GAME攻略書庫、Gamezukushi、5ch/2ch歷史串。未發現會改變現有攻略架構的新核心站。",
+    "confirmed_gaps": [
+      "GAME攻略書庫可確認海外選手権、ネーミングライツ契約、自主トレ効果、ショップリスト等頁曾存在，但部分精確表目前僅索引可見，正文未可靠恢復。",
+      "失效舊站、未索引頁、登入限定與私人備份仍不能視為不存在。"
+    ]
+  },
+  "bahamut_recheck_20261009": {
+    "result": "既有 PS2 三代部分全文已整理入攻略，但未挖乾淨，本輪新增來源主要為索引線索。",
+    "integrated_before": "2005 OB、2006 金手指、初期經營及部分 PCSX2 討論分章收錄於 guide-book。",
+    "indexed_only": [
+      "3代球員的技藝（snA=140）：搜尋摘要證實三種觸發類型，條件與效果正文目前 403。",
+      "模擬職棒3 金手指3（精華 sn=29）：2006-12-28 標題可查；正文 403，碼值未核實。",
+      "要命的薪水勒索（snA=130）：多年約／高額索薪玩家個案，正文 403，不能推算公式。",
+      "相關網站（parent=7）：企劃案／攻略網站 1～3 歷史線索，外部 URL 未核實。",
+      "SEGA太郎怎們養才會強阿（snA=65）：可確認 PS2 討論串及標題，細節目前 403，育成條件未核實。"
+    ],
+    "limits": "混有 DC、NDS、2003 等別代內容；403、未索引、登入限制不等於不存在。",
+    "newly_readable_fulltext": "2018-09-09 PS2 三代玩家長文 snA=214 內容含投手實戰樣本；原有改名原型已收，本次補 14 位能力／球種摘要；明確屬玩家紀錄，不視為各年齡固定數值。",
+    "additional_verified": "2018 PS2 三代長文 snA=214 可讀到尚未確定初期值的先發、中繼、救援推薦候選；已依類型整合入 OB／架空章，與 14 位有能力紀錄者分開，不杜撰 Rank／數值。",
+    "dedup_20261009": {
+      "planning_table_overlap_removed": 75,
+      "exact_row_duplicates_removed": 31,
+      "alias_sections_merged": 2,
+      "alias_unique_names": 18,
+      "chapter_counts_recomputed": true
+    },
+    "excluded_cross_generation": [
+      "NDS版 2008/2009 年的自創選手、養成與隱玉卡規則，不套用 PS2 やきゅつく3。",
+      "名稱含模擬職棒3但上下文含 2003 年版者列為待版本複核，不直接當作 PS2 三代公式。"
+    ]
+  },
+  "bahamut_20261010": {
+    "status": "新找到 2005–2007 年 PS2 文章的標題與部分索引；正文受限，不把搜尋摘要編成玩法公式。",
+    "indexed_only": [
+      "遊戲初期節省薪資的辦法（snA=53，2005-08）",
+      "發現鈴木一郎和 B．邦茲！！（snA=57）",
+      "發現一個可靠消息！（snA=145，2007-05）",
+      "我終於在第六年拿到冠軍了（snA=82）"
+    ],
+    "excluded_cross_version": "交換球員的成功率（snA=11，2003-12）早於 PS2 三代，不能直接引用為三代成功率公式；NDS 二代討論同樣不得混入。",
+    "dedup_semantic": {
+      "planning_rules_merged": 8,
+      "trading_sections_merged": 1,
+      "skills_repeated_direction_removed": 1
+    },
+    "fulltext_new": "本輪未取得上列 2005–2007 文章正文，不稱新增完整攻略；上一輪 2018 PS2 可讀長文已整理入 models 章。"
+  },
+  "bahamut_20261010_recheck": {
+    "fulltext": "巴哈 snA=214（2018／PS2）原文全文再次核對：補收未列出的 20 位投手玩家樣本，與既有14筆整合。Wazap 2005 改名原型和巴哈 2018 交叉整理，移除兩個表互相重複的別名。",
+    "data_merged": {
+      "new_pitcher_notes": 20,
+      "new_from_wazap": 19,
+      "new_from_2018": 17,
+      "alias_total": 35,
+      "alias_rows_merged": 19,
+      "alias_conflicts": 0
+    },
+    "version_warning": "巴哈精華初期經營法出現「2003年版」，原文所涉遊戲代別無法僅憑標題保證。已移至版本待核，不能直接作 PS2 三代已確認開局攻略。",
+    "no_new_confirmed_sources": "本輪專門檢索 PS2／技能／球探／金手指後，新可讀內容仍集中於已知 2018 長文和 2006 精華。其他 NDS 版與 DC 一二代內容不匯入本專案；未索引／受阻來源不視為不存在。"
+  },
+  "bahamut_external_20261010": {
+    "confirmed_external_links": [
+      "巴哈 sn=470 提及 Ikasumi 經營 Memo 與 kiyopf1005/keiei.html；後者是目前失效的 Geocities 日本頁。",
+      "巴哈 sn=850 提及 Ikasumi 與 datapot.com/pw/vs/index.php；後者未取得可驗證正文。"
+    ],
+    "verified_archive": "2005 2ch《プロ野球チームをつくろう！３(やきゅつく)20年目》正文可讀，列出五個地區的 引っ越し屋＋Memo 候選與中国・四国猜想；另有試作失敗的回報，因此只收為未確認考古資料。",
+    "historical_reference": "kiyopf1005/yakyutuku.html 在 2005 年串為攻略模板，2006 年第40年串已記為失效。",
+    "existing_readable_external": "Ikasumi攻略メモ與網站原本已在攻略中，只補上巴哈歷史來源，不重複登錄規則。",
+    "limits": "巴哈精華區相關網站 1～3、Geocities Japan 舊正文、datapot 目前無法可靠取得，不等於原內容不存在；NDS／DC 版本需排除。",
+    "recognition_evaluation": "本輪新增原始列裁切交叉證據與姓／名分隔回復流程，尚未完成 92列實機真實姓名正確率驗證；不得以確認數作準確率。"
+  },
+  "bahamut_external_recheck_20261010": {
+    "requested_scope": "巴哈姆特 PS2《やきゅつく3》外部連結循環追查，排除 NDS/DC/2003 版混用。",
+    "confirmed_fulltext": "2007 年《プロ野球チームをつくろう!3》45年目討論串可讀。新增練習道具顯示相同◎但實際成長可能不同的玩家 FAQ 到自創球員章，日文原文保留。",
+    "historical_external": "45年目列出 ya3.tsukuclear.com；現站正文無法可靠存取，記在來源查核。Ikasumi／kiyopf1005／datapot 已在前一輪記錄，這次不重覆新增。",
+    "dedup": "技能傳承的重複 20 年樣本細節已移除一個補充章，數字仍完整保留在《20年技能傳承觀察樣本》；唯一的原創技能限制與多技能球員樣本記錄合入《技能傳承：公開資料交叉整理》。",
+    "remaining": "巴哈歷史精華外部網站的部分舊頁無法完整查閱。無法證明已經全部挖乾淨。未讀取不等於不存在。",
+    "recognition": "增加不依賴姓／名分隔區的純本機 16×16 全名冊比對，只處理仍未確認的列。來自兩個不同裁切的結果相符才可提升信心；沒有加入已知答案。仍缺這批 92 列的逐人姓名真值評測。"
+  },
+  "r29_selected_row_and_sources": {
+    "selected_row_problem": "PS2 roster selection draws near-black/navy glyphs on neutral gray. Grayscale-only OCR-free matcher cannot detect ink. New deterministic dark-blue chroma correction before normalization + raw-crop fallback, without player names in production code.",
+    "selected_row_reference_test": "2026-10-10 user-provided selected-row image: bundled deterministic reference matcher produced no name before chroma restoration; afterward the top candidate agreed with the user's manually labeled screenshot (score .7349, runner-up .6106). The manually labeled name and the image itself are kept out of production app/data.",
+    "mobile_desktop": "Same per-pixel arithmetic used by Safari, Chrome and Edge. Real browser/iPhone accuracy not yet verified on this release.",
+    "web_audit": "Rechecked Bahamut board 6035 historical external guide index and Co sn=470, still blocked/403 for direct content; existing Ikasumi, Geocities kiyopf1005, datapot, ya3.tsukuclear links remain separately categorized by readability. No new Bahamut fulltext claimed.",
+    "new_readable_external": "2023 Japanese PS2 long-form diary re-owls.com/entry/100123 has a readable first-person challenge rule set; unique four self-imposed rules added to advanced guide, never treated as game mechanics.",
+    "dedup": "Rechecked complete guide table for exact row duplicates (zero) and ensured new challenge article is stored only once, with original Japanese alongside Traditional Chinese."
+  },
+  "r30_batch_and_research": {
+    "real_sample": "666.zip verified: 11 JPGs. Raw screenshot name-zone pixel check after fixed-header alignment: 99 occupied slots across 11 screenshots, 22 empty slots (7 in 3583, 8 in 3584, 7 in 3596). Previous app showed 114 raw slots; 15 were blank false positives. No player-name truth labels used in this occupancy test.",
+    "repeating_wrong_candidate": "Name matching was attempted on empty grid/background due icon-side hasName fallback; unrelated short names such as 神崎孝司 could surface across positions. r30 checks aligned NAME ink before overlap and again before matching, plus CV-level empty-name suppression.",
+    "tested_limitation": "The occupancy check was run locally with reference Python layout on user supplied 666.zip. The browser/Safari result and post-correction cross-page overlap count remain to be verified. The archive contains screens with footer rosters of 32 and 77 players; these represent different roster contexts, so their displayed footer totals must not be summed as a single roster.",
+    "folder_archive_import": "Multiple image selections, ZIPs, nested folders; the file picker appends instead of replacing. Local JSZip 3.10.1 bundled into offline PWA; skips macOS resource forks and has per-file archive size safeguards. Folder chooser browser support varies; ZIP available in Safari.",
+    "claude_plan_review": "2026-10-09 r18 Claude Code spec examined: Python-based per-row empty-name gate, glyph/hand constraints and split/selected rows are useful. The golden answer files are not bundled into PWA or used as recognition hints.",
+    "research_new": "2006 40年目 and 2011 52年目 historical PS2 threads identify old PukiWiki, 神様２人のサイト, Vector data tool, Jenova idea memo tables, and notitle/yaku3 index. Jenova and notitle index are fetchable but some characters/subpages are unavailable; Geocities/Livedoor/Vector old endpoints unavailable. Marked as indexes or historical references, NOT fully imported gameplay rules.",
+    "dedup": "Added one external-links chapter/table in sources. Removed one repeated newcomer salary summary already present in cheap/contract guide. Exact table-row duplicates remain zero."
+  },
+  "r31_progress": {
+    "checked_at": "2026-10-10",
+    "result": "Mixed ZIP stress coverage ~50%, not true name accuracy. Fixed cross-ZIP overlap boundary and duplicate-name conflict scoped to each archive. Restored compare 4 players. PS2 verified Bahamut code post snA=121 already exists in cheats; no repeat import. PS2 Yokohama diary adds three unique observations with original Japanese + Traditional Chinese.",
+    "unverified": "Real Safari/Chrome retest is still required. Old mixed screenshot counts do not represent verified accuracy."
+  },
+  "r32_20261011": {
+    "sample_archive": "777.zip inspected locally: 12 valid files, one editor-overlay PNG at IMG_3609.PNG 2796×1290 (central embedded game), 11 direct JPGs roughly 1212–1268 wide. ZIP CRC valid. One image had header fallback in user test but exact file identity not provided.",
+    "user_observed_r31": "4 ZIPs: both 454 named rows →387 distinct / 67 overlaps / 5 remaining candidates; desktop confirmed351, tentative31; Safari confirmed347, tentative35. 777 alone: both 118 named rows→103 distinct, 91 confirmed, 10 tentative, 2 candidates. Counts are result statuses, not measured person-name accuracy.",
+    "root_cause_hypothesis": "One editor-overlay image cannot be found by the old top-left x≤320,y≤126 header scan and exceeds standard photo scale. r32 searches large-image central inset only when width ≥1900 and height≥850, independently of player names.",
+    "release_validation": "New synthetic inset-header correlation test in CI plus complete existing source/guide tests; offline browser real 777 batch on Safari/desktop still needs final independent device run.",
+    "bahamut_index_only": "2006 G2 精華〈模擬職棒3 金手指2〉 returns HTTP 403 direct, but search index includes partial 背番号指定によるスキル変更(XT) template. Archived author uncertain if uniform number subtract 1; not copied as a confirmed functioning cheat.",
+    "confirmed_new_external": "re-owls.com/rearule is readable and adds five distinct challenge themes, integrated into the existing advanced challenge section, Japanese original + Traditional Chinese. These are optional self-imposed restrictions, not game mechanics.",
+    "wiki_limit": "game-syo Wiki main index loads, but tested meeting/explosion/camp subpage URLs redirect to the homepage; no alleged details imported. Existing guide body checked for exact duplicate rows; no repeated rows added."
+  },
+  "bahamut_external_20261011_r33": {
+    "result": "再次逆追巴哈 PS2 G2 精華：金手指2 原先僅標索引片段，本輪公開搜尋能檢索 XT/PAR 8 格技能替換模板與技能代碼，共 107 組，收進同一金手指章；既有狀態碼不重複。直接 G2 原頁仍 HTTP 403，不能標為直接取得完整全文。另重查巴哈「相關網站」歷史索引，未得到新可讀外站正文。",
+    "search_index_readable": "https://forum.gamer.com.tw/G2.php?bsn=6035&lorder=2&parent=11&sn=21",
+    "new_code_rows": 7,
+    "new_skill_mapping_rows": 107,
+    "existing_state_code_rows_duplicated": 0,
+    "duplicate_guide_table_rows": 0,
+    "status": "長期歷史外連 Geocities/Datapot/ya3.tsukuclear/部分 G2 正文未能恢復；不等於不存在，也不能宣稱全部挖完。",
+    "recognition": "沿用使用者 R31 實測結果：混合四 ZIP 387 去重列（351/347 確認）；777 單獨 103 去重列，桌機與手機均 91 確認。這是候選分級而非人工真值正確率。本版不更動影像辨識程式。"
+  },
+  "bahamut_external_20261011_r34": {
+    "scope": "巴哈 PS2 三代討論／精華對外連結交叉 2006 第40年、2007 第45年及2009 PS2 第27串；另查 2006 crazyboys00 第39回一年模式文章。",
+    "historical_urls": [
+      "http://yakyutsuku.net/itinenmode.html",
+      "http://www.gamerkaihathu.com/yakyu/yakyu3.htm",
+      "http://versus.s52.xrea.com/game/yakyutsuku/index.php",
+      "http://members2.jcom.home.ne.jp/akihiko-9392/"
+    ],
+    "readable_mixed_thread": "https://kako.5ch.io/test/read.cgi/gamespo/1251974024",
+    "link_evidence": "第40年、第45年公開歷史討論提供 URL；やきゅつくNET 的一年模式頁亦有 2006 部落格引述。VERSUS 另可從當年站點目錄查到攻略站定位。",
+    "availability": "四個舊站正文目前無法可靠開啟，只能歷史來源記錄，不推定任何已失傳公式。",
+    "variant_warning": "2009 PS2 多版本串包含 2、2003、3，不能未經版本辨識直接匯入三代數值；巴哈 NDS/DC 同樣排除。",
+    "dedup": "31 章攻略已刪除 5 個跨章重複的步驟段落、19 筆重複主題資料列，共減少 38 筆顯示資料。保留單一主題完整規則與具獨立價值的內容。",
+    "dedup_removed_sections": 5,
+    "dedup_removed_rows": 19,
+    "dedup_removed_display_entries": 38,
+    "flat_rows": 742,
+    "unique_book_table_rows": 1451,
+    "unresolved": "巴哈部分精華仍 403；舊站未復原。不能宣告全部公開來源已挖乾淨。"
+  },
+  "bahamut_external_20261011_r35": {
+    "search_scope": "續查巴哈 6035 精華/全文檢索；由 PS2 三代2006第40年串及2007第45年串追出五個特殊討論串（只查到索引）。另全文對照2005~2009 改造碼185則、Wazap 29攻略列表二頁、Jenova攻略主索引/技能、Wazap原型與經營企劃。",
+    "verified_new_fulltext_urls": [
+      "https://kako.5ch.io/test/read.cgi/gamespo/1122038561",
+      "https://wazap.com/cheat/%E3%83%A1%E3%82%B8%E3%83%A3%E3%83%BC/371082/",
+      "https://wazap.com/cheat/%E5%90%84%E9%81%B8%E6%89%8B%E3%81%AE%E8%83%BD%E5%8A%9B/127284/",
+      "https://wazap.com/cheat/%E9%80%9A%E5%B8%B8%E4%BC%81%E7%94%BB%E3%83%87%E3%83%BC%E3%82%BF/182846/",
+      "https://wazap.com/cheat/%E5%85%A8%E5%9B%BD%E8%A1%8C%E4%BA%8B%E4%B8%80%E8%A6%A7/182850/"
+    ],
+    "player_aliases_added": 22,
+    "player_aliases_crosschecked_existing": 8,
+    "pitcher_sample_crosschecked_existing": 34,
+    "seasonal_events_added": 1,
+    "seasonal_japanese_names_corrected": 11,
+    "normal_planning_added": 7,
+    "new_uncorroborated_legacy_code_rows": 16,
+    "new_source_index_records": 15,
+    "source_total": 71,
+    "guide_chapters": 31,
+    "guide_entry_change": 47,
+    "strict_unique_table_rows": 1497,
+    "version_exclusions": "改造碼串中 DS/やきゅつく2 的求碼討論排除；2009 PS2混代未採未標三代數值；Wazap原型是玩家投稿，非官方權威。",
+    "source_status": "Wazap與歷史改造碼原帖可讀；Jenova現存但編碼破字；五個特殊 2ch 討論串仍只有歷史引用；巴哈多個 G1/G2 網址 403，未取得全文部分不偽稱已挖到。",
+    "open_questions": "所有無法取得全文與紙本攻略的潛在資料無法確認完整度；改造碼未做實機驗收；批次找人R31姓名真值與手機實機尚未通過。",
+    "convergence": "本輪特定查詢的末段結果多次回到 Gamezukushi/Sheep/Ikasumi/Wazap/40年目原串。只能描述已查公開可檢索範圍逐漸收斂，不能保證不存在新公開鏡像。"
+  },
+  "bahamut_external_20261011_r36": {
+    "scope": "繼續查巴哈 6035 C/G2/外站；重新檢視2018 PS2 模擬器玩家全文搜尋索引、2005 原始改造碼串、GAME攻略書庫PukiWiki真實子頁、Jenova亂碼站、skillove 20年實測及其他日文部落格。",
+    "new_hardware_reference_rows": 7,
+    "complete_transcribed_lines_or_blocks": 6,
+    "incomplete_transcribed_blocks": 1,
+    "original_source": "https://forum.gamer.com.tw/C.php?bsn=6035&snA=214&tnum=1",
+    "crosscheck_source": "https://kako.5ch.io/test/read.cgi/gamespo/1122038561",
+    "duplicate_code_crosschecks": [
+      "201728DC 24020001",
+      "20523554 24020064"
+    ],
+    "warnings": "PCSX2 1.4 個人實測不可當跨平台保證；2018 Skills 列首行20245784 4060001僅7位，未補碼值；18歳只是顯示，仍衰退。金手指仍需實機驗證。",
+    "source_count": 71,
+    "source_status_rechecked": "2018巴哈 C頁直接403但搜尋索引有長正文。GAME 攻略書庫子頁（海外選手権、アイデアメモ、選手スキル、ミッションポイント）實際點擊均導回TopPage，非完整攻略。Jenova舊 Shift_JIS 顯示破字，無可確認新表。",
+    "duplicate_semantics": "對照既有技能、Team Color、資金與年齡碼；目前以前版已收的完全相同碼條目為 0。2005 與 2018 同碼只新增一列並標跨來源。",
+    "excluded": "DS／2003 的搜尋結果不得當成 PS2 三代；skillove 20年技能實驗先前已收錄8項完整樣本，這輪沒有再次匯入。",
+    "discovery_boundary": "搜尋回流目前的主站/史料；仍有舊站與巴哈403未取得正文，不能宣告網路上不存在公開備份。"
+  },
+  "bahamut_external_20261011_r37": {
+    "scope": "2026-10-11 繼續查 Crazyboys 2006 第17回／2007 第90回的外部攻略站與投手研究引用",
+    "names": [
+      "やきゅつく攻略メモ",
+      "やきゅつく３徹底攻略",
+      "プロ野球チームをつくろう・攻略式",
+      "たなぼたとやきゅぼた３"
+    ],
+    "primary_page": "https://crazyboys00.wordpress.com/2007/01/24/%E7%AC%AC%EF%BC%99%EF%BC%90%E5%9B%9E%E3%83%BB%E8%B6%85%E5%88%9D%E5%BF%83%E8%80%85%E7%94%A8%E3%81%AE%E3%83%A4%E3%82%AD%E3%83%A5%E3%83%84%E3%82%AF%E6%8C%87%E5%8D%97%EF%BC%96%EF%BC%88%E6%96%BD%E8%A8%AD/",
+    "source_count": 73,
+    "added_primary_sources": 2,
+    "added_facility_strategy_rows": 4,
+    "added_historical_names": 4,
+    "url_status": "四個網站的原站 URL 尚未取得可靠證據；只保存確定的日文站名與引用文章，不編造網址、不當成已讀正文。",
+    "exclusions": "2006 投手變化球規則此前已歸納，不再次複製；跨代資料排除；批次辨識原樣。"
+  },
+  "bahamut_external_20261011_r38": {
+    "search_scope": "G2 巴哈2006金手指1及其舊來源；2005~2006 half_half311 經歷一到五年實玩日記；2005 Livedoor 起步破產案例；2005 FC2 玩家選秀；2008 PS2 綜合版第25串；另外交叉看 G2 初期經營法、2018 巴哈碼、2016 一年模式及歷史外站名。",
+    "new_url_records": 9,
+    "source_total": 82,
+    "exact_new_code": "巴哈2006年 G2 sn12：資金最大（PAR）七行，原文完整；原帖提醒PAR硬體相性，未經實機驗證。",
+    "case_studies_added": 5,
+    "par_code_rows_added": 2,
+    "source_types": "G2直接回403但搜尋索引保留完整碼；half_half311四篇可直接讀全文；FC2 metakin直讀403但搜尋索引可讀長篇；Livedoor舊日記有全文；2008 PS2第25串全文可讀但2、2003、3混談。",
+    "documented_no_duplicate": "half_half 2005首年12億的基本設定與Codevis既有實例重合，不再貼一遍，只補實際交易/三冠案例。原有XT資金碼、資金每月MAX與PAR七行不是同一組，不混碼。",
+    "cross_version_exception": "巴哈精華初期經營法雖2006重編但正文明講2003版松阪，故繼續留版本待核；2008 PS2第25串亦混版且赤星能力上限有人說A有人說B，不升級為三代已確認數值。",
+    "new_unresolved": "2005 Livedoor 僅讀到首則完整文章，其他連載仍可能有可讀正文；half_half 5年日記已讀並有案例。Jenova Shift_JIS、巴哈G2其餘403、舊外站無原址仍未恢復。",
+    "exhaustion_status": "這一輪仍找到新可讀來源 Chaos-File 的完整歷史代碼與其原始來源鏡像，故不能宣告公開資料挖盡。繼續區分 403/失效外站與可讀原文。",
+    "additional_2006_code_rows": 3,
+    "code_crosscheck": "巴哈 G2 sn12 的 PAR 資金最大第一組7行與 Hiscode/Chaos-File 相符；另一組只有第5行 9CFF80FC B0D54435 不同，採獨立完整組，兩組切勿同時開。2006原文亦有年齢18歳.ver2 XT/PAR 及秘書変更 XT 模板，均未實機驗證。"
+  },
+  "bahamut_external_20261011_r39": {
+    "scope": "繼續篩查2005 PS2 攻略專串索引；2018年 PS2 三代第54年目可讀原文（1,002則），交叉對2007年DC混版串第959、960樓明確自認為三代的稀有外國人簽約Bug。",
+    "added_sources": 2,
+    "source_count": 84,
+    "new_experiment_rows": 6,
+    "new_camp_method_rows": 3,
+    "existing_bug_updated": 1,
+    "original_2018": "https://medaka.5ch.io/test/read.cgi/gamespo/1538897478",
+    "original_2007": "https://kako.5ch.io/test/read.cgi/gamespo/1157542684",
+    "method_warning": "三輪投手ERA採用了『能力仮限界まで成長』修改碼，因此不是純原版受控測試；時間、球隊及存檔固定也不代表樣本足以建置球員排名。",
+    "bug_warning": "2007年該原串標題是DC，僅樓959/960明言PS2三代；2018年PS2三代第54年目FAQ亦重述此Bug，因此補到原已存在的Bug條目，不新增第二筆。",
+    "original_2005_guide_thread": "https://itest.5ch.net/medaka/test/read.cgi/gameover/1122437345/259-n 原本2005攻略串當前可於搜尋索引見留言摘要，但直接開啟會導回5ch板首頁；僅索引，不虛構全文。",
+    "unresolved": "歷史論壇大量混版；G2部分403及Jenova破字、失效GeoCities、2005專串全文仍無法直接取回。已檢索到的新有效資料仍持續出現，不能宣告所有公開來源挖盡。"
+  },
+  "bahamut_external_20261011_r40": {
+    "scope": "在原有84筆來源之外，沿第55年討論串及巴哈/日本舊站追回2009 notitle 完整靜態路徑，核對其主頁450行、record跟器用Bug兩篇詳細頁；2021～2026 第55年全文含2023 #509資料欄位實測；重讀2005三代第20年原串。",
+    "restored_fulltext_pages": [
+      "https://notitle.moo.jp/ch/yaku3x/",
+      "https://notitle.moo.jp/ch/yaku3x/rec.html",
+      "https://notitle.moo.jp/ch/yaku3x/seiseki.html"
+    ],
+    "living_original_thread": "https://medaka.5ch.io/test/read.cgi/gamespo/1638738401",
+    "source_counts": {
+      "before": 84,
+      "after": 88,
+      "added": 4
+    },
+    "new_content": {
+      "pitcher_hitter_conversions": 18,
+      "player_iso_field_hypotheses": 11,
+      "record_strategies": 5,
+      "camp_skill_transfer_observations": 2,
+      "growth_claim_disagreements": 2,
+      "updated_existing_bug_entries": 1
+    },
+    "access_correction": "notitle.moo.jp/ch/yaku3/ 的 index.php? 動態子頁的確404，但 notitle.moo.jp/ch/yaku3x/ 及 rec/seiseki.html 靜態頁直接可讀。不能將動態頁失效等同原作者全部資料失效。",
+    "age_conflict": "notitle說自創球員第31年後起始能力不再提升，Gamezukushi表述遊戲第20年起進入第三能力段；兩者不能冒充相同結論，併列玩家說法待驗。",
+    "hex_uncertainty": "55年串的ISO球員位址2022曾由0x707B4FA0更正為0x707B5000，2023第509樓列+0x15、+0x35、+0x37等；+0x39、+0x47、+0x49、+0x4D、+0xA3作者仍標可能/問號。這是私人修改原版映像試驗，不證明所有區域版通用。",
+    "exhaustive_status": "此輪成功新挖復原靜態攻略全文，所以尚不能誠稱所有公開可讀來源已挖完。剩餘巴哈 G1/G2 403、GeoCities 失效、舊wiki索引、notitle動態wiki404、2005特定串及資料 viewer 的原文待查。",
+    "note": "批次截圖辨識與球員名冊無變動。"
+  },
+  "bahamut_external_20261011_r41": {
+    "scope": "繼續追2012 PS2 三代第53年原串1002則，沿 2014#454 效果別経営企画舊站網址及2017#782 pinkpantu 舊金手指原站，並查2006 mimizun 過去FAQ鏡像。",
+    "source_new_url_total": 4,
+    "source_count": 92,
+    "confirmed_fulltext": [
+      "https://medaka.5ch.io/test/read.cgi/gamespo/1352107542",
+      "https://pinkpantu.gozaru.jp/yakyutuku3.htm"
+    ],
+    "historical_only_unavailable": [
+      "http://www.tsukuclear.com/keiei/",
+      "http://mimizun.com/log/2ch/gamespo/1151312142/"
+    ],
+    "new_structured": {
+      "idea_memo_hex_labels": 68,
+      "hdd_and_nonhdd_raw_memory_blocks": 9,
+      "pipe_conflicts": 3,
+      "hometown_upper_bound_observations": 1,
+      "salary_negotiation_observations": 2
+    },
+    "source_notes": "pinkpantu官方原碼頁62行皆可讀；含HDD使用時？、HDDなしの場合？及xx/xxxx模板。該網站非軟體發行商，未見完整版本對應表及硬體相容報告，不能以此保證可用性。",
+    "contradiction": "2012#9說早乙女北美初期3500、平瀬也許2500、ゴッデス9000，但Gamezukushi整理平瀬3500、ゴッデス8000；Grand6500、米加加入160、球探上限6000互證。數值分歧不可暗改原有固定攻略。",
+    "dedup": "經濟10 DVD製作可收入5億、成長型評語、34/39/44壽命公式已在現有章節，這輪未重複灌錄；只補新編碼／來源分歧／操作特例。",
+    "no_verified_exhaustion": "本輪新找到62行可讀金手指站與2012-2018完整原始論壇、而且原串還有大量樓層，因此仍不能證明所有公開可讀內容已追到沒有新增。",
+    "excluded": "跨代PS2 2003／DC／NDS之代碼排除；聲稱手機/PAR通用的文字都不當驗證，AI-free本機截圖辨識與3767原版名冊完全不變。"
+  },
+  "bahamut_external_20261011_r42": {
+    "scope": "繼續逐段核對2012年53年目第14~28樓中的新球種使用頻率原始逐球記錄，並橫向再查PS2三代原版日本攻略、巴哈精華及2023-2026混版MOD資料，避免重複覆蓋原版。",
+    "primary": "https://medaka.5ch.io/test/read.cgi/gamespo/1352107542",
+    "source_count": 92,
+    "new_original_pitch_case_rows": 3,
+    "new_reliability_notes": 2,
+    "source_erratum": "第25樓川本修司的球數最初誤列直球27、シュート26、フォーク28；同一作者第26樓更正為直球17、シュート16、フォーク18。新版只匯入更正後數字，總球數162，並保留其他58球不可識別。",
+    "scope_convergence": "擴充關鍵字（原版選手資料／金手指／Idea Memo／2005-2026攻略／變化球球數）本輪末段主要重新出現Gamezukushi、Sheep、Ikasumi、舊Wiki索引與已收錄的MOD日記，尚未出現可驗證的全新獨立全文站。不能把此次搜尋收斂推論成所有歷史鏡像絕對不存在。",
+    "still_inaccessible": "部分巴哈 G1/G2 403，tsukuclear 效果別企劃站、mimizun原始鏡像、GeoCities、舊Wiki子頁與 Jenova Shift_JIS 破字仍不可完整恢復。記錄為無法取回正文而非不存在。",
+    "no_changes": "批次圖像CV引擎、原版3767人名冊、已驗證的金手指資料不修改。"
+  },
+  "bahamut_external_20261011_r43": {
+    "scope": "由2012第53年原帖引用找2011～2012第52年（991則），一般kako/medaka直取失敗，另發現n2ch鏡像101-及201-分頁可讀；掃讀一年模式自訂A/B位置推薦與單一輪值受傷/醫務室原始回報；51年串的同型鏡像仍不可讀。",
+    "successful_mirror": "https://n2ch.net/r/FbB------F/gamespo/1317196650/101-?guid=ON",
+    "archive_access": "直接讀101-及201-範圍有可讀原文，首頁1-和301後工具回Unicode解碼/內部錯誤；不能宣稱991則全讀、不可把下一分頁失效當來源不存在。",
+    "sources_added": 1,
+    "total_sources": 93,
+    "new_year_mode_position_rows": 8,
+    "new_recovery_vs_prevention_rows": 4,
+    "interpretation": "一年模式推薦A/B是作者2011#105自訂評價而非原版全選手Rank；#196首年單一輪值負例、#197需3名先發與中繼支援，與notitle2009一人輪值攻略存在條件分歧。#225醫務室加速療傷、#226作者把浴場更正泳池，其他玩家推薦大浴場且有人受傷數沒明顯改善，仍未建立硬性機率。",
+    "archive_link_status": "原始 https://kako.5ch.io/test/read.cgi/gamespo/1317196650 與medaka直接失敗，但部分n2ch分頁成功；同串51年目 mirror目前也失敗。",
+    "excludes": "其他代別如DC/2003的文字不直接當三代；單季排名、玩家的A/B評分、傷病統計不是官方能力值。",
+    "still_unresolved": "巴哈G1/G2 403、歷史站GeoCities/tsukuclear/mimizun、舊Wiki子頁、Jenova舊編碼及n2ch未開段落；這輪找回又一份可讀原始串，因此不能宣告全部公開資料已收斂到終點。"
+  },
+  "bahamut_external_20261011_r44": {
+    "scope": "第52年原串n2ch經前後頁連結全10段共991則均可開啟；沿51年（2009–2011，共1001樓）及50年（2009，共981樓）前串連結追查其鏡像。新增主題以技能8格、重複技能、HomeTown建物合併、投野轉換及原帖自我更正的留學Pipe門檻為主。",
+    "available_year52_pages": [
+      "1-",
+      "101-",
+      "201-",
+      "301-",
+      "401-",
+      "501-",
+      "601-",
+      "701-",
+      "801-",
+      "901-"
+    ],
+    "full_year52": "https://n2ch.net/r/FbB------F/gamespo/1317196650/1-?guid=ON",
+    "year51": "https://n2ch.net/r/FbB------F/gamespo/1259337191/1-?guid=ON",
+    "year50": "https://n2ch.net/r/FbB------F/gamespo/1233052146/1-?guid=ON",
+    "source_total": 95,
+    "source_new_urls": 2,
+    "guide_additions": {
+      "skill_caveats": 4,
+      "building_merge_routes": 4,
+      "corrected_pipeline_cases": 4,
+      "conversion_player_cases": 3,
+      "CPU_trade_reset_anecdote": 1
+    },
+    "access_scope": "52年鏡像各100樓分頁確實已成功開啟至901-991。51年鏡像首頁與末段可讀但未審完所有1001樓；50年鏡像末段可讀、未審完981樓。僅可開啟不等於已逐樓人工精讀，剩餘有用段落須繼續。",
+    "correction": "#622先猜ソックラム2500，#625質疑，#626原作者自認16進位計算錯誤並改4000；#305回答技能8格（含教練技能）；#913 vs #918教練技能來源有矛盾，不當官方硬規則。",
+    "pitfalls": "不可把玩家自訂A/B年度推薦誤作遊戲Rank；對CPU交易重載玩家討論尚未受控驗證；本機非AI截圖辨識核心與3767名名冊未修改。",
+    "exhaustion": "新發現兩條現存可讀長篇原串，仍無法宣告公共有效來源都已追至無新正文。巴哈G2部分403、GeoCities/tsukuclear失效與破字頁持續標記不可取得。"
+  },
+  "bahamut_external_20261012_r44": {
+    "scope": "以 R43 最新主分支為基準重看2005 PS2《やきゅつく3》第20年目可讀1,001則原始討論全文；與31章既有攻略逐項交叉、避免重複。",
+    "original_thread": "https://kako.5ch.io/test/read.cgi/gamespo/1123809103",
+    "existing_source_status": "已在R40標示verified_fulltext_original_ps2_2005_thread，本輪不重複增加來源URL。",
+    "new_guide_rows": 4,
+    "source_count_baseline": 95,
+    "topic": "第69/74、74/76則兒童探病事件選秀與隔年候選；第31~36則藍色？與蓄積疲勞紅線。",
+    "quality": "原帖玩家實例及問答，不當官方或必然演算法。巴哈模2與2003版隔離，不匯入。",
+    "exhaustion": "仍有可讀原始全文與歷史舊網址，不能宣稱全部有效來源已無新增；此次已推動已核實的小項，尚需繼續公開可讀來源挖掘。"
+  },
+  "bahamut_external_20261012_r45": {
+    "scope": "2005 PS2 三代第20年目原串第148/371/416則的イチネンモード早期對戰與候補名單，逐項和2011第52年同主題A/B推薦去重。",
+    "primary_source": "https://kako.5ch.io/test/read.cgi/gamespo/1123809103",
+    "new_yearmode_rows": 6,
+    "guide_evidence": "2005討論串有左投手集中補強/一名右先發開始後換左投、五隊對左弱的玩家觀察；第416則另列各隊對左主力。第148則野手與中繼選人示例。原文第371則自行撤回『巨人對左弱』說法，已明確排除。",
+    "crossversion": "全部為2005 PS2 三代發售當年的當次擴張選秀經驗，不能當全年全版固定Rank，2011年玩家A/B列表保留獨立年代。",
+    "source_count": "未新增URL，既有2005原串來源唯一保留",
+    "status": "收錄本輪經查有效且既有攻略未完整呈現的6個具體資料列；五個歷史子串、部分巴哈403、失效原站與破字頁仍未取得全文，無法宣稱公開來源不存在其他內容。"
+  },
+  "bahamut_external_20261012_r46": {
+    "scope": "針對 R45 新讀2005第20年目全文的Idea配方、Sheep與Ikasumi舊經營企劃表交叉核對，修正本專案已存在錯誤。",
+    "sources": [
+      "https://kako.5ch.io/test/read.cgi/gamespo/1123809103",
+      "https://www.ikasumi.org/yakyu3/cp.html",
+      "https://www.sheepplus.com/yakyutsuku3/management/planning.html"
+    ],
+    "ballboy_before": "バスケットボール＋サッカーボール＋バス（本工具原誤寫需3卡）",
+    "ballboy_corrected": "バスケットボール＋サッカーボール（只需2卡），2005第822則與兩家攻略來源相符。",
+    "confirmed_shop_regions": [
+      "関東 パソコン＋引っ越し屋",
+      "近畿 ハリセン＋引っ越し屋",
+      "九州・沖縄 明太子＋引っ越し屋"
+    ],
+    "still_unverified": [
+      "北海道・東北 わんこそば＋引っ越し屋（原帖失敗）",
+      "北信越・東海 自動車＋引っ越し屋（僅討論猜測）",
+      "中国・四国 未知（候選未確認）"
+    ],
+    "source_url_growth": 0,
+    "source_reason": "3家來源均已存在資料庫；補的是舊攻略誤寫及由未驗證升級成兩個可讀來源互證，拒絕重複新增URL。",
+    "note": "以上為公開可讀資料的交叉確認，未經本次 PS2 實機驗收；保持日本原文與繁中並列。全站公開資料仍有403與歷史失效來源，不可宣告絕對沒有新內容。"
+  },
+  "bahamut_external_20261012_r47": {
+    "scope": "逐頁開啟2011–2012《やきゅつく3》第52年原始 n2ch 991 則：頁面1–100至901–991全部實際可開；從早年已收技能/留學/城鎮內容進一步檢索低重複的操作FAQ。",
+    "source": "https://n2ch.net/r/FbB------F/gamespo/1317196650/1-?guid=ON",
+    "new_guide_rows": 3,
+    "source_url_growth": 0,
+    "added_topics": [
+      "#909–910 車站被拆除後可再次駅誘致署名運動（玩家回報）",
+      "#515–519 自動無條件換投導致中繼頻繁登板、先發兼任中繼與體力限制（玩家回報／推測）"
+    ],
+    "excluded_as_already_present": [
+      "#305 技能8格",
+      "#626 留學Pipe勘誤",
+      "#414–417 HomeTown合併",
+      "#905 單季防禦率特殊玩法",
+      "#714–719 爆發經驗來源"
+    ],
+    "uncertainties": "回覆未受控驗證，混版言論與個人配隊數值不能當硬規則；新加入的3筆只描述可讀原文的經驗與可能原因。",
+    "exhaustion": "52年目十個分頁可訪問；仍有歷史站失效及巴哈403可追，不能宣告全網絕對挖盡。"
+  },
+  "bahamut_external_20261012_r48": {
+    "scope": "繼續逐頁審核2011–2012 PS2 第52年目 #701–991 段落，交叉既有HomeTown與Trade改造碼資料。",
+    "original": "https://n2ch.net/r/FbB------F/gamespo/1317196650/1-?guid=ON",
+    "new_guide_rows": 1,
+    "existing_code_warning_strengthened": 1,
+    "source_url_growth": 0,
+    "original_posts": "#765 使用Trade 2 turn/必定成功/全選手可選的PAR碼時存檔凍結及存檔損毀；#766/#768 一般城市建築月初生、企劃建物例外。",
+    "qualification": "2012一則玩家存檔個案和另一位玩家的城市機制回答，不是跨版本實機重現；不可作成必定發生或官方公式。",
+    "source_status": "95 unique URLs retained. Other 2005 one-year subthreads and historical references only indexed, 403/失效/編碼失真仍未復原，不能宣告完整挖盡。"
+  },
+  "bahamut_external_20261012_r49": {
+    "scope": "進一步追2013末次發言的 2005 起 mixi《やきゅつく３トピ》287則及相關PS2三代小主題。",
+    "url": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=1578351",
+    "visibility": "未登入網頁僅呈24則公開留言，剩餘263則需要登入；不得宣告全文讀到。",
+    "new_guide_rows": 3,
+    "source_url_growth": 0,
+    "topic": "公開第259樓 Camp年齡搭配、Banri留學回國一週前改人事排程獲得精神技能、Camp可教5/教練留學6與2012第52年原串8技能槽不同口徑。",
+    "confidence": "玩家單篇回報與不同年代說法；尚未實機確認。保留日文原文、繁中解釋、證據差異，不給虛假必然成功率。",
+    "exhaustion": "仍有登入牆mixi留言、巴哈403與歷史死站，沒有可合法直接讀取的全文，不能聲稱每一篇已挖乾淨。"
+  },
+  "bahamut_external_20261012_r50": {
+    "scope": "同輪沿2005–2007 PS2 三代原始論壇串、巴哈及外部鏡像、mixi主題索引繼續追查，將2007年官方客服答覆的玩家轉述、2006學院/盜壘/契約及2007王貞治個案整合，未更動金手指、名冊或CV辨識引擎。",
+    "source_before": 95,
+    "source_after": 103,
+    "new_urls": 8,
+    "new_sections": 5,
+    "new_guide_rows": 15,
+    "primary_ps2_threads": [
+      "https://kako.5ch.io/test/read.cgi/gamespo/1157525747",
+      "https://kako.5ch.io/test/read.cgi/gamespo/1178709384"
+    ],
+    "manufacturer_reply_evidence": "2007第44年目第28則玩家轉貼據稱SEGA寄回的BUG說明：賽前スタメン変更可能影響自己/對手以外球隊的投手數值，替代OFFICE→グラウンド→作戦室→オーダー設定。第5及24–37則有部分多次重現與未重現的回覆。這是玩家轉述，不等同可獨立檢驗的官方公告或本專案實機驗證。",
+    "new_mixi_index": "https://mixi.jp/list_bbs.pl?id=88318",
+    "mixi_visibility": "公開可讀兩頁55個主題的索引；PS2三代相關Academy、盜壘、契約與王貞治部分留言可讀，其餘有登入限制。只錄可讀內容並排除DC/PS2 2/2003、DS混版話題。",
+    "dedup": "Team Color反向屬性、四壞誤記盜壘、年薪低價策略已於既有攻略收錄；本版新增具日期/出處的佐證與相互矛盾的操作注意，未複製數值為官方公式。",
+    "inaccessible": [
+      "https://kako.5ch.io/test/read.cgi/gamespo/1170922632",
+      "https://kako.5ch.io/test/read.cgi/gamespo/1151312142",
+      "巴哈部分G2/G1直接403",
+      "GeoCities歷史失效網頁",
+      "mixi未登入留言"
+    ],
+    "research_boundary": "已核對本次新增來源和現有條目去重，但不能對全部歷史論壇每一樓/登入內容與所有公共網址宣稱絕對挖盡；來源受限即標注未讀，沒有把無法找到說成不存在。",
+    "no_changes": "不修改PS2 3767人名冊、不修改非AI本機影像辨識模型或幾何/去重邏輯、不修改其他repository。",
+    "counting_note": "五段分別4/4/3/2/2列，共15筆新表列；另同步修訂既有對左打線注意，並非額外三筆。"
+  },
+  "bahamut_external_20261012_r51": {
+    "scope": "持續由歷史mixi公開主題、2023遊戲攻略作者討論及2005年串外鏈逐層追查，收錄玩家100年經營存檔統計和架空外國球員原型的作者修訂，不變更原版名冊、金手指或非AI批次辨識核心。",
+    "source_before": 103,
+    "source_after": 109,
+    "source_added": 6,
+    "guide_added_sections": 2,
+    "new_guide_rows": 14,
+    "new_guide_rows_since_r49": 29,
+    "model_author_discussion": "https://gamezukinahito.bbs.fc2.com/?act=reply&tid=8320615",
+    "model_revisions": "イザベル→エステバン・ロアイザ、メヒア→ホセ・メサ僅資料作者2023修訂推測，非SEGA官方對照。其他角色保持未定。",
+    "player_hundred_year": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=5334774",
+    "player_sample": "2006單一玩家100年紀錄日本一57次、王1030轟、大野500勝、江夏693救援、大豐單季77轟；不可推定一般球員必然上限或規則。",
+    "unread_or_partial": [
+      "https://mixi.jp/view_bbs.pl?comm_id=88318&id=1598312 公開23/52",
+      "https://mixi.jp/view_bbs.pl?comm_id=88318&id=1708954 公開14/30",
+      "https://kuronokuru1985.blog.fc2.com/blog-entry-744.html 直接403",
+      "https://bbs6.fc2.com/cgi-bin/e.cgi/hamakyu/ 歷史引用失效"
+    ],
+    "dedup": "R50共15列、R51再新增14列。31章日本原文／繁中內容單一列位交叉去重、原型及數值個案不造假高信心。",
+    "exhaustion": "這一輪持續找到新可讀資料，且仍有未讀原文、登入牆、索引-only與過去鏡像失效，不能宣稱所有公開來源永久挖盡；未取得正文不等於不存在。"
+  },
+  "bahamut_external_20261012_r52": {
+    "scope": "繼續沿mixi 55主題清單的PS2三代主題與公開Livedoor 2005原始球團日記，交叉2006留學條件、OB使用成績和巨人首十年的重建進度。",
+    "source_before": 109,
+    "source_after": 113,
+    "new_sources": 4,
+    "new_guide_rows": 10,
+    "new_sections": 3,
+    "reference_urls": [
+      "https://mixi.jp/view_bbs.pl?comm_id=88318&id=10575948",
+      "https://mixi.jp/view_bbs.pl?comm_id=88318&id=2685129",
+      "https://blog.livedoor.jp/ray_drop/archives/29561522.html",
+      "https://blog.livedoor.jp/ray_drop/archives/30505401.html"
+    ],
+    "player_data_safety": "2005 mixi強力選手串有12留言僅7可讀，明指DC第10回覆江夏101勝排除；王898轟有新增技能，其他年成績不代表官方必然上限。",
+    "study_crosscheck": "2006 mixiカリブローグ=既有カリブ（環境＋運動）、エアーズ交通經濟、カンウ生活；ゴッデス北美Pipe玩家未解鎖，與Gamezukushi資料核對但不假稱實機。",
+    "original_diary": "同作者2005/08/03和08/20兩篇不雙重計數；9年聯盟勝、10年日本一為一檔玩家個案。",
+    "dedup": "R49後累計R50 15列＋R51 14列＋R52 10列＝39列，31章1744唯一表格列。兩篇日記同一個人的記錄，原版玩家樣本不拿來當固定Rank。",
+    "limitations": "mixi登入限制、巴哈少數G1/G2 403及歷史失效鏡像尚未完整復原。能查到索引不代表可讀全文；不宣稱世界上的公開內容已絕對無新發現。"
+  },
+  "bahamut_external_20261012_r53": {
+    "scope": "繼續mixi原始2005薪資討論（33回覆；26公開、7登入）採集原版三代玩家實際薪水數值、提前續約與費用效益，排除混入2003版與當時現實MLB數據。",
+    "source_before": 113,
+    "source_after": 114,
+    "new_urls": 1,
+    "new_guide_rows": 7,
+    "new_sections": 1,
+    "original": "https://mixi.jp/view_bbs.pl?comm_id=88318&id=1788036",
+    "data": "高額球員30億多份玩家個案、エリック 29億4150万/225安、岩隈5.5億→21.5億要求、山田久志13億、低價多年約落合與球團700億單檔記錄。",
+    "confidence": "最高年俸30億只是2005玩家推測+不同玩家最多到達30億的事例，尚不等於官方設定年薪上限。留學壓薪、續約年二軍登錄只屬社群策略，不寫成必然公式。",
+    "exclusion": "#30文字明確是2003版而非PS2三代、同串2004 MLB現實薪水亦不是遊戲資料；這些資訊不匯入三代攻略。",
+    "dedup": "R49後已新增R50 15、R51 14、R52 10、R53 7共46筆攻略表格資料列；114個唯一來源、31章1751筆不重複表格資料列。",
+    "boundary": "除公開可讀26/33回覆外，另7則仍登入限制；其餘部分巴哈403、舊站失效、版面及文字破碎仍非全文，不能宣告全部公開來源永久查盡。"
+  },
+  "bahamut_external_20261012_r55": {
+    "scope": "延伸已收錄2021 PS2第55年串全文與2015原始評論、2005 Wazap 提問，查重後補缺漏；未取出的403／登入內容維持不可讀分類。",
+    "source_before": 114,
+    "source_after": 116,
+    "new_urls": 2,
+    "new_guide_rows": 6,
+    "verified_public_new_source": "https://pcgame.blog.shinobi.jp/%E3%82%B2%E3%83%BC%E3%83%A0%E3%81%AE%E6%84%9F%E6%83%B3/%E3%83%97%E3%83%AD%E9%87%8E%E7%90%83%E3%83%81%E3%83%BC%E3%83%A0%E3%82%92%E3%81%A4%E3%81%8F%E3%82%8D%E3%81%86%EF%BC%813%E3%81%AE%E6%84%9F%E6%83%B3%E3%81%A7%E3%82%82",
+    "indexed_only_new_source": "https://wazap.com/question/12%E5%84%84%E5%86%86%E3%81%97%E3%81%8B%E3%81%AA%E3%81%84%E3%81%AE%E3%81%AB%E9%81%B8%E6%89%8B%E3%81%AE%E5%90%88%E8%A8%88%E3%81%8C20%E5%84%84%EF%BD%A5%EF%BD%A5%EF%BD%A5%28%E5%8D%83%E8%91%89%E3%83%AD%E3%83%83%E3%83%86%29%0D%0A1%E5%84%84%E5%BE%8C%E5%8D%8A%E3%80%9C2%E5%84%84%E7%B4%9A%E3%81%AE%2B.../67623/",
+    "existing_source_reused": "https://medaka.5ch.io/test/read.cgi/gamespo/1638738401",
+    "added_topics": [
+      "2015球探逐回合指示與三選一好感度對話",
+      "2021野手人數下限與外國人入團資金異常風險",
+      "2005年羅德12億/20億薪資窘境與玩家重建方案"
+    ],
+    "dedup": "Gamezukushi已收錄留學Pipe 6500/8000及自創球員初始年數分段，不重抄；R53 30億年俸與二軍壓薪已有，不重加；2026 note戲劇化作者自稱完全虛構，不列規則。",
+    "limits": "Wazap索引可讀但原頁直取失敗；2005 metakin2007 #340原頁重導迴圈只得索引，不把未取得全文誤列驗證來源；mixi需登入的留言、部分巴哈403、歷史站失效仍未取全。",
+    "exhaustion": "本輪取得2015原文及未整理2021 FAQ，故仍不能聲稱全球公開資料絕對永久挖盡；已追查的分支把已確認、索引-only、舊歷史/失效清楚分開。"
+  },
+  "bahamut_external_20261012_r56": {
+    "scope": "持續追查跨世代選手圖文博客，僅採明確『⑧プロ野球チームをつくろう！3』節點6篇全文，用作本作球員技能第二手佐證。",
+    "source_before": 116,
+    "source_after": 122,
+    "new_urls": 6,
+    "new_guide_rows": 6,
+    "players": [
+      {
+        "name": "土肥 義弘",
+        "skill": "上位チームに強い",
+        "url": "https://ameblo.jp/yakyutsuku777/entry-12614263410.html"
+      },
+      {
+        "name": "岡崎 太一",
+        "skill": "好リード",
+        "url": "https://ameblo.jp/yakyutsuku777/entry-12694435608.html"
+      },
+      {
+        "name": "染田 賢作",
+        "skill": "直球の出来次第",
+        "url": "https://ameblo.jp/yakyutsuku777/entry-12797935897.html"
+      },
+      {
+        "name": "犬伏 稔昌",
+        "skill": "左キラー",
+        "url": "https://ameblo.jp/yakyutsuku777/entry-12604284042.html"
+      },
+      {
+        "name": "浅間 敬太",
+        "skill": "WSカーブ",
+        "url": "https://ameblo.jp/yakyutsuku777/entry-12684804119.html"
+      },
+      {
+        "name": "須永 英輝",
+        "skill": "下位球団キラー",
+        "url": "https://ameblo.jp/yakyutsuku777/entry-12792016879.html"
+      }
+    ],
+    "qualification": "作者網站主要記錄PS2二代及不同世代；本次只讀清楚標示2005 PS2三代的技能描述。其他代別、DS架空對應及現實球員成績絕不寫入PS2三代資料。除浅間敬太WSカーブ可與既有Seed互證，其他逐筆尚未完成全部3767名原表校對，保留為第二手資料。",
+    "exclusions": [
+      "2026 note 作者自稱完全虛構的劇情不可當遊戲規則",
+      "2015/2005直接取得失敗但索引可讀的網站不得謊稱全文",
+      "先前115?來源以目前116為準；混版敘述只按三代專段採錄"
+    ],
+    "exhaustion": "跨代圖文仍有大量個別球員、部分歷史站無法取得；本輪有新增可讀內容，故不宣稱所有公開有效資料都已挖盡。"
+  }
+}
