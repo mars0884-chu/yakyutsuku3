@@ -1,0 +1,17 @@
+/* R64 多人比較：20 人欄位按內容呈現，不把少數選手平均拉滿整個畫面。 */
+#view-players .compare-panel{min-width:0;max-width:100%;overflow:hidden}
+#view-players .compare-head{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+#view-players .compare-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+#view-players .compare-actions button{font-size:12px;padding:5px 9px;min-height:32px}
+#view-players .compare-scroll{width:100%;max-width:100%;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:auto}
+#view-players .compare-table{width:max-content;min-width:0;max-width:none;table-layout:auto}
+#view-players .compare-table thead th:not(:first-child),#view-players .compare-table tbody td{min-width:123px;max-width:178px;white-space:normal;overflow-wrap:anywhere}
+#view-players .compare-table th:first-child{position:sticky;left:0;z-index:4;min-width:107px;max-width:122px}
+#view-players .compare-table thead th:first-child{z-index:6}
+#view-players .compare-table thead th:not(:first-child){position:sticky;top:0;z-index:3}
+#view-players .compare-player{white-space:normal;text-align:left;overflow-wrap:anywhere}
+@media(max-width:700px){
+ #view-players .compare-panel{padding:8px}
+ #view-players .compare-table thead th:not(:first-child),#view-players .compare-table tbody td{min-width:104px;max-width:135px;padding:5px 7px}
+ #view-players .compare-table th:first-child{min-width:89px;max-width:108px}
+}

@@ -1,0 +1,54 @@
+/* R60 最終覆寫：表格欄位依內容尺寸，避免 100%+fixed 產生巨大空白。 */
+#view-batch .batch-groups{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start;gap:10px 14px}
+#view-batch .batch-group{flex:0 1 auto;width:max-content;max-width:100%;min-width:0;overflow:visible}
+#view-batch .batch-group>.table-shell{display:block;width:max-content;max-width:100%;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+#view-batch .batch-detail-table:not(.full-abilities){width:max-content;min-width:0;max-width:none;table-layout:auto;font-size:12px;border-spacing:0}
+#view-batch .batch-detail-table:not(.full-abilities) th,
+#view-batch .batch-detail-table:not(.full-abilities) td{width:auto;min-width:0;max-width:none;padding:5px 7px;white-space:nowrap;vertical-align:top}
+#view-batch .batch-detail-table:not(.full-abilities) th:nth-child(1),#view-batch .batch-detail-table:not(.full-abilities) td:nth-child(1){width:32px;text-align:center}
+#view-batch .batch-detail-table:not(.full-abilities) th:nth-child(2),#view-batch .batch-detail-table:not(.full-abilities) td:nth-child(2){width:58px}
+#view-batch .batch-detail-table:not(.full-abilities) th:nth-child(3),#view-batch .batch-detail-table:not(.full-abilities) td:nth-child(3){width:234px;min-width:185px;max-width:234px;white-space:normal;overflow-wrap:anywhere}
+#view-batch .batch-detail-table:not(.full-abilities) th:nth-child(4),#view-batch .batch-detail-table:not(.full-abilities) td:nth-child(4){width:49px}
+#view-batch .batch-detail-table:not(.full-abilities) th:nth-child(5),#view-batch .batch-detail-table:not(.full-abilities) td:nth-child(5){width:51px}
+#view-batch .batch-detail-table:not(.full-abilities) th:nth-child(6),#view-batch .batch-detail-table:not(.full-abilities) td:nth-child(6){width:65px}
+#view-batch .batch-detail-table:not(.full-abilities) th:nth-child(7),#view-batch .batch-detail-table:not(.full-abilities) td:nth-child(7){width:59px;display:table-cell}
+#view-batch .batch-detail-table:not(.full-abilities) td.name{min-width:185px;max-width:234px;white-space:normal}
+#view-batch .batch-detail-table:not(.full-abilities) .candidate-note{max-width:218px;white-space:normal;overflow-wrap:anywhere;line-height:1.35}
+#view-batch .batch-detail-table.full-abilities{width:max-content;min-width:0;max-width:none;table-layout:auto}
+#view-batch .batch-detail-table.full-abilities th,#view-batch .batch-detail-table.full-abilities td{width:auto;min-width:0;padding:5px 7px}
+#view-players .table-shell{display:block;width:max-content;max-width:100%;min-width:0;overflow-x:auto}
+#view-players #playerTable{width:max-content;min-width:0;max-width:none;table-layout:auto;border-spacing:0}
+#view-players #playerTable th,#view-players #playerTable td{width:auto;min-width:0;padding:6px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#view-players #playerTable th:first-child,#view-players #playerTable td:first-child{width:156px;min-width:116px;max-width:156px}
+#view-players #playerTable th:nth-last-child(-n+3),#view-players #playerTable td:nth-last-child(-n+3){width:auto;min-width:0}
+#view-guides .guide-table-wrap{width:max-content;max-width:100%;min-width:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+#view-guides .guide-table{width:max-content;min-width:0;max-width:none;table-layout:auto;border-collapse:collapse}
+#view-guides .guide-table th,#view-guides .guide-table td{width:auto;min-width:0;max-width:235px;white-space:normal;overflow-wrap:break-word;word-break:normal;padding:5px 7px}
+#view-guides .guide-fact{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:flex-start;max-width:100%}
+#view-guides .guide-fact b{flex:0 0 auto;max-width:190px}
+#view-guides .guide-fact span{flex:0 1 auto;min-width:0;max-width:670px}
+#view-guides .guide-plan-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,285px),max-content))}
+#view-cheats .cheat-index{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start;gap:8px}
+#view-cheats .cheat-section,#view-cheats .cheat-section[open]{flex:0 1 auto;width:max-content;min-width:min(100%,260px);max-width:100%;grid-column:auto}
+#view-cheats .cheat-section>summary{min-width:min(100%,260px)}
+#view-cheats .cheat-section[open]{width:min(100%,700px)}
+#view-cheats .cheat-table-wrap{width:max-content;max-width:100%;min-width:0;overflow-x:auto}
+#view-cheats .cheat-table{width:max-content;min-width:0;max-width:none;table-layout:auto}
+#view-cheats .cheat-table td,#view-cheats .cheat-table th{width:auto;min-width:0;max-width:250px;padding:5px 7px;overflow-wrap:anywhere}
+.compare-table{width:max-content;min-width:0;max-width:none;table-layout:auto}
+.compare-table th,.compare-table td{min-width:0;max-width:190px;padding:6px 8px}
+.compare-table th:first-child{min-width:90px;max-width:130px}
+@media(max-width:700px){
+ #view-batch .batch-groups{display:block}
+ #view-batch .batch-group{width:100%;max-width:100%}
+ #view-batch .batch-group>.table-shell{width:100%;max-width:100%}
+ #view-batch .batch-detail-table:not(.full-abilities){width:max-content;min-width:0;font-size:11px}
+ #view-batch .batch-detail-table:not(.full-abilities) th,#view-batch .batch-detail-table:not(.full-abilities) td{padding:5px 5px}
+ #view-batch .batch-detail-table:not(.full-abilities) th:nth-child(3),#view-batch .batch-detail-table:not(.full-abilities) td:nth-child(3){width:174px;min-width:150px;max-width:174px}
+ #view-batch .batch-detail-table:not(.full-abilities) td.name{min-width:150px;max-width:174px}
+ #view-guides .guide-table{min-width:0}
+ #view-guides .guide-plan-grid{grid-template-columns:minmax(0,1fr)}
+ #view-cheats .cheat-index{display:block}
+ #view-cheats .cheat-section{width:100%;margin-bottom:7px}
+ #view-cheats .cheat-section[open]{width:100%}
+}
